@@ -1,1 +1,1 @@
-# es-fun-facts-splashscreens
+# Fun Facts Splashscreens for EmulationStation
