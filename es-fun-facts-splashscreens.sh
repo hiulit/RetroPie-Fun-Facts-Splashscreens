@@ -15,50 +15,15 @@ function check_dependencies() {
 
 check_dependencies
 
-fun_facts=(
-    "The original Nintendo Entertainment System had a resolution of 256 x 224 pixels. In comparison, the Nintendo Switch can run games at 1920 x 1080"
-    "The Light Gun that was included with some Nintendo Entertainment Systems does not work on modern HDTV screens, due to image processing causing a display lag of about 20 to 50 milliseconds"
-    "The PlayStation1 was able to render textures with about 700kb of video memory. The N64 only had 4kb, resulting in more cartoony styled games and clever programming tricks to add detail to the environment"
-    "The N64 had 4mb of RAM compared to the PS1's 2mb, allowing for larger 3D worlds, better draw distances, and higher resolution"
-    "Around 650MB of data could fit on a PS1 CD, as opposed to about 64MB on an N64 cartridge. This usually led to movie-style cutscenes, higher quality music, and voice acting on the PlayStation"
-    "The most valuable NES game today is Nintendo World Championships Gold. Only 26 copies were produced and given out by Nintendo in 1990 as a contest prize. It has sold for more than $25,000!"
-    "The highest grossing arcade game of all time is Pac-Man, estimated to have earned $2.5 billion in quarters from its release in 1980 to 1990"
-    "Nintendo offered repair service for the original GameBoy, released in 1989, until 2007"
-    "When Space Invaders was released in Japan, it caused a temporary shortage of the 100 yen coin"
-    "Mario first appeared in 1981 as the playable character in Nintendo's arcade game Donkey Kong. However, he was a carpenter known only as Jumpman"
-    "NBA Jam creator Mark Turmell, a Pistons fan, admitted that there is special code in the game that diminishes the Bulls' chances of making a last second shot",
-    "The Final Fantasy series is so named because the developer, Square Enix, was going bankrupt and it was thought this could be their last game. However, it was a massive success and has led to over 15 installments and spin-offs"
-    "In the original Civilization game, Gandhi's aggression rating began at the lowest setting of 1. If it was lowered, a bug caused it to loop around to the maximum of 255, turning Gandhi into a nuke-flinging warmonger"
-    "Pac-Man was originally going to be called Puck-Man in the United States, but that was changed after considering how easy it would be to vandalize the arcade cabinets to say... something else"
-    "A cheat code giving the player all power ups was inserted into the game Gradius by the developers for testing purposes, and was left in upon release. The Konami Code, as it is now called, has made appearances in many games since"
-    "Ice Climber was the first game that Kazuaki Morita worked on. He would go on to refine the game's formula for his next title at Nintendo: Super Mario Bros"
-    "Balloon Fight was one of the first games Satoru Iwata worked on at Nintendo. He later went on to become president and CEO of the company, and oversaw the launches of the Nintendo DS and Wii"
-    "Metroid and Kid Icarus were both developed by the same team at Nintendo"
-    "Ninja Gaiden was the first console game to have the story presented with cinematic cutscenes"
-    "In The Legend of Zelda, the player character was originally envisioned to be able to travel throughout time periods with the help of the Triforce. Thus he was named Link after his connection between the eras"
-    "According to a calendar in Nintendo Power volume 2, Mario's birthday is October 11"
-    "Nintendo was founded in 1889 as a playing card and toy manufacturer"
-    "In the original Super Mario Brothers for NES, the clouds and bushes are the same graphic"
-    "The console that was to be the SNES sequel was a originally a collaboration between Nintendo and Sony. However, Nintendo backed out of the deal leading Sony to independently develop what would become the PlayStation"
-    "At its release in 1996, the N64 had only two games: Super Mario 64 and Pilotwings 64"
-    "The look of Donkey Kong County was achieved through use of rasterization: the graphics were rendered in 3D on a more powerful system, then converted into 2D for the 16-bit SNES"
-    "In 1982, the arcade video game industry's revenue in quarters was estimated at $8 billion, surpassing the annual revenue of pop music ($4 billion) and Hollywood films ($3 billion) combined"
-    "Zaxxon, released in by Sega in 1982, was the first game to feature isometric graphics"
-    "Space Invaders, manufactured in 1978 by Taito, was the first game to include a continuous background soundtrack, even though it was comprised of only four notes that changed pace with the stage"
-    "The first game to feature true background music was Namco's Rally-X in 1980"
-    "The graphic finishing moves known as 'Fatalities' in Midway's Mortal Kombat led to the creation of the Entertainment Software Rating Board to give age-appropriate content ratings for video games"
-)
-
-random_number=$(( RANDOM % ${#fun_facts[@]} ))
-
-echo ${fun_facts[$random_number]}
+random_fact=$(shuf -n 1 fun_facts.txt)
+echo $random_fact
 
 time convert splash4-3.png \
     -size 1000x100 \
     -interline-spacing 5 \
     -background transparent \
     -fill white \
-    caption:"${fun_facts[$random_number]}" \
+    caption:"$random_fact" \
     -gravity south \
     -geometry +0+25 \
     -composite \
