@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
+
 function check_dependencies() {
     if ! which convert > /dev/null; then
         echo "ERROR: The imagemagick package is not installed!"
@@ -15,8 +18,8 @@ function check_dependencies() {
 
 check_dependencies
 
-random_fact=$(shuf -n 1 fun_facts.txt)
-echo $random_fact
+random_fact="$(shuf -n 1 $FUN_FACTS_TXT)"
+echo "$random_fact"
 
 time convert splash4-3.png \
     -size 1000x100 \
