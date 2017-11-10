@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+user="$SUDO_USER"
+[[ -z "$user" ]] && user="$(id -un)"
+home="$(eval echo ~$user)"
+
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
 
 ES_DIR="/etc/emulationstation"
-SYSTEMS_ARRAY=()
-ES_SYSTEMS_CFG="$ES_DIR/es_systems.cfg"
 DEFAULT_FONT="$ES_DIR/themes/carbon/art/Cabin-Bold.ttf"
 
 function check_dependencies() {
@@ -23,53 +25,40 @@ function check_dependencies() {
 
 check_dependencies
 
-#~ function list_systems() {
-    #~ xmlstarlet sel -t -v "/systemList/system/name" "$ES_SYSTEMS_CFG" | grep -v retropie
-#~ }
-
-#~ function get_systems() {
-    #~ [[ -n "$SISTEMS_ARRAY" ]] && return 0
-    #~ local system_list
-    #~ system_list=$(list_systems)
-    #~ SYSTEMS_ARRAY=($system_list)
-    
-    #~ for SYSTEM in ${SYSTEMS_ARRAY[@]}; do
-        #~ echo "$SYSTEM"
-    #~ done
-#~ }
-
 function get_current_theme() {
-    #~ xmlstarlet sel -t -v "string" "/home/pi/.emulationstation/es_settings.cfg"
-    current_theme=$(grep "name=\"ThemeSet\"" "/home/pi/.emulationstation/es_settings.cfg" | sed -n -e "s/^.*value=['\"]\(.*\)['\"].*/\1/p")
-    #~ echo "$current_theme"
+    grep "name=\"ThemeSet\"" "$home/.emulationstation/es_settings.cfg" | sed -n -e "s/^.*value=['\"]\(.*\)['\"].*/\1/p"
 }
 
 function get_theme_font() {
-    get_current_theme
-    if [[ -n "$(find "$ES_DIR/themes/$current_theme/art" -type f -name '*.ttf')" ]]; then
-        font="$(find "$ES_DIR/themes/$current_theme/art" -type f -name '*.ttf')"
-        #~ echo $font
-    else
-        font=$DEFAULT_FONT
-        #~ echo $font
-    fi
+    xmlstarlet sel -t -v "/theme/view[contains(@name,'detailed')]/textlist/fontPath" "$ES_DIR/themes/$current_theme/$current_theme.xml" 2> /dev/null
 }
 
 function create_fun_fact() {
-    get_theme_font
+    current_theme=$(get_current_theme)
+    theme_font=$(get_theme_font)
+    
+    if [[ -z "$theme_font" ]]; then
+        font="$DEFAULT_FONT"
+    else
+        font="$ES_DIR/themes/$current_theme/art/$(basename $theme_font)"
+    fi
+    
     random_fact="$(shuf -n 1 $FUN_FACTS_TXT)"
-    #~ echo "$random_fact"
+    
     echo -e "Creating Fun Fact!\u2122 splashscreen ..."
+    
     convert splash4-3.png \
         -size 1000x100 \
         -background none \
         -fill white \
+        -interline-spacing 5 \
         -font "$font" \
         caption:"$random_fact" \
         -gravity south \
         -geometry +0+25 \
         -composite \
         result.png
+        
     echo -e "Fun Fact!\u2122 splashscreen successfully created!"
 }
 
