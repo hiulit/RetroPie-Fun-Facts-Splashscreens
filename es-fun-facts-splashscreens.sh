@@ -34,15 +34,17 @@ function get_font() {
         "/theme/view[contains(@name,'detailed')]/textlist/fontPath" \
         "$ES_THEMES_DIR/$theme/$theme.xml" 2> /dev/null)"
 
-    [[ -z "$font" ]] && font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
-
-    if [[ -z "$font" ]]; then
-        echo "ERROR: Unable to get the font from the \"$theme\" theme files." >&2
-        echo "Aborting..." >&2
-        exit 1
+    if [[ -n "$font" ]]; then
+        font="$ES_THEMES_DIR/$theme/$font"
+    else
+        # note: the find below returns the full path file name
+        font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
+        if [[ -z "$font" ]]; then
+            echo "ERROR: Unable to get the font from the \"$theme\" theme files." >&2
+            echo "Aborting..." >&2
+            exit 1
+        fi
     fi
-
-    font="$ES_THEMES_DIR/$theme/$font"
 
     echo "$font"
 }
