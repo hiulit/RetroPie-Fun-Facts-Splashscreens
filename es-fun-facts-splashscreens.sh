@@ -7,10 +7,7 @@ home="$(eval echo ~$user)"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/splash4-3.png"
-readonly ES_DIR="/etc/emulationstation"
-
-# TODO: DEFAUL_FONT shouldn't be hardcoded this way. What if theme maintainer change this font in the future?
-readonly DEFAULT_FONT="$ES_DIR/themes/carbon/art/Cabin-Bold.ttf"
+readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 
 function check_dependencies() {
     if ! which convert > /dev/null; then
@@ -26,28 +23,35 @@ function check_dependencies() {
 }
 
 function get_current_theme() {
-    grep "name=\"ThemeSet\"" "$home/.emulationstation/es_settings.cfg" | sed -n -e "s/^.*value=['\"]\(.*\)['\"].*/\1/p"
+    sed -n "/name=\"ThemeSet\"/ s/^.*value=['\"]\(.*\)['\"].*/\1/p" "$home/.emulationstation/es_settings.cfg" 
 }
 
-function get_theme_font() {
-    xmlstarlet sel -t -v "/theme/view[contains(@name,'detailed')]/textlist/fontPath" "$ES_DIR/themes/$current_theme/$current_theme.xml" 2> /dev/null
+function get_font() {
+    local theme="$(get_current_theme)"
+    [[ -z "$theme" ]] && theme="carbon"
+
+    local font="$(xmlstarlet sel -t -v \
+        "/theme/view[contains(@name,'detailed')]/textlist/fontPath" \
+        "$ES_THEMES_DIR/$theme/$theme.xml" 2> /dev/null)"
+
+    [[ -z "$font" ]] && font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
+
+    if [[ -z "$font" ]]; then
+        echo "ERROR: Unable to get the font from the \"$theme\" theme files." >&2
+        echo "Aborting..." >&2
+        exit 1
+    fi
+
+    font="$ES_THEMES_DIR/$theme/$font"
+
+    echo "$font"
 }
 
-# TODO: the logic here can be improved. ;)
 function create_fun_fact() {
-    current_theme="$(get_current_theme)"
-    local theme_font="$(get_theme_font)"
     local splash="$1"
+    local font="$(get_font)"
 
-    if [[ ! -f "$splash" ]]; then
-        splash="$DEFAULT_SPLASH"
-    fi
-
-    if [[ -z "$theme_font" ]]; then
-        font="$DEFAULT_FONT"
-    else
-        font="$ES_DIR/themes/$current_theme/art/$(basename "$theme_font")"
-    fi
+    [[ -f "$splash" ]] || splash="$DEFAULT_SPLASH"
 
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
@@ -63,9 +67,8 @@ function create_fun_fact() {
         -gravity south \
         -geometry +0+25 \
         -composite \
-        result.png
-
-    echo -e "Fun Fact!\u2122 splashscreen successfully created!"
+        result.png \
+    && echo -e "Fun Fact!\u2122 splashscreen successfully created!"
 }
 
 check_dependencies
