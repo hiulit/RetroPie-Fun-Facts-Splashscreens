@@ -39,7 +39,7 @@ function create_fun_fact() {
     local theme_font="$(get_theme_font)"
     local splash="$1"
 
-    if [[ -f "$splash" ]]; then
+    if [[ ! -f "$splash" ]]; then
         splash="$DEFAULT_SPLASH"
     fi
 
