@@ -1,4 +1,4 @@
-# Fun Facts Splashscreens for EmulationStation
+# Fun Facts Splashscreens for RetroPie
 
 Not working yet! It's just for testing purposes!
 
