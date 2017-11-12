@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Fun Facts splashscreens
+# A tool for RetroPie to create splashscreens with random video game related fun facts.
+#
+# Requirements:
+# - Retropie 4.x.x
+# - Imagemagick package
+
 user="$SUDO_USER"
 [[ -z "$user" ]] && user="$(id -un)"
 home="$(eval echo ~$user)"
