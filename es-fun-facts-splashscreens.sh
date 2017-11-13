@@ -11,10 +11,11 @@ user="$SUDO_USER"
 [[ -z "$user" ]] && user="$(id -un)"
 home="$(eval echo ~$user)"
 
+readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/splash4-3.png"
-readonly ES_THEMES_DIR="/etc/emulationstation/themes"
+readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-fact-splashscreen.png"
 
 function check_dependencies() {
     if ! which convert > /dev/null; then
@@ -64,7 +65,7 @@ function create_fun_fact() {
 
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
-    echo -e "Creating Fun Fact!\u2122 splashscreen ..."
+    echo -e "Creating Fun Fact!\u2122 splashscreen..."
 
     convert "$splash" \
         -size 1000x100 \
@@ -76,7 +77,7 @@ function create_fun_fact() {
         -gravity south \
         -geometry +0+25 \
         -composite \
-        result.png \
+        "$RESULT_SPLASH" \
     && echo -e "Fun Fact!\u2122 splashscreen successfully created!"
 }
 
@@ -84,4 +85,4 @@ check_dependencies
 
 create_fun_fact "$1"
 
-feh --full-screen result.png
+feh --full-screen "$RESULT_SPLASH"
