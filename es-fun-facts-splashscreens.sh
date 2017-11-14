@@ -7,9 +7,11 @@
 # - Retropie 4.x.x
 # - Imagemagick package
 
-user="$SUDO_USER"
-[[ -z "$user" ]] && user="$(id -un)"
-home="$(eval echo ~$user)"
+#~ user="$SUDO_USER"
+#~ [[ -z "$user" ]] && user="$(id -un)"
+#~ home="$(eval echo ~$user)"
+
+home="/home/pi"
 
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -28,6 +30,21 @@ function check_dependencies() {
         echo "Please, install it with 'sudo apt-get install feh'."
         exit 1
     fi
+}
+
+function check_safe_exit_boot_script() {
+    if [[ "$(tail -n1 /etc/rc.local)" != "exit 0" ]]; then
+        sed -i -e '$i \exit 0\' "/etc/rc.local"
+    fi
+}
+
+function check_boot_script() {
+    grep "$SCRIPT_DIR" "/etc/rc.local"
+}
+
+function add_boot_script() {
+    sed -i -e '$i \\n'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &\n' "/etc/rc.local"
+    check_safe_exit_boot_script
 }
 
 function get_current_theme() {
@@ -83,7 +100,7 @@ function create_fun_fact() {
 
 check_dependencies
 
-sed -e '$i \sudo $home/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &\n' /etc/rc.local
+[[ -z "$(check_boot_script)" ]] && add_boot_script
 
 create_fun_fact "$1"
 
