@@ -85,4 +85,4 @@ check_dependencies
 
 create_fun_fact "$1"
 
-feh --full-screen "$RESULT_SPLASH"
+# feh --full-screen "$RESULT_SPLASH"
