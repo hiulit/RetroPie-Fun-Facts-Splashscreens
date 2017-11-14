@@ -83,7 +83,7 @@ function create_fun_fact() {
 
 check_dependencies
 
-sed -e '$i \sudo $home/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &\n' rc.local
+sed -e '$i \sudo $home/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &\n' /etc/rc.local
 
 create_fun_fact "$1"
 
