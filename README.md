@@ -14,6 +14,8 @@ sudo ./es-fun-facts-splashscreens.sh
 
 This should create a new splashscreen in `/home/pi/RetroPie/splashscreens` called `fun-fact-splashscreen.png`.
 
-Now, in order to launch the script at boot, you have to edit `/etc/rc.local` and this line `sudo /home/pi/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &` just before `exit 0`.
+~~Now, in order to launch the script at boot, you have to edit `/etc/rc.local` and this line `sudo /home/pi/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &` just before `exit 0`.~~
 
-Remeber to add `&` at the end of the line.
+~~Remeber to add `&` at the end of the line.~~
+
+The script now adds the line in `/etc/rc.local` to launch itself at boot automatically.
