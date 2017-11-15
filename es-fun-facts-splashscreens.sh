@@ -70,7 +70,7 @@ function get_options() {
             -h|--help)
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
-                echo                
+                echo
                 exit 0
                 ;;
 #H --enable-boot    Enable script to be launch at boot.
@@ -95,7 +95,7 @@ function get_options() {
                     exit 1
                 fi
                 ;;
-#H --create-fun-fact Create Fun Fact Splashscreen
+#H --create-fun-fact Create Fun Fact Splashscreen.
             --create-fun-fact)
                 create_fun_fact
                 exit 0
@@ -109,7 +109,7 @@ function get_options() {
 }
 
 function get_current_theme() {
-    sed -n "/name=\"ThemeSet\"/ s/^.*value=['\"]\(.*\)['\"].*/\1/p" "$home/.emulationstation/es_settings.cfg" 
+    sed -n "/name=\"ThemeSet\"/ s/^.*value=['\"]\(.*\)['\"].*/\1/p" "$home/.emulationstation/es_settings.cfg"
 }
 
 function get_font() {
