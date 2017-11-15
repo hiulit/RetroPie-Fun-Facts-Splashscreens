@@ -13,6 +13,7 @@
 
 home="/home/pi"
 
+readonly ES_DIR=("$home/.emulationstation" "/etc/emulationstation")
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
@@ -43,8 +44,68 @@ function check_boot_script() {
 }
 
 function add_boot_script() {
-    sed -i -e '$i \\n'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh &\n' "/etc/rc.local"
+    sed -i -e '$i \'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh --create-fun-fact &' "/etc/rc.local"
     check_safe_exit_boot_script
+}
+
+function remove_boot_script() {
+    sed -i -e "s%$(check_boot_script)%%g" "/etc/rc.local"
+}
+
+function usage() {
+    echo
+    echo "USAGE: sudo ./$(basename $0) [options]"
+    echo
+    echo "Use '--help' to see all the options"
+    echo
+}
+
+function get_options() {
+    if [[ -z "$1" ]]; then
+        usage
+    fi
+    while [[ -n "$1" ]]; do
+        case "$1" in
+#H -h, --help       Print the help message and exit.
+            -h|--help)
+                echo
+                sed '/^#H /!d; s/^#H //' "$0"
+                echo                
+                exit 0
+                ;;
+#H --enable-boot    Enable script to be launch at boot.
+            --enable-boot)
+                if [[ -z "$(check_boot_script)" ]]; then
+                    add_boot_script
+                    echo "Script enabled to be launched at boot."
+                    exit 0
+                else
+                    echo "ERROR: launch at boot is already enabled." >&2
+                    exit 1
+                fi
+                ;;
+#H --disable-boot   Disable script to be launch at boot.
+            --disable-boot)
+                if [[ -n "$(check_boot_script)" ]]; then
+                    remove_boot_script
+                    echo "Script disabled to be launched at boot."
+                    exit 0
+                else
+                    echo "ERROR: launch at boot is already disabled." >&2
+                    exit 1
+                fi
+                ;;
+#H --create-fun-fact Create Fun Fact Splashscreen
+            --create-fun-fact)
+                create_fun_fact
+                exit 0
+                ;;
+            *)
+                echo "ERROR: invalid option \"$1\"" >&2
+                exit 2
+                ;;
+        esac
+    done
 }
 
 function get_current_theme() {
@@ -100,8 +161,8 @@ function create_fun_fact() {
 
 check_dependencies
 
-[[ -z "$(check_boot_script)" ]] && add_boot_script
+get_options "$@"
 
-create_fun_fact "$1"
+#~ create_fun_fact "$1"
 
 # feh --full-screen "$RESULT_SPLASH"
