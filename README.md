@@ -6,6 +6,8 @@ This script creates a splashscreen for RetroPie with a random 'Fun Fact!' to be 
 
 An option can be enabled to automatically create a new splashscreen at every boot.
 
+For now, the best way to use the splashscreen created by this script is to use the `Choose Own Splashscreen` option under the **Splashscreen Menu** in **RetroPie settings**. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
+
 ## Instalation
 
 ```
