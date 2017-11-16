@@ -44,12 +44,18 @@ function check_boot_script() {
 }
 
 function add_boot_script() {
-    sed -i -e '$i \'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh --create-fun-fact &' "/etc/rc.local"
+    sed -i -e '$i \\n'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh --create-fun-fact &\n' "/etc/rc.local"
     check_safe_exit_boot_script
 }
 
 function remove_boot_script() {
+    # Remove line
     sed -i -e "s%$(check_boot_script)%%g" "/etc/rc.local"
+    # Remove all new lines
+    sed -i -e '/^\s*$/d' "/etc/rc.local"
+    check_safe_exit_boot_script
+    # Add new line before 'exit 0'
+    sed -i -e '$i \ ' "/etc/rc.local"
 }
 
 function usage() {
@@ -162,6 +168,11 @@ function create_fun_fact() {
 check_dependencies
 
 get_options "$@"
+
+#~ sed -e '{N; s/ *\n//}' /etc/rc.local
+#~ sed -e '/^\s*$/d' /etc/rc.local
+#~ sed -e '$i \ ' /etc/rc.local
+#~ sed -e '$ {/^$/d;}' /etc/rc.local
 
 #~ create_fun_fact "$1"
 
