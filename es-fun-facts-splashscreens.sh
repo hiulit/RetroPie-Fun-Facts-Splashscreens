@@ -13,7 +13,6 @@
 
 home="/home/pi"
 
-readonly ES_DIR=("$home/.emulationstation" "/etc/emulationstation")
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
@@ -168,11 +167,6 @@ function create_fun_fact() {
 check_dependencies
 
 get_options "$@"
-
-#~ sed -e '{N; s/ *\n//}' /etc/rc.local
-#~ sed -e '/^\s*$/d' /etc/rc.local
-#~ sed -e '$i \ ' /etc/rc.local
-#~ sed -e '$ {/^$/d;}' /etc/rc.local
 
 #~ create_fun_fact "$1"
 
