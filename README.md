@@ -90,8 +90,9 @@ Me 😛 [@hiulit](https://github.com/hiulit).
 
 Thanks to:
 
-* [meleu](https://github.com/meleu/) - For all his help and wisdom :D
-* All the people at the [RetroPie Forum](https://retropie.org.uk/forum/)
+* [Parviglumis](https://retropie.org.uk/forum/user/parviglumis) - For the idea of creating the [Fun Facts Splashscrenns](https://retropie.org.uk/forum/topic/13630).
+* [meleu](https://github.com/meleu/) - For all his help and wisdom with the code :D
+* All the people at the [RetroPie Forum](https://retropie.org.uk/forum/).
 
 ## License
 
