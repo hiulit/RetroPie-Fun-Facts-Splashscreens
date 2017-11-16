@@ -1,6 +1,9 @@
 # Fun Facts Splashscreens for RetroPie
 
-Not working yet! Well, it's working, but it's not officially released! It's just for testing purposes!
+> Not working yet! Well, it's working, but it's not officially released! It's just for testing purposes!
+
+This script creates a splashscreen for RetroPie with a random 'Fun Fact!' to be shown at boot.
+An option can be enabled to automatically create a new splashscreen at every boot.
 
 ## Instalation
 
