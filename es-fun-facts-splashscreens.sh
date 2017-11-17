@@ -102,7 +102,7 @@ function get_options() {
                 ;;
 #H --create-fun-fact Create Fun Fact Splashscreen.
             --create-fun-fact)
-                create_fun_fact
+                create_fun_fact "$2"
                 exit 0
                 ;;
             *)
