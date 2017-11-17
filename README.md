@@ -39,6 +39,8 @@ Use '--help' to see all the options
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--create-fun-fact`: Create Fun Fact Splashscreen.
+    * `$1`: Path to the splashscreen to be used.
+    * `$2`: Text color.
 
 ## Changelog
 
