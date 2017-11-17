@@ -25,7 +25,9 @@ sudo chmod +x es-fun-facts-splashscreens.sh
 sudo ./es-fun-facts-splashscreens.sh [options]
 ```
 
-If no option is passed, you will be prompted with a usage example:
+Example: `sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black`
+
+If no optiona are passed, you will be prompted with a usage example:
 
 ```
 USAGE: sudo ./es-fun-facts-splashscreens.sh [options]
@@ -41,6 +43,8 @@ Use '--help' to see all the options
 * `--create-fun-fact`: Create Fun Fact Splashscreen.
     * `$1`: Path to the splashscreen to be used.
     * `$2`: Text color.
+
+If no options are passed to `--create-fun-fact`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
 
 ## Changelog
 
