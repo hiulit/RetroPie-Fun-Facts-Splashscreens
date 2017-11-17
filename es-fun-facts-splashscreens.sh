@@ -102,7 +102,7 @@ function get_options() {
                 ;;
 #H --create-fun-fact Create Fun Fact Splashscreen.
             --create-fun-fact)
-                create_fun_fact "$2"
+                create_fun_fact "$2" "$3"
                 exit 0
                 ;;
             *)
@@ -142,9 +142,11 @@ function get_font() {
 
 function create_fun_fact() {
     local splash="$1"
+    local color="$2"
     local font="$(get_font)"
 
     [[ -f "$splash" ]] || splash="$DEFAULT_SPLASH"
+    [[ -n "$color" ]] || color="white"
 
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
@@ -153,7 +155,7 @@ function create_fun_fact() {
     convert "$splash" \
         -size 1000x100 \
         -background none \
-        -fill white \
+        -fill "$color" \
         -interline-spacing 5 \
         -font "$font" \
         caption:"$random_fact" \
