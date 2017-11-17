@@ -2,7 +2,7 @@
 
 > Not working yet! Well, it's working, but it's not officially released! It's just for testing purposes!
 
-This script creates a splashscreen for RetroPie with a random **Fun Fact!** to be shown at boot.
+This script creates a splashscreen for RetroPie with a random **Fun Fact!™** to be shown at boot.
 
 An option can be enabled to automatically create a new splashscreen at every boot.
 
@@ -25,7 +25,11 @@ sudo chmod +x es-fun-facts-splashscreens.sh
 sudo ./es-fun-facts-splashscreens.sh [options]
 ```
 
-Example: `sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black`
+**Example:**
+
+```
+sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black
+```
 
 If no optiona are passed, you will be prompted with a usage example:
 
