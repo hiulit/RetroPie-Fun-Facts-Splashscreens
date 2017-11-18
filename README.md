@@ -2,13 +2,16 @@
 
 > Not working yet! Well, it's working, but it's not officially released! It's just for testing purposes!
 
-This script creates a splashscreen for RetroPie with a random **Fun Fact!™** to be shown at boot.
+This script generates splashscreens for RetroPie with a random **Fun Fact!™**.
 
-An option can be enabled to automatically create a new splashscreen at every boot.
+**WARNING: Splashscreens are only only available on the Raspberry Pi.**
 
-For now, the best way to use the splashscreen created by this script is to use the `Choose Own Splashscreen` option under the **Splashscreen Menu** in **RetroPie settings**. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
+For now, this is the best way to use the splashscreen created by this script:
 
-**This script is to be used with RetroPie in a Raspberry Pi (because splashscreens only work with the Raspberry Pi).**
+* Create a **Fun Fact!™** splashscreen. See the [examples below](#examples).
+* Go to the **Splashscreen Menu** (the Splashscreen Menu can be accessed from the RetroPie Menu in EmulationStation or through the setup script under option 3)
+* Select the `Choose Own Splashscreen` option. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
+* Select the recently created **Fun Fact!™** splashscreen.
 
 ## Instalation
 
@@ -23,12 +26,6 @@ sudo chmod +x es-fun-facts-splashscreens.sh
 
 ```
 sudo ./es-fun-facts-splashscreens.sh [options]
-```
-
-**Example:**
-
-```
-sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black
 ```
 
 If no options are passed, you will be prompted with a usage example:
@@ -51,6 +48,54 @@ Use '--help' to see all the options
     * `$2`: Text color.
 
 If no options are passed to `--create-fun-fact` or `--enable-boot`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
+
+## Examples
+
+### `--help`
+
+Print the help message and exit.
+
+```
+sudo ./es-fun-facts-splashscreens.sh --help
+```
+
+### `--enable-boot [options]`
+
+Enable script to be launch at boot.
+
+**WARNING: Backing up `/etc/rc.local` it's most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+
+Options:
+
+* `$1`: Path to the splashscreen to be used.
+* `$2`: Text color.
+
+```
+sudo ./es-fun-facts-splashscreens.sh --enable-boot /home/pi/Downloads/retropie-2014.png black
+```
+
+### `--disable-boot`
+
+Disable script to be launch at boot.
+
+**WARNING: Backing up `/etc/rc.local` it's most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+
+```
+sudo ./es-fun-facts-splashscreens.sh --disable-boot
+```
+
+### `--create-fun-fact`
+
+Create Fun Fact Splashscreen.
+
+Options:
+
+* `$1`: Path to the splashscreen to be used.
+* `$2`: Text color.
+
+```
+sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black
+```
 
 ## Changelog
 
