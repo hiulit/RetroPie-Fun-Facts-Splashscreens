@@ -43,14 +43,28 @@ Use '--help' to see all the options
 
 * `--help`: Print the help message and exit.
 * `--enable-boot`: Enable script to be launch at boot.
+    * `$1`: Path to the splashscreen to be used.
+    * `$2`: Text color.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--create-fun-fact`: Create Fun Fact Splashscreen.
     * `$1`: Path to the splashscreen to be used.
     * `$2`: Text color.
 
-If no options are passed to `--create-fun-fact`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
+If no options are passed to `--create-fun-fact` or `--enable-boot`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
 
 ## Changelog
+
+### v0.3.1 (November 18th 2017)
+
+#### Added
+
+* Options for `--enable-boot`:
+    * `$1`: Path to the splashscreen to be used.
+    * `$2`: Text color.
+
+Example: `sudo ./es-fun-facts-splashscreens.sh --enable-boot /home/pi/Downloads/retropie-2014.png black`
+
+If no options are passed to `--create-fun-fact`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
 
 ### v0.3.0 (November 17th 2017)
 
