@@ -54,11 +54,11 @@ If no options are passed to `--create-fun-fact` or `--enable-boot`, the script t
 
 ## Changelog
 
-See [CHANGELOG.md](/CHANGELOG.md)
+See [CHANGELOG](/CHANGELOG.md).
 
 ## Contributing
 
-See [CONTRIBUTING.md](/CONTRIBUTING.md).
+See [CONTRIBUTING](/CONTRIBUTING.md).
 
 ## Authors
 
