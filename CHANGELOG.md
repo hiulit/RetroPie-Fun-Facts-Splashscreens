@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.0 (November 18th 2017)
+
+### Added
+
+* Options for `--enable-boot`:
+    * `$1`: Path to the splashscreen to be used.
+    * `$2`: Text color.
+
+Example: `sudo ./es-fun-facts-splashscreens.sh --enable-boot /home/pi/Downloads/retropie-2014.png black`
+
+If no options are passed to `--create-fun-fact`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
+
 ## v0.3.0 (November 17th 2017)
 
 ### Added
