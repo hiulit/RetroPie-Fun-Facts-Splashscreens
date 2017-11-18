@@ -71,14 +71,14 @@ function get_options() {
     fi
     while [[ -n "$1" ]]; do
         case "$1" in
-#H -h, --help       Print the help message and exit.
+#H -h, --help                   Print the help message and exit.
             -h|--help)
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
                 echo
                 exit 0
                 ;;
-#H --enable-boot    Enable script to be launch at boot.
+#H --enable-boot [options]      Enable script to be launch at boot. [splash path, text color]
             --enable-boot)
                 if [[ -z "$(check_boot_script)" ]]; then
                     add_boot_script "$2" "$3"
@@ -89,7 +89,7 @@ function get_options() {
                     exit 1
                 fi
                 ;;
-#H --disable-boot   Disable script to be launch at boot.
+#H --disable-boot               Disable script to be launch at boot.
             --disable-boot)
                 if [[ -n "$(check_boot_script)" ]]; then
                     remove_boot_script
@@ -100,7 +100,7 @@ function get_options() {
                     exit 1
                 fi
                 ;;
-#H --create-fun-fact Create Fun Fact Splashscreen.
+#H --create-fun-fact [options]  Create Fun Fact Splashscreen. [splash path, text color]
             --create-fun-fact)
                 create_fun_fact "$2" "$3"
                 exit 0
