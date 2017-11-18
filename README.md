@@ -31,7 +31,7 @@ sudo ./es-fun-facts-splashscreens.sh [options]
 sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black
 ```
 
-If no optiona are passed, you will be prompted with a usage example:
+If no options are passed, you will be prompted with a usage example:
 
 ```
 USAGE: sudo ./es-fun-facts-splashscreens.sh [options]
