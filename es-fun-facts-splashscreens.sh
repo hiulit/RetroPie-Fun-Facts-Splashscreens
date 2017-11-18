@@ -43,7 +43,7 @@ function check_boot_script() {
 }
 
 function add_boot_script() {
-    sed -i -e '$i \\n'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh --create-fun-fact &\n' "/etc/rc.local"
+    sed -i -e '$i \\n'"$home"'/es-fun-facts-splashscreens/es-fun-facts-splashscreens.sh --create-fun-fact '"$1"' '"$2"' &\n' "/etc/rc.local"
     check_safe_exit_boot_script
 }
 
@@ -81,7 +81,7 @@ function get_options() {
 #H --enable-boot    Enable script to be launch at boot.
             --enable-boot)
                 if [[ -z "$(check_boot_script)" ]]; then
-                    add_boot_script
+                    add_boot_script "$2" "$3"
                     echo "Script enabled to be launched at boot."
                     exit 0
                 else
