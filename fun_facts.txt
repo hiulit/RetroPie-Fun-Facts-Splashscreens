@@ -29,3 +29,4 @@ Zaxxon, released in by Sega in 1982, was the first game to feature isometric gra
 Space Invaders, manufactured in 1978 by Taito, was the first game to include a continuous background soundtrack, even though it was comprised of only four notes that changed pace with the stage
 The first game to feature true background music was Namco's Rally-X in 1980
 The graphic finishing moves known as 'Fatalities' in Midway's Mortal Kombat led to the creation of the Entertainment Software Rating Board to give age-appropriate content ratings for video games
+Donkey Kong, Mario, and Princess Peach are based on characters from the cartoon series Popeye. Nintendo created them after they failed to obtain a license to make a Popeye video game.
