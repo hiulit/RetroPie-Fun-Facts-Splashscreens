@@ -131,7 +131,7 @@ function validate_color() {
     if convert -list color | grep -q "^$1\b"; then
         return 0
     fi
-    
+
     echo "${RED}ERROR: invalid color \"$1\".${NC}" >&2
     echo "Short list of available colors:" >&2
     echo "black white gray gray10 gray25 gray50 gray75 gray90" >&2
@@ -140,14 +140,14 @@ function validate_color() {
     exit 1
 }
 
-function check_argument() { 
+function check_argument() {
     # XXX: this method doesn't accept arguments starting with '-'.
-    if [[ -z "$2" || "$2" =~ ^- ]]; then 
-        echo -e "${RED}ERROR: \"$1\" is missing an argument.${NC}" >&2 
-        echo "$($0 --help)" >&2 
-        return 1 
-    fi 
-} 
+    if [[ -z "$2" || "$2" =~ ^- ]]; then
+        echo -e "${RED}ERROR: \"$1\" is missing an argument.${NC}" >&2
+        echo "$($0 --help)" >&2
+        return 1
+    fi
+}
 
 function get_options() {
     if [[ -z "$1" ]]; then
@@ -185,7 +185,7 @@ function get_options() {
                 check_argument "$1" "$2" || exit 1
                 shift
                 SPLASH="$1"
-                
+
                 if [[ ! -f "$SPLASH" ]]; then
                     echo -e "${RED}ERROR: \"$SPLASH\" file not found!${RED}" >&2
                     exit 1
@@ -205,16 +205,16 @@ function get_options() {
                 shift
                 validate_color "$1"
                 TEXT_COLOR="$1"
-        
+
                 # Add text color to config.
                 xmlstarlet ed --inplace -u \
                     "/splashscreen/textcolor"\
                     -v "$TEXT_COLOR"\
                     "$SCRIPT_DIR/fun-facts-settings.cfg" 2> /dev/null \
                 && echo -e "${GREEN}Text color set to \"$TEXT_COLOR\".${NC}"
-                
+
                 #~ sed -i -r 's|<([^ ]) (.)	/>|<\1 \2>|;s|<(.*)/>|<\1>|' "$SCRIPT_DIR/fun-facts-settings.cfg"
-        
+
                 ;;
 
             *)
@@ -228,14 +228,14 @@ function get_options() {
 
 function main() {
     check_dependencies
-    
+
     # check if sudo is used.
     if [[ "$(id -u)" -ne 0 ]]; then
         echo -e "${RED}ERROR: Script must be run under sudo.${NC}" >&2
         usage
         exit 1
     fi
-    
+
     if ! is_retropie; then
         echo -e "${RED}ERROR: RetroPie is not installed. Aborting...${NC}" >&2
         exit 1
