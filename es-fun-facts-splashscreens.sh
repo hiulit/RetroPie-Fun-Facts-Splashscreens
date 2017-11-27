@@ -12,6 +12,7 @@ home="${home%/RetroPie}"
 
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+readonly FUN_FACTS_CFG="$SCRIPT_DIR/fun_facts_settings.cfg"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/splash4-3.png"
 readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-fact-splashscreen.png"
@@ -21,13 +22,8 @@ GREEN="\033[0;32m"
 RED="\033[0;31m"
 NC="\033[0m"
 
-SPLASH="$(xmlstarlet sel -t -v \
-    "/splashscreen/path" \
-    "$SCRIPT_DIR/fun-facts-settings.cfg" 2> /dev/null)"
-TEXT_COLOR="$(xmlstarlet sel -t -v \
-    "/splashscreen/textcolor" \
-    "$SCRIPT_DIR/fun-facts-settings.cfg" 2> /dev/null)"
-CREATE_SPLASH_FLAG=0
+SPLASH=
+TEXT_COLOR=
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
 
@@ -49,6 +45,19 @@ function check_dependencies() {
         echo "Please, install it with 'sudo apt-get install imagemagick'." >&2
         exit 1
     fi
+}
+
+function set_config() {
+    sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$FUN_FACTS_CFG"
+    echo -e "${GREEN}\"$1\" set to \"$2\".${NC}"
+}
+
+function get_config() {
+    local config
+    config="$(grep -Po "(?<=^$1 = ).*" "$FUN_FACTS_CFG")"
+    config="${config%\"}"
+    config="${config#\"}"
+    echo "$config"
 }
 
 function assure_safe_exit_boot_script() {
@@ -126,28 +135,40 @@ function create_fun_fact() {
     && echo -e "${GREEN}Fun Fact!\u2122 splashscreen successfully created!${NC}"
 }
 
+function validate_splash() {
+    if [[ ! -f "$1" ]]; then
+        echo -e "${RED}ERROR: \"$1\" file not found!${RED}" >&2
+        exit 1
+    fi
+}
+
 # check if $1 is a valid color, exit if it's not.
 function validate_color() {
     if convert -list color | grep -q "^$1\b"; then
         return 0
     fi
-
-    echo "${RED}ERROR: invalid color \"$1\".${NC}" >&2
+    
+    echo >&2
+    echo -e "${RED}ERROR: invalid color \"$1\".${NC}" >&2
+    echo >&2
     echo "Short list of available colors:" >&2
+    echo "-------------------------------" >&2
     echo "black white gray gray10 gray25 gray50 gray75 gray90" >&2
     echo "pink red orange yellow green silver blue cyan purple brown" >&2
-    echo "TIP: run the 'convert -list color' command to get a full list" >&2
+    echo >&2
+    echo "TIP: run the 'convert -list color' command to get a full list." >&2
+    echo >&2
     exit 1
 }
 
-function check_argument() {
+function check_argument() { 
     # XXX: this method doesn't accept arguments starting with '-'.
-    if [[ -z "$2" || "$2" =~ ^- ]]; then
-        echo -e "${RED}ERROR: \"$1\" is missing an argument.${NC}" >&2
-        echo "$($0 --help)" >&2
-        return 1
-    fi
-}
+    if [[ -z "$2" || "$2" =~ ^- ]]; then 
+        echo -e "${RED}ERROR: \"$1\" is missing an argument.${NC}" >&2 
+        echo "$($0 --help)" >&2 
+        return 1 
+    fi 
+} 
 
 function get_options() {
     if [[ -z "$1" ]]; then
@@ -184,19 +205,10 @@ function get_options() {
             -s|--splash)
                 check_argument "$1" "$2" || exit 1
                 shift
+                validate_splash "$1"
                 SPLASH="$1"
-
-                if [[ ! -f "$SPLASH" ]]; then
-                    echo -e "${RED}ERROR: \"$SPLASH\" file not found!${RED}" >&2
-                    exit 1
-                else
-                    # Add splashscreen to config.
-                    xmlstarlet ed -L -u \
-                        "/splashscreen/path" \
-                        -v "$SPLASH" \
-                        "$SCRIPT_DIR/fun-facts-settings.cfg" 2> /dev/null \
-                    && echo -e "${GREEN}Splashscreen set to \"$SPLASH\".${NC}"
-                fi
+                # Add splashscreen to config.
+                set_config "splashscreen_path" "$SPLASH"
                 ;;
 
 #H --text-color COLOR           	  Set which text color to use (default: white).
@@ -205,16 +217,8 @@ function get_options() {
                 shift
                 validate_color "$1"
                 TEXT_COLOR="$1"
-
                 # Add text color to config.
-                xmlstarlet ed --inplace -u \
-                    "/splashscreen/textcolor"\
-                    -v "$TEXT_COLOR"\
-                    "$SCRIPT_DIR/fun-facts-settings.cfg" 2> /dev/null \
-                && echo -e "${GREEN}Text color set to \"$TEXT_COLOR\".${NC}"
-
-                #~ sed -i -r 's|<([^ ]) (.)	/>|<\1 \2>|;s|<(.*)/>|<\1>|' "$SCRIPT_DIR/fun-facts-settings.cfg"
-
+                set_config "text_color" "$TEXT_COLOR"
                 ;;
 
             *)
@@ -227,15 +231,20 @@ function get_options() {
 }
 
 function main() {
+    SPLASH="$(get_config splashscreen_path)"
+    TEXT_COLOR="$(get_config text_color)"
+    validate_splash "$SPLASH"
+    validate_color "$TEXT_COLOR"
+    
     check_dependencies
-
+    
     # check if sudo is used.
     if [[ "$(id -u)" -ne 0 ]]; then
         echo -e "${RED}ERROR: Script must be run under sudo.${NC}" >&2
         usage
         exit 1
     fi
-
+    
     if ! is_retropie; then
         echo -e "${RED}ERROR: RetroPie is not installed. Aborting...${NC}" >&2
         exit 1
