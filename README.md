@@ -61,7 +61,7 @@ sudo ./es-fun-facts-splashscreens.sh --help
 
 ### `--splash [options]`
 
-Set which splasscreen to use.
+Set which splashscreen to use.
 
 #### Options
 
