@@ -14,7 +14,8 @@ readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly FUN_FACTS_CFG="$SCRIPT_DIR/fun_facts_settings.cfg"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
-readonly DEFAULT_SPLASH="$SCRIPT_DIR/splash4-3.png"
+readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
+readonly DEFAULT_COLOR="white"
 readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-fact-splashscreen.png"
 readonly RCLOCAL="/etc/rc.local"
 
@@ -26,6 +27,7 @@ SPLASH=
 TEXT_COLOR=
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
+CONFIG_FLAG=0
 
 function usage() {
     echo
@@ -115,17 +117,18 @@ function create_fun_fact() {
     local font="$(get_font)"
 
     [[ -f "$splash" ]] || splash="$DEFAULT_SPLASH"
-    [[ -n "$color" ]] || color="white"
+    [[ -n "$color" ]] || color="$DEFAULT_COLOR"
 
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
+    echo
     echo -e "Creating Fun Fact!\u2122 splashscreen ..."
 
     convert "$splash" \
         -size 1000x100 \
         -background none \
         -fill "$color" \
-        -interline-spacing 3 \
+        -interline-spacing 2 \
         -font "$font" \
         caption:"$random_fact" \
         -gravity south \
@@ -137,12 +140,15 @@ function create_fun_fact() {
 
 function validate_splash() {
     if [[ ! -f "$1" ]]; then
-        echo -e "${RED}ERROR: \"$1\" file not found!${RED}" >&2
+        echo >&2
+        echo -e "${RED}ERROR: '$1' file not found!${NC}" >&2
+        if [[ "$CONFIG_FLAG" == 1 ]]; then
+            echo "Check the 'splashscreen_path' value in '$FUN_FACTS_CFG'" >&2
+        fi
         exit 1
     fi
 }
 
-# check if $1 is a valid color, exit if it's not.
 function validate_color() {
     if convert -list color | grep -q "^$1\b"; then
         return 0
@@ -150,6 +156,9 @@ function validate_color() {
     
     echo >&2
     echo -e "${RED}ERROR: invalid color \"$1\".${NC}" >&2
+    if [[ "$CONFIG_FLAG" == 1 ]]; then
+        echo "Check the 'text_color' value in '$FUN_FACTS_CFG'" >&2
+    fi
     echo >&2
     echo "Short list of available colors:" >&2
     echo "-------------------------------" >&2
@@ -168,7 +177,34 @@ function check_argument() {
         echo "$($0 --help)" >&2 
         return 1 
     fi 
-} 
+}
+
+function check_config() {
+    CONFIG_FLAG=1
+    SPLASH="$(get_config splashscreen_path)"
+    TEXT_COLOR="$(get_config text_color)"
+    
+    if [[ -z "$SPLASH" ]]; then
+        echo
+        echo "'splashscreen_path' is not defined in 'fun_facts_settings.cfg'"
+        echo "Switching to default splashscreen."
+        SPLASH="$DEFAULT_SPLASH"
+    fi
+    
+    if [[ -z "$TEXT_COLOR" ]]; then
+        echo
+        echo "'text_color' is not defined in 'fun_facts_settings.cfg'"
+        echo "Switching to default color."
+        TEXT_COLOR="$DEFAULT_COLOR"
+    fi
+    
+    validate_splash "$SPLASH"
+    validate_color "$TEXT_COLOR"
+    
+    echo
+    echo "Splashscreen = '$SPLASH'"
+    echo "Text color   = '$TEXT_COLOR'"
+}
 
 function get_options() {
     if [[ -z "$1" ]]; then
@@ -178,7 +214,7 @@ function get_options() {
 
     while [[ -n "$1" ]]; do
         case "$1" in
-#H -h, --help                   	  Print the help message and exit.
+#H -h, --help                   	        Print the help message and exit.
             -h|--help)
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
@@ -186,39 +222,37 @@ function get_options() {
                 exit 0
                 ;;
 
-#H --enable-boot                	  Enable script to be launch at boot.
-            --enable-boot)
-                ENABLE_BOOT_FLAG=1
-                ;;
-
-#H --disable-boot               	  Disable script to be launch at boot.
-            --disable-boot)
-                DISABLE_BOOT_FLAG=1
-                ;;
-
-#H --create-fun-fact            	  Create Fun Fact! splashscreen.
-            --create-fun-fact)
-                CREATE_SPLASH_FLAG=1
-                ;;
-
-#H -s|--splash SPLASHSCREEN PATH     Set which splashscreen to use.
+#H -s, --splash [path/to/splashscreen]     Set which splashscreen to use.
             -s|--splash)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_splash "$1"
                 SPLASH="$1"
-                # Add splashscreen to config.
                 set_config "splashscreen_path" "$SPLASH"
                 ;;
 
-#H --text-color COLOR           	  Set which text color to use (default: white).
+#H --text-color [color]           	        Set which text color to use.
             --text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_color "$1"
                 TEXT_COLOR="$1"
-                # Add text color to config.
                 set_config "text_color" "$TEXT_COLOR"
+                ;;
+
+#H --create-fun-fact            	        Create Fun Fact! splashscreen.
+            --create-fun-fact)
+                CREATE_SPLASH_FLAG=1
+                ;;
+                
+#H --enable-boot                	        Enable script to be launch at boot.
+            --enable-boot)
+                ENABLE_BOOT_FLAG=1
+                ;;
+
+#H --disable-boot               	        Disable script to be launch at boot.
+            --disable-boot)
+                DISABLE_BOOT_FLAG=1
                 ;;
 
             *)
@@ -231,11 +265,6 @@ function get_options() {
 }
 
 function main() {
-    SPLASH="$(get_config splashscreen_path)"
-    TEXT_COLOR="$(get_config text_color)"
-    validate_splash "$SPLASH"
-    validate_color "$TEXT_COLOR"
-    
     check_dependencies
     
     # check if sudo is used.
@@ -255,10 +284,12 @@ function main() {
     get_options "$@"
 
     if [[ "$CREATE_SPLASH_FLAG" == 1 ]]; then
+        check_config
         create_fun_fact "$SPLASH" "$TEXT_COLOR"
     fi
 
     if [[ "$ENABLE_BOOT_FLAG" == 1 ]]; then
+        check_config
         enable_boot_script "$SPLASH" "$TEXT_COLOR" || echo -e "${RED}ERROR: failed to enable script at boot.${NC}" >&2
     fi
 
