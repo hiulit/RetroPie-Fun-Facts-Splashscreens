@@ -45,7 +45,7 @@ Use '--help' to see all the options
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
 
-If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
+If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `retropie-default.png` and `white`, respectively.
 
 ## Examples
 
