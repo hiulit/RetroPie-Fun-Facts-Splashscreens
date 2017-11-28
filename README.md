@@ -109,6 +109,8 @@ Enable script to be launch at boot.
 sudo ./es-fun-facts-splashscreens.sh --enable-boot
 ```
 
+If you set a new splashscreen using `--splash` or set a new text color using `--text-color`, you need to run `--enable-boot` again to reflect these changes.
+
 ### `--disable-boot`
 
 Disable script to be launch at boot.
