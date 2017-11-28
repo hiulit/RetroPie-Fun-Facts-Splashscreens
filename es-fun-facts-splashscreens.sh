@@ -173,8 +173,11 @@ function validate_color() {
 function check_argument() { 
     # XXX: this method doesn't accept arguments starting with '-'.
     if [[ -z "$2" || "$2" =~ ^- ]]; then 
+        echo >&2
         echo -e "${RED}ERROR: \"$1\" is missing an argument.${NC}" >&2 
-        echo "$($0 --help)" >&2 
+        echo >&2
+        echo "Try '$0 --help' for more info." >&2 
+        echo >&2
         return 1 
     fi 
 }
