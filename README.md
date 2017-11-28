@@ -9,7 +9,7 @@ This script generates splashscreens for RetroPie with a random **Fun Fact!™**.
 For now, this is the best way to use the splashscreen created by this script:
 
 * Create a **Fun Fact!™** splashscreen. See the [examples below](#examples).
-* Go to the **Splashscreen Menu** (the Splashscreen Menu can be accessed from the RetroPie Menu in EmulationStation or through the setup script under option 3)
+* Go to the **Splashscreen Menu** (the Splashscreen Menu can be accessed from the RetroPie Menu in EmulationStation or from the setup script under option 3)
 * Select the `Choose Own Splashscreen` option. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
 * Select the recently created **Fun Fact!™** splashscreen.
 
@@ -39,15 +39,13 @@ Use '--help' to see all the options
 ## Options
 
 * `--help`: Print the help message and exit.
-* `--enable-boot`: Enable script to be launch at boot.
-    * `$1`: Path to the splashscreen to be used.
-    * `$2`: Text color.
-* `--disable-boot`: Disable script to be launch at boot.
+* `--splash [options]`: Set which splashscreen to use.
+* `--text-color [options]`: Set which text color to use.
 * `--create-fun-fact`: Create Fun Fact Splashscreen.
-    * `$1`: Path to the splashscreen to be used.
-    * `$2`: Text color.
+* `--enable-boot`: Enable script to be launch at boot.
+* `--disable-boot`: Disable script to be launch at boot.
 
-If no options are passed to `--create-fun-fact` or `--enable-boot`, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
+If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `splash4-3.png` and `white`, respectively.
 
 ## Examples
 
@@ -55,47 +53,86 @@ If no options are passed to `--create-fun-fact` or `--enable-boot`, the script t
 
 Print the help message and exit.
 
+#### Example
+
 ```
 sudo ./es-fun-facts-splashscreens.sh --help
 ```
 
-### `--enable-boot [options]`
+### `--splash [options]`
 
-Enable script to be launch at boot.
+Set which splasscreen to use.
 
-**WARNING: Backing up `/etc/rc.local` it's most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+#### Options
 
-Options:
+* `path/to/splashscreen`: Path to the splashscreen to be used.
 
-* `$1`: Path to the splashscreen to be used.
-* `$2`: Text color.
-
-```
-sudo ./es-fun-facts-splashscreens.sh --enable-boot /home/pi/Downloads/retropie-2014.png black
-```
-
-### `--disable-boot`
-
-Disable script to be launch at boot.
-
-**WARNING: Backing up `/etc/rc.local` it's most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+#### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --disable-boot
+sudo ./es-fun-facts-splashscreens.sh --splash /home/pi/Downloads/retropie-2014.png
+```
+
+### `--text-color [options]`
+
+Set which text color to use.
+
+#### Options
+
+* `color`: Text color to be used.
+
+#### Example
+
+```
+sudo ./es-fun-facts-splashscreens.sh --text-color black
 ```
 
 ### `--create-fun-fact`
 
 Create Fun Fact Splashscreen.
 
-Options:
-
-* `$1`: Path to the splashscreen to be used.
-* `$2`: Text color.
+#### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --create-fun-fact /home/pi/Downloads/retropie-2014.png black
+sudo ./es-fun-facts-splashscreens.sh --create-fun-fact
 ```
+
+### `--enable-boot`
+
+Enable script to be launch at boot.
+
+**Backing up `/etc/rc.local` is most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+
+#### Example
+
+```
+sudo ./es-fun-facts-splashscreens.sh --enable-boot
+```
+
+### `--disable-boot`
+
+Disable script to be launch at boot.
+
+**Backing up `/etc/rc.local` is most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+
+#### Example
+
+```
+sudo ./es-fun-facts-splashscreens.sh --disable-boot
+```
+
+## Config file
+
+When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, the generated values are stored in `fun_facts_settings.cfg`.
+
+```
+# Settings for Fun Facts!
+
+splashscreen_path = ""
+text_color = ""
+```
+
+You can edit this file directly instead of using `--splash` or `--text-color`.
 
 ## Changelog
 
