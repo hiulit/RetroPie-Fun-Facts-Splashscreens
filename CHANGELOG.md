@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+#### Added
+
+* Merged #4 from [@meleu](https://github.com/meleu).
+    * Added `--splash` argument.
+    * Added `--text-color` argument.
+* Created `fun_facts_settings.cfg` config file.
+* Added colors for some messages.
+
+### Changes
+
+* Default splashscreen is now `retropie-default.png`
+* Use of `--splash` to set splashscreen path.
+* Use of `--text-color` to set text color.
+* `fun_facts_settings.cfg` can be edited directly instead of using `--splash` or `--text-color` to store the splashscreen path and the text color values.
+
+### Deprecated
+
+* Removed arguments for `--create-fun-fact` and `--enable-boot`. Added `--splash` to set the splashscreen path and `--text-color` to set the text color.
+    * ~~Options for `--create-fun-fact`:~~
+        * ~~`$1`: Path to the splashscreen to be used.~~
+        * ~~`$2`: Text color.~~
+    * ~~Options for `--enable-boot`:~~
+        * ~~`$1`: Path to the splashscreen to be used.~~
+        * ~~`$2`: Text color.~~
+
 ## v0.4.0 (November 18th 2017)
 
 ### Added
