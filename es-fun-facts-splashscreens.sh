@@ -65,7 +65,7 @@ function check_config() {
     CONFIG_FLAG=1
     SPLASH="$(get_config splashscreen_path)"
     TEXT_COLOR="$(get_config text_color)"
-    
+
     if [[ -z "$SPLASH" ]]; then
         if [[ "$GUI_FLAG" == 0 ]]; then
             echo
@@ -74,7 +74,7 @@ function check_config() {
         fi
         SPLASH="$DEFAULT_SPLASH"
     fi
-    
+
     if [[ -z "$TEXT_COLOR" ]]; then
         if [[ "$GUI_FLAG" == 0 ]]; then
             echo
@@ -83,10 +83,10 @@ function check_config() {
         fi
         TEXT_COLOR="$DEFAULT_COLOR"
     fi
-    
+
     validate_splash "$SPLASH"
     validate_color "$TEXT_COLOR"
-    
+
     if [[ "$GUI_FLAG" == 0 ]]; then
         echo
         echo "Splashscreen = \"$SPLASH\""
@@ -172,15 +172,15 @@ function create_fun_fact() {
 
 function validate_splash() {
     [[ -z "$1" ]] && return 0
-    
+
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" == 1 ]]; then
             if [[ "$CONFIG_FLAG" == 1 ]]; then
-                echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""
+                echo "ERROR: check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""
             else
                 echo "ERROR: \"$1\" file not found!"
             fi
-            
+
             return 1
         else
             echo >&2
@@ -189,7 +189,7 @@ function validate_splash() {
                 echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""  >&2
             fi
             echo >&2
-            
+
             exit 1
         fi
     fi
@@ -197,7 +197,7 @@ function validate_splash() {
 
 function validate_color() {
     [[ -z "$1" ]] && return 0
-    
+
     if convert -list color | grep -q "^$1\b"; then
         return 0
     else
@@ -207,7 +207,7 @@ function validate_color() {
             else
                 echo "ERROR: invalid color \"$1\"."
             fi
-            
+
             return 1
         else
             echo >&2
@@ -223,39 +223,39 @@ function validate_color() {
             echo >&2
             echo "TIP: run the 'convert -list color' command to get a full list." >&2
             echo >&2
-            
+
             exit 1
         fi
     fi
 }
 
-function check_argument() { 
+function check_argument() {
     # XXX: this method doesn't accept arguments starting with '-'.
-    if [[ -z "$2" || "$2" =~ ^- ]]; then 
+    if [[ -z "$2" || "$2" =~ ^- ]]; then
         echo >&2
-        echo "ERROR: \"$1\" is missing an argument." >&2 
+        echo "ERROR: \"$1\" is missing an argument." >&2
         echo >&2
-        echo "Try '$0 --help' for more info." >&2 
+        echo "Try '$0 --help' for more info." >&2
         echo >&2
-        
-        return 1 
-    fi 
+
+        return 1
+    fi
 }
 
 function gui() {
     check_config
-    
+
     while true; do
         cmd=(dialog \
             --title "Fun Facts! Splashacreens Main Menu" \
             --menu "Choose and option" 20 60 20)
-        
+
         option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen ($SPLASH)"
-        
+
         option_color="Set text color (default: $DEFAULT_COLOR)"
         [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
-        
+
         options=(
             1 "$option_splash"
             2 "$option_color"
@@ -263,11 +263,11 @@ function gui() {
             4 "Enable at boot"
             5 "Disable at boot"
         )
-        
+
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-        
+
         result_value="$?"
-        
+
         if [[ -n "$choice" ]]; then
             case "$choice" in
                 1)
@@ -275,9 +275,9 @@ function gui() {
                     splash="$(dialog \
                         --title "Title" \
                         --inputbox "Enter path to splashscreen..." 8 40 2>&1 >/dev/tty)"
-                    
+
                     result_value="$?"
-                    
+
                     if [[ "$result_value" == 0 ]]; then
                         local validation="$(validate_splash $splash)"
 
@@ -296,37 +296,38 @@ function gui() {
                     fi
                     ;;
                 2)
+                    CONFIG_FLAG=0
                     local i=1
                     local color_list=()
                     options=("$i" "default: white")
-                    
+
                     while IFS= read -r line; do
                         color_list+=("$line")
                     done < <(convert -list color | grep "srgb" | grep -Eo "^[^ ]+")
-                    
+
                     for color in "${color_list[@]}"; do
                         ((i++))
                         options+=("$i" "$color")
                         #~ ((i++))
                     done
-                    
+
                     cmd=(dialog \
                         --title "Fun Facts! Splashacreens Main Menu" \
                         --menu "Choose color" 20 60 "${#color_list[@]}")
-                        
+
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                    
+
                     result_value="$?"
-                    
+
                     if [[ "$result_value" == 0 ]]; then
                         if [[ "$choice" == 1 ]]; then
                             local color=""
                         else
                             local color="${options[$((choice*2-1))]}"
                         fi
-                        
+
                         local validation="$(validate_color $color)"
-                        
+
                          if [[ -n "$validation" ]]; then
                             dialog --msgbox "$validation" 6 40 2>&1 >/dev/tty
                         else
@@ -362,7 +363,7 @@ function gui() {
 function get_options() {
     if [[ -z "$1" ]]; then
         usage
-        
+
         exit 0
     fi
 
@@ -373,7 +374,7 @@ function get_options() {
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
                 echo
-                
+
                 exit 0
                 ;;
 
@@ -405,7 +406,7 @@ function get_options() {
             --create-fun-fact)
                 CREATE_SPLASH_FLAG=1
                 ;;
-                
+
 #H --enable-boot                	        Enable script to be launch at boot.
             --enable-boot)
                 ENABLE_BOOT_FLAG=1
@@ -432,14 +433,14 @@ function get_options() {
 
 function main() {
     check_dependencies
-    
+
     # check if sudo is used.
     if [[ "$(id -u)" -ne 0 ]]; then
         echo "ERROR: Script must be run under sudo." >&2
         usage
         exit 1
     fi
-    
+
     if ! is_retropie; then
         echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
@@ -462,7 +463,7 @@ function main() {
     if [[ "$DISABLE_BOOT_FLAG" == 1 ]]; then
         disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
     fi
-    
+
     if [[ "$GUI_FLAG" == 1 ]]; then
         gui
     fi
