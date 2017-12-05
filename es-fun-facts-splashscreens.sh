@@ -19,15 +19,12 @@ readonly DEFAULT_COLOR="white"
 readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-fact-splashscreen.png"
 readonly RCLOCAL="/etc/rc.local"
 
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-NC="\033[0m"
-
 SPLASH=
 TEXT_COLOR=
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
 CONFIG_FLAG=0
+GUI_FLAG=0
 
 function usage() {
     echo
@@ -43,7 +40,7 @@ function is_retropie() {
 
 function check_dependencies() {
     if ! which convert > /dev/null; then
-        echo -e "${RED}ERROR: The imagemagick package is not installed!${NC}" >&2
+        echo "ERROR: The imagemagick package is not installed!" >&2
         echo "Please, install it with 'sudo apt-get install imagemagick'." >&2
         exit 1
     fi
@@ -51,7 +48,9 @@ function check_dependencies() {
 
 function set_config() {
     sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$FUN_FACTS_CFG"
-    echo -e "${GREEN}\"$1\" set to \"$2\".${NC}"
+    if [[ "$GUI_FLAG" == 0 ]]; then
+        echo "\"$1\" set to \"$2\"."
+    fi
 }
 
 function get_config() {
@@ -60,6 +59,39 @@ function get_config() {
     config="${config%\"}"
     config="${config#\"}"
     echo "$config"
+}
+
+function check_config() {
+    CONFIG_FLAG=1
+    SPLASH="$(get_config splashscreen_path)"
+    TEXT_COLOR="$(get_config text_color)"
+    
+    if [[ -z "$SPLASH" ]]; then
+        if [[ "$GUI_FLAG" == 0 ]]; then
+            echo
+            echo "\"splashscreen_path\" is not defined in \"$FUN_FACTS_CFG\""
+            echo "Switching to default splashscreen."
+        fi
+        SPLASH="$DEFAULT_SPLASH"
+    fi
+    
+    if [[ -z "$TEXT_COLOR" ]]; then
+        if [[ "$GUI_FLAG" == 0 ]]; then
+            echo
+            echo "\"text_color\" is not defined in \"$FUN_FACTS_CFG\""
+            echo "Switching to default color."
+        fi
+        TEXT_COLOR="$DEFAULT_COLOR"
+    fi
+    
+    validate_splash "$SPLASH"
+    validate_color "$TEXT_COLOR"
+    
+    if [[ "$GUI_FLAG" == 0 ]]; then
+        echo
+        echo "Splashscreen = \"$SPLASH\""
+        echo "Text color   = \"$TEXT_COLOR\""
+    fi
 }
 
 function assure_safe_exit_boot_script() {
@@ -102,7 +134,7 @@ function get_font() {
         # note: the find below returns the full path file name.
         font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
         if [[ -z "$font" ]]; then
-            echo "${RED}ERROR: Unable to get the font from the \"$theme\" theme files.${NC}" >&2
+            echo "ERROR: Unable to get the font from the \"$theme\" theme files." >&2
             echo "Aborting ..." >&2
             exit 1
         fi
@@ -122,7 +154,7 @@ function create_fun_fact() {
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
     echo
-    echo -e "Creating Fun Fact!\u2122 splashscreen ..."
+    echo "Creating Fun Fact! splashscreen ..."
 
     convert "$splash" \
         -size 1000x100 \
@@ -135,83 +167,202 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && echo -e "${GREEN}Fun Fact!\u2122 splashscreen successfully created!${NC}"
+    && echo "Fun Fact! splashscreen successfully created!"
 }
 
 function validate_splash() {
+    [[ -z "$1" ]] && return 0
+    
     if [[ ! -f "$1" ]]; then
-        echo >&2
-        echo -e "${RED}ERROR: '$1' file not found!${NC}" >&2
-        if [[ "$CONFIG_FLAG" == 1 ]]; then
-            echo "Check the 'splashscreen_path' value in '$FUN_FACTS_CFG'" >&2
+        if [[ "$GUI_FLAG" == 1 ]]; then
+            if [[ "$CONFIG_FLAG" == 1 ]]; then
+                echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""
+            else
+                echo "ERROR: \"$1\" file not found!"
+            fi
+            
+            return 1
+        else
+            echo >&2
+            echo "ERROR: \"$1\" file not found!"  >&2
+            if [[ "$CONFIG_FLAG" == 1 ]]; then
+                echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""  >&2
+            fi
+            echo >&2
+            
+            exit 1
         fi
-        exit 1
     fi
 }
 
 function validate_color() {
+    [[ -z "$1" ]] && return 0
+    
     if convert -list color | grep -q "^$1\b"; then
         return 0
+    else
+        if [[ "$GUI_FLAG" == 1 ]]; then
+            if [[ "$CONFIG_FLAG" == 1 ]]; then
+                echo "ERROR: check the \"text_color\" value in \"$FUN_FACTS_CFG\""
+            else
+                echo "ERROR: invalid color \"$1\"."
+            fi
+            
+            return 1
+        else
+            echo >&2
+            echo "ERROR: invalid color \"$1\"." >&2
+            if [[ "$CONFIG_FLAG" == 1 ]]; then
+                echo "Check the \"text_color\" value in \"$FUN_FACTS_CFG\"" >&2
+            fi
+            echo >&2
+            echo "Short list of available colors:" >&2
+            echo "-------------------------------" >&2
+            echo "black white gray gray10 gray25 gray50 gray75 gray90" >&2
+            echo "pink red orange yellow green silver blue cyan purple brown" >&2
+            echo >&2
+            echo "TIP: run the 'convert -list color' command to get a full list." >&2
+            echo >&2
+            
+            exit 1
+        fi
     fi
-    
-    echo >&2
-    echo -e "${RED}ERROR: invalid color \"$1\".${NC}" >&2
-    if [[ "$CONFIG_FLAG" == 1 ]]; then
-        echo "Check the 'text_color' value in '$FUN_FACTS_CFG'" >&2
-    fi
-    echo >&2
-    echo "Short list of available colors:" >&2
-    echo "-------------------------------" >&2
-    echo "black white gray gray10 gray25 gray50 gray75 gray90" >&2
-    echo "pink red orange yellow green silver blue cyan purple brown" >&2
-    echo >&2
-    echo "TIP: run the 'convert -list color' command to get a full list." >&2
-    echo >&2
-    exit 1
 }
 
 function check_argument() { 
     # XXX: this method doesn't accept arguments starting with '-'.
     if [[ -z "$2" || "$2" =~ ^- ]]; then 
         echo >&2
-        echo -e "${RED}ERROR: \"$1\" is missing an argument.${NC}" >&2 
+        echo "ERROR: \"$1\" is missing an argument." >&2 
         echo >&2
         echo "Try '$0 --help' for more info." >&2 
         echo >&2
+        
         return 1 
     fi 
 }
 
-function check_config() {
-    CONFIG_FLAG=1
-    SPLASH="$(get_config splashscreen_path)"
-    TEXT_COLOR="$(get_config text_color)"
+function gui() {
+    check_config
     
-    if [[ -z "$SPLASH" ]]; then
-        echo
-        echo "'splashscreen_path' is not defined in 'fun_facts_settings.cfg'"
-        echo "Switching to default splashscreen."
-        SPLASH="$DEFAULT_SPLASH"
-    fi
-    
-    if [[ -z "$TEXT_COLOR" ]]; then
-        echo
-        echo "'text_color' is not defined in 'fun_facts_settings.cfg'"
-        echo "Switching to default color."
-        TEXT_COLOR="$DEFAULT_COLOR"
-    fi
-    
-    validate_splash "$SPLASH"
-    validate_color "$TEXT_COLOR"
-    
-    echo
-    echo "Splashscreen = '$SPLASH'"
-    echo "Text color   = '$TEXT_COLOR'"
+    while true; do
+        cmd=(dialog \
+            --title "Fun Facts! Splashacreens Main Menu" \
+            --menu "Choose and option" 20 60 20)
+        
+        option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
+        [[ -n "$SPLASH" ]] && option_splash="Set splashscreen ($SPLASH)"
+        
+        option_color="Set text color (default: $DEFAULT_COLOR)"
+        [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
+        
+        options=(
+            1 "$option_splash"
+            2 "$option_color"
+            3 "Create a new Fun Fact! splashscreen"
+            4 "Enable at boot"
+            5 "Disable at boot"
+        )
+        
+        choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+        
+        result_value="$?"
+        
+        if [[ -n "$choice" ]]; then
+            case "$choice" in
+                1)
+                    CONFIG_FLAG=0
+                    splash="$(dialog \
+                        --title "Title" \
+                        --inputbox "Enter path to splashscreen..." 8 40 2>&1 >/dev/tty)"
+                    
+                    result_value="$?"
+                    
+                    if [[ "$result_value" == 0 ]]; then
+                        local validation="$(validate_splash $splash)"
+
+                        if [[ -n "$validation" ]]; then
+                            dialog --msgbox "$validation" 10 40 2>&1 >/dev/tty
+                        else
+                            if [[ -z "$validation" ]]; then
+                                SPLASH="$DEFAULT_SPLASH"
+                                set_config "splashscreen_path" ""
+                            else
+                                SPLASH="$splash"
+                                set_config "splashscreen_path" "$SPLASH"
+                            fi
+                            dialog --msgbox "Splashscreen path set to \"$SPLASH\"" 10 40 2>&1 >/dev/tty
+                        fi
+                    fi
+                    ;;
+                2)
+                    local i=1
+                    local color_list=()
+                    options=("$i" "default: white")
+                    
+                    while IFS= read -r line; do
+                        color_list+=("$line")
+                    done < <(convert -list color | grep "srgb" | grep -Eo "^[^ ]+")
+                    
+                    for color in "${color_list[@]}"; do
+                        ((i++))
+                        options+=("$i" "$color")
+                        #~ ((i++))
+                    done
+                    
+                    cmd=(dialog \
+                        --title "Fun Facts! Splashacreens Main Menu" \
+                        --menu "Choose color" 20 60 "${#color_list[@]}")
+                        
+                    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                    
+                    result_value="$?"
+                    
+                    if [[ "$result_value" == 0 ]]; then
+                        if [[ "$choice" == 1 ]]; then
+                            local color=""
+                        else
+                            local color="${options[$((choice*2-1))]}"
+                        fi
+                        
+                        local validation="$(validate_color $color)"
+                        
+                         if [[ -n "$validation" ]]; then
+                            dialog --msgbox "$validation" 6 40 2>&1 >/dev/tty
+                        else
+                            if [[ -z "$color" ]]; then
+                                TEXT_COLOR="$DEFAULT_COLOR"
+                                set_config "text_color" ""
+                            else
+                                TEXT_COLOR="$color"
+                                set_config "text_color" "$TEXT_COLOR"
+                            fi
+                            dialog --msgbox "Text color set to \"$TEXT_COLOR\"" 6 40 2>&1 >/dev/tty
+                        fi
+                    fi
+                    ;;
+                3)
+                    check_config
+                    create_fun_fact "$SPLASH" "$TEXT_COLOR"
+                    ;;
+                4)
+                    check_config
+                    enable_boot_script "$SPLASH" "$TEXT_COLOR" || echo "ERROR: failed to enable script at boot." >&2
+                    ;;
+                5)
+                    disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+                    ;;
+            esac
+        else
+            break
+        fi
+    done
 }
 
 function get_options() {
     if [[ -z "$1" ]]; then
         usage
+        
         exit 0
     fi
 
@@ -222,6 +373,7 @@ function get_options() {
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
                 echo
+                
                 exit 0
                 ;;
 
@@ -230,8 +382,11 @@ function get_options() {
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_splash "$1"
-                SPLASH="$1"
-                set_config "splashscreen_path" "$SPLASH"
+                return_value="$?"
+                if [[ "$return_value" != 1 ]]; then
+                    SPLASH="$1"
+                    set_config "splashscreen_path" "$SPLASH"
+                fi
                 ;;
 
 #H --text-color [color]           	        Set which text color to use.
@@ -239,8 +394,11 @@ function get_options() {
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_color "$1"
-                TEXT_COLOR="$1"
-                set_config "text_color" "$TEXT_COLOR"
+                return_value="$?"
+                if [[ "$return_value" != 1 ]]; then
+                    TEXT_COLOR="$1"
+                    set_config "text_color" "$TEXT_COLOR"
+                fi
                 ;;
 
 #H --create-fun-fact            	        Create Fun Fact! splashscreen.
@@ -258,8 +416,13 @@ function get_options() {
                 DISABLE_BOOT_FLAG=1
                 ;;
 
+#H --gui              	                Start GUI.
+            --gui)
+                GUI_FLAG=1
+                ;;
+
             *)
-                echo -e "${RED}ERROR: invalid option \"$1\"${NC}" >&2
+                echo "ERROR: invalid option \"$1\"" >&2
                 exit 2
                 ;;
         esac
@@ -272,13 +435,13 @@ function main() {
     
     # check if sudo is used.
     if [[ "$(id -u)" -ne 0 ]]; then
-        echo -e "${RED}ERROR: Script must be run under sudo.${NC}" >&2
+        echo "ERROR: Script must be run under sudo." >&2
         usage
         exit 1
     fi
     
     if ! is_retropie; then
-        echo -e "${RED}ERROR: RetroPie is not installed. Aborting...${NC}" >&2
+        echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
     fi
 
@@ -293,11 +456,15 @@ function main() {
 
     if [[ "$ENABLE_BOOT_FLAG" == 1 ]]; then
         check_config
-        enable_boot_script "$SPLASH" "$TEXT_COLOR" || echo -e "${RED}ERROR: failed to enable script at boot.${NC}" >&2
+        enable_boot_script "$SPLASH" "$TEXT_COLOR" || echo "ERROR: failed to enable script at boot." >&2
     fi
 
     if [[ "$DISABLE_BOOT_FLAG" == 1 ]]; then
-        disable_boot_script || echo -e "${RED}ERROR: failed to disable script at boot.${NC}" >&2
+        disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+    fi
+    
+    if [[ "$GUI_FLAG" == 1 ]]; then
+        gui
     fi
 }
 
