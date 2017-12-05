@@ -247,7 +247,7 @@ function gui() {
 
     while true; do
         cmd=(dialog \
-            --title "Fun Facts! Splashacreens Main Menu" \
+            --title "Fun Facts! Splashacreens Menu" \
             --menu "Choose and option" 20 60 20)
 
         option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
