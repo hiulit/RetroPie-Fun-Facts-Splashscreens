@@ -103,7 +103,7 @@ function check_boot_script() {
 }
 
 function enable_boot_script() {
-    local command="\"$SCRIPT_DIR/$(basename "$0")\" --create-fun-fact --splash \"$1\" --text-color \"$2\" \&"
+    local command="\"$SCRIPT_DIR/$(basename "$0")\" --create-fun-fact \&"
     disable_boot_script # deleting any previous config (do nothing if there isn't).
     sed -i "s|^exit 0$|${command}\\nexit 0|" "$RCLOCAL"
     assure_safe_exit_boot_script
@@ -456,7 +456,7 @@ function main() {
 
     if [[ "$ENABLE_BOOT_FLAG" == 1 ]]; then
         check_config
-        enable_boot_script "$SPLASH" "$TEXT_COLOR" || echo "ERROR: failed to enable script at boot." >&2
+        enable_boot_script || echo "ERROR: failed to enable script at boot." >&2
     fi
 
     if [[ "$DISABLE_BOOT_FLAG" == 1 ]]; then
