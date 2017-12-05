@@ -44,6 +44,7 @@ Use '--help' to see all the options
 * `--create-fun-fact`: Create Fun Fact Splashscreen.
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
+* `--gui`: Start GUI.
 
 If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `retropie-default.png` and `white`, respectively.
 
@@ -121,6 +122,18 @@ Disable script to be launch at boot.
 sudo ./es-fun-facts-splashscreens.sh --disable-boot
 ```
 
+### `--gui`
+
+Start GUI.
+
+It let's you perform all the previous functions, but in a more friendly manner.
+
+#### Example
+
+```
+sudo ./es-fun-facts-splashscreens.sh --gui
+```
+
 ## Config file
 
 When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, the generated values are stored in `fun_facts_settings.cfg`.
@@ -128,7 +141,18 @@ When setting the splashscreen path using `--splash` or setting the text color us
 ```
 # Settings for Fun Facts!
 
+# Must be an absolute path.
+# (e.g /home/pi/my-awesome-splashscreen.png)
+
 splashscreen_path = ""
+
+# Short list of available colors:
+# -------------------------------
+# black, white, gray, gray10, gray25, gray50, gray75, gray90,
+# pink, red, orange, yellow, green, silver, blue, cyan, purple, brown.
+#
+# TIP: run the 'convert -list color' command to get a full list.
+
 text_color = ""
 ```
 
