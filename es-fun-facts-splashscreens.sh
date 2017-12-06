@@ -243,12 +243,15 @@ function check_argument() {
 }
 
 function gui() {
+    local backtitle="Fun Facts! Splashacreens for RetroPie"
+    
     check_config
 
     while true; do
         cmd=(dialog \
+            --backtitle "$backtitle"
             --title "Fun Facts! Splashacreens Menu" \
-            --menu "Choose and option" 20 60 20)
+            --menu "Choose and option" 12 60 5)
 
         option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen ($SPLASH)"
@@ -273,8 +276,9 @@ function gui() {
                 1)
                     CONFIG_FLAG=0
                     splash="$(dialog \
-                        --title "Title" \
-                        --inputbox "Enter path to splashscreen..." 8 40 2>&1 >/dev/tty)"
+                        --backtitle "$backtitle" \
+                        --title "Set splashscreen" \
+                        --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 40 2>&1 >/dev/tty)"
 
                     result_value="$?"
 
@@ -312,8 +316,9 @@ function gui() {
                     done
 
                     cmd=(dialog \
-                        --title "Fun Facts! Splashacreens Main Menu" \
-                        --menu "Choose color" 20 60 "${#color_list[@]}")
+                        --backtitle "$backtitle" \
+                        --title "Set text color" \
+                        --menu "Choose a color" 20 60 "${#color_list[@]}")
 
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
 
