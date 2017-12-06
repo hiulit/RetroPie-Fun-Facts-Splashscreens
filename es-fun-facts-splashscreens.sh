@@ -251,20 +251,29 @@ function gui() {
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashacreens Menu" \
-            --menu "Choose and option" 12 60 5)
+            --menu "Choose and option" 15 60 4)
 
         option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen ($SPLASH)"
 
         option_color="Set text color (default: $DEFAULT_COLOR)"
         [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
+        
+        check_boot_script
+        return_value="$?"
+        if [[ "$return_value" == 0 ]]; then
+            option_boot="enabled"
+        else
+            option_boot="disabled"
+        fi
 
         options=(
             1 "$option_splash"
             2 "$option_color"
             3 "Create a new Fun Fact! splashscreen"
-            4 "Enable at boot"
-            5 "Disable at boot"
+            #~ 4 "Enable at boot"
+            #~ 5 "Disable at boot"
+            4 "Enable/Disable at boot ($option_boot)"
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -286,7 +295,9 @@ function gui() {
                         local validation="$(validate_splash $splash)"
 
                         if [[ -n "$validation" ]]; then
-                            dialog --msgbox "$validation" 10 40 2>&1 >/dev/tty
+                            dialog \
+                                --backtitle "$backtitle" \
+                                --msgbox "$validation" 10 40 2>&1 >/dev/tty
                         else
                             if [[ -z "$validation" ]]; then
                                 SPLASH="$DEFAULT_SPLASH"
@@ -295,7 +306,9 @@ function gui() {
                                 SPLASH="$splash"
                                 set_config "splashscreen_path" "$SPLASH"
                             fi
-                            dialog --msgbox "Splashscreen path set to \"$SPLASH\"" 10 40 2>&1 >/dev/tty
+                            dialog \
+                                --backtitle "$backtitle" \
+                                --msgbox "Splashscreen path set to \"$SPLASH\"" 10 40 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -318,7 +331,7 @@ function gui() {
                     cmd=(dialog \
                         --backtitle "$backtitle" \
                         --title "Set text color" \
-                        --menu "Choose a color" 20 60 "${#color_list[@]}")
+                        --menu "Choose a color" 15 60 "${#color_list[@]}")
 
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
 
@@ -334,7 +347,9 @@ function gui() {
                         local validation="$(validate_color $color)"
 
                          if [[ -n "$validation" ]]; then
-                            dialog --msgbox "$validation" 6 40 2>&1 >/dev/tty
+                            dialog \
+                                --backtitle "$backtitle" \
+                                --msgbox "$validation" 6 40 2>&1 >/dev/tty
                         else
                             if [[ -z "$color" ]]; then
                                 TEXT_COLOR="$DEFAULT_COLOR"
@@ -343,20 +358,32 @@ function gui() {
                                 TEXT_COLOR="$color"
                                 set_config "text_color" "$TEXT_COLOR"
                             fi
-                            dialog --msgbox "Text color set to \"$TEXT_COLOR\"" 6 40 2>&1 >/dev/tty
+                            dialog \
+                                --backtitle "$backtitle" \
+                                --msgbox "Text color set to \"$TEXT_COLOR\"" 6 40 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
                 3)
                     check_config
-                    create_fun_fact "$SPLASH" "$TEXT_COLOR"
+                    create_fun_fact
                     ;;
+                #~ 4)
+                    #~ check_config
+                    #~ enable_boot_script || echo "ERROR: failed to enable script at boot." >&2
+                    #~ ;;
+                #~ 5)
+                    #~ disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+                    #~ ;;
                 4)
-                    check_config
-                    enable_boot_script "$SPLASH" "$TEXT_COLOR" || echo "ERROR: failed to enable script at boot." >&2
-                    ;;
-                5)
-                    disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+                    check_boot_script
+                    return_value="$?"
+                    if [[ "$return_value" == 0 ]]; then
+                        disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+                    else
+                        check_config
+                        enable_boot_script || echo "ERROR: failed to enable script at boot." >&2  
+                    fi
                     ;;
             esac
         else
