@@ -134,9 +134,24 @@ It let's you perform all the previous functions, but in a more friendly manner.
 sudo ./es-fun-facts-splashscreens.sh --gui
 ```
 
+##### Set splashscreen (`--splash`)
+![Fun Facts Splashscreens GUI - 01](gui-examples/fun-facts-splashscreens-gui-01.jpg)
+##### Enter path to splashscreen
+![Fun Facts Splashscreens GUI - 02](gui-examples/fun-facts-splashscreens-gui-02.jpg)
+##### Set text color (`--text-color`)
+![Fun Facts Splashscreens GUI - 03](gui-examples/fun-facts-splashscreens-gui-03.jpg)
+##### Choose a color
+![Fun Facts Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
+##### Create a new Fun Fact! splashscreen (`--create-fun-fact`)
+![Fun Facts Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
+##### Enable at boot (`--enable-boot`)
+![Fun Facts Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
+##### Disable at boot (`--disable-boot`)
+![Fun Facts Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
+
 ## Config file
 
-When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, the generated values are stored in `fun_facts_settings.cfg`.
+When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun_facts_settings.cfg`.
 
 ```
 # Settings for Fun Facts!

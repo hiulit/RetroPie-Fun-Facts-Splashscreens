@@ -7,8 +7,8 @@
 * Merged #4 from [@meleu](https://github.com/meleu).
     * Added `--splash` argument.
     * Added `--text-color` argument.
+* Added `--gui` argument. All the functions can be performed in a more friendly manner.
 * Created `fun_facts_settings.cfg` config file.
-* Added colors for some messages.
 
 ### Changes
 
