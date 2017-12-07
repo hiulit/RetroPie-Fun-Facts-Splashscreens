@@ -379,11 +379,14 @@ function gui() {
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" == 0 ]]; then
-                        disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+                        disable_boot_script && local output="Script disabled at boot." || local output="ERROR: failed to disable script at boot."
                     else
                         check_config
-                        enable_boot_script || echo "ERROR: failed to enable script at boot." >&2  
+                        enable_boot_script && local output="Script enabled at boot." || local output="ERROR: failed to enable script at boot."
                     fi
+                    dialog \
+                        --backtitle "$backtitle" \
+                        --msgbox "$output" 6 40 2>&1 >/dev/tty
                     ;;
             esac
         else
