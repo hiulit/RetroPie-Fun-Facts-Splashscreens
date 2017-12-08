@@ -153,9 +153,15 @@ function create_fun_fact() {
 
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
-    echo
-    echo "Creating Fun Fact! splashscreen ..."
-
+    if [[ "$GUI_FLAG" == 1 ]]; then
+        dialog \
+            --backtitle "$backtitle" \
+            --infobox "Creating Fun Fact! splashscreen ..." 3 40 2>&1 >/dev/tty
+    else
+        echo
+        echo "Creating Fun Fact! splashscreen ..."
+    fi
+    
     convert "$splash" \
         -size 1000x100 \
         -background none \
@@ -167,7 +173,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && echo "Fun Fact! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" == 1 ]] && dialog --backtitle "$backtitle" --msgbox "Fun Fact! splashscreen successfully created!" 6 40 2>&1 || echo "Fun Fact! splashscreen successfully created!"
 }
 
 function validate_splash() {
