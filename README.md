@@ -151,7 +151,7 @@ sudo ./es-fun-facts-splashscreens.sh --gui
 
 ## Config file
 
-When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun_facts_settings.cfg`.
+When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-settings.cfg`.
 
 ```
 # Settings for Fun Facts!
@@ -179,7 +179,7 @@ You can edit this file directly instead of using `--splash` or `--text-color`.
 
 ## Add a new Fun Fact!
 
-* Open `fun_facts.txt`.
+* Open `fun-facts.txt`.
 * Add a new **Fun Fact!** (each **Fun Fact!** must be in one line).
 
 If you have an awesome **Fun Fact!** that you'd like to share, you can create a [new issue]((/CONTRIBUTING.md)) with your awesome **Fun Fact!** and I'll gladly add it to the repository for everyone to enjoy! 😃🎉

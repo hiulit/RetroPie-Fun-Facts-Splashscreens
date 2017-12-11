@@ -12,7 +12,7 @@
     * Added `--splash` argument.
     * Added `--text-color` argument.
 * Added `--gui` argument. All the functions can be performed in a more friendly manner.
-* Created `fun_facts_settings.cfg` config file.
+* Created `fun-facts-settings.cfg` config file.
 
 ### Changes
 
@@ -20,7 +20,7 @@
 * Resulting Fun Facts! splashscreen is now `fun-facts-splashscreen.png`.
 * Use of `--splash` to set splashscreen path.
 * Use of `--text-color` to set text color.
-* `fun_facts_settings.cfg` can be edited directly instead of using `--splash` or `--text-color` to store the splashscreen path and the text color values.
+* `fun-facts-settings.cfg` can be edited directly instead of using `--splash` or `--text-color` to store the splashscreen path and the text color values.
 
 ### Deprecated
 
