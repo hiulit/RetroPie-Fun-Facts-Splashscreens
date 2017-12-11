@@ -241,7 +241,7 @@ function check_argument() {
         echo >&2
         echo "ERROR: \"$1\" is missing an argument." >&2
         echo >&2
-        echo "Try '$0 --help' for more info." >&2
+        echo "Try \"$0 --help\" for more info." >&2
         echo >&2
 
         return 1
