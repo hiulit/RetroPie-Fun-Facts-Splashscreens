@@ -156,13 +156,17 @@ When setting the splashscreen path using `--splash` or setting the text color us
 ```
 # Settings for Fun Facts!
 
+# Splashscreen path
+#
 # Must be an absolute path.
 # (e.g /home/pi/my-awesome-splashscreen.png)
 
 splashscreen_path = ""
 
+# Text color
+#
 # Short list of available colors:
-# -------------------------------
+#
 # black, white, gray, gray10, gray25, gray50, gray75, gray90,
 # pink, red, orange, yellow, green, silver, blue, cyan, purple, brown.
 #
@@ -172,6 +176,15 @@ text_color = ""
 ```
 
 You can edit this file directly instead of using `--splash` or `--text-color`.
+
+## Add a new Fun Fact!
+
+* Open `fun_facts.txt`.
+* Add a new **Fun Fact!** (each **Fun Fact!** must be in one line).
+
+If you have an awesome **Fun Fact!** that you'd like to share, you can create a [new issue]((/CONTRIBUTING.md)) with your awesome **Fun Fact!** and I'll gladly add it to the repository for everyone to enjoy! 😃🎉
+
+Also (and preferably), if you know how, you can create a [pull request](/CONTRIBUTING.md) 😉
 
 ## Changelog
 
