@@ -443,7 +443,7 @@ function get_options() {
                 fi
                 ;;
 
-#H --create-fun-fact            	        Create Fun Facts! splashscreen.
+#H --create-fun-fact            	        Create a new Fun Facts! splashscreen.
             --create-fun-fact)
                 CREATE_SPLASH_FLAG=1
                 ;;
