@@ -1,19 +1,19 @@
-# Fun Facts Splashscreens for RetroPie
+# Fun Facts! Splashscreens for RetroPie
 
-> Not working yet! Well, it's working, but it's not officially released! It's just for testing purposes!
+This script generates splashscreens for RetroPie with random **Fun Facts!**.
 
-This script generates splashscreens for RetroPie with a random **Fun Fact!™**.
+**WARNING: Splashscreens are only available on the Raspberry Pi.**
 
-**WARNING: Splashscreens are only only available on the Raspberry Pi.**
+## Show the Fun Facts! splashcreen in RetroPie
 
-For now, this is the best way to use the splashscreen created by this script:
+For now, this is the best way to show the Fun Facts! splashcreen in RetroPie:
 
-* Create a **Fun Fact!™** splashscreen. See the [examples below](#examples).
-* Go to the **Splashscreen Menu** (the Splashscreen Menu can be accessed from the RetroPie Menu in EmulationStation or from the setup script under option 3)
-* Select the `Choose Own Splashscreen` option. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
-* Select the recently created **Fun Fact!™** splashscreen.
+* Create a new **Fun Facts!** splashscreen. See the instructions for [installation](#installation) and [usage](#usage) below.
+* In RetroPie, go to the **Splashscreen Menu** (the Splashscreen Menu can be accessed from the RetroPie Menu in EmulationStation or from the setup script under option 3).
+* Select the option `Choose Own Splashscreen`. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
+* Select the recently created **Fun Facts!** splashscreen.
 
-## Instalation
+## Installation
 
 ```
 cd /home/pi/
@@ -41,7 +41,7 @@ Use '--help' to see all the options
 * `--help`: Print the help message and exit.
 * `--splash [options]`: Set which splashscreen to use.
 * `--text-color [options]`: Set which text color to use.
-* `--create-fun-fact`: Create Fun Fact Splashscreen.
+* `--create-fun-fact`: Create a new Fun Facts! splashscreen.
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--gui`: Start GUI.
@@ -90,7 +90,7 @@ sudo ./es-fun-facts-splashscreens.sh --text-color black
 
 ### `--create-fun-fact`
 
-Create Fun Fact Splashscreen.
+Create a new Fun Facts! splashscreen.
 
 #### Example
 
@@ -142,7 +142,7 @@ sudo ./es-fun-facts-splashscreens.sh --gui
 ![Fun Facts Splashscreens GUI - 03](gui-examples/fun-facts-splashscreens-gui-03.jpg)
 ##### Choose a color
 ![Fun Facts Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
-##### Create a new Fun Fact! splashscreen (`--create-fun-fact`)
+##### Create a new Fun Facts! splashscreen (`--create-fun-fact`)
 ![Fun Facts Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
 ##### Enable at boot (`--enable-boot`)
 ![Fun Facts Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
