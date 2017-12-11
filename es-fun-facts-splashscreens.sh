@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Fun Facts splashscreens
+# Fun Facts! splashscreens for RetroPie.
 # A tool for RetroPie to create splashscreens with random video game related fun facts.
 #
 # Requirements:
@@ -16,7 +16,7 @@ readonly FUN_FACTS_CFG="$SCRIPT_DIR/fun_facts_settings.cfg"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun_facts.txt"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_COLOR="white"
-readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-fact-splashscreen.png"
+readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-facts-splashscreen.png"
 readonly RCLOCAL="/etc/rc.local"
 
 SPLASH=
@@ -156,10 +156,10 @@ function create_fun_fact() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$backtitle" \
-            --infobox "Creating Fun Fact! splashscreen ..." 3 40 2>&1 >/dev/tty
+            --infobox "Creating Fun Facts! splashscreen ..." 3 40 2>&1 >/dev/tty
     else
         echo
-        echo "Creating Fun Fact! splashscreen ..."
+        echo "Creating Fun Facts! splashscreen ..."
     fi
 
     convert "$splash" \
@@ -173,7 +173,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$backtitle" --msgbox "Fun Fact! splashscreen successfully created!" 6 40 2>&1 || echo "Fun Fact! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$backtitle" --msgbox "Fun Facts! splashscreen successfully created!" 6 40 2>&1 || echo "Fun Facts! splashscreen successfully created!"
 }
 
 function validate_splash() {
@@ -249,14 +249,14 @@ function check_argument() {
 }
 
 function gui() {
-    local backtitle="Fun Facts! Splashacreens for RetroPie"
+    local backtitle="Fun Facts! Splashscreens for RetroPie"
 
     check_config
 
     while true; do
         cmd=(dialog \
             --backtitle "$backtitle"
-            --title "Fun Facts! Splashacreens Menu" \
+            --title "Fun Facts! Splashscreens Config Menu" \
             --menu "Choose and option" 15 60 4)
 
         option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
@@ -276,7 +276,7 @@ function gui() {
         options=(
             1 "$option_splash"
             2 "$option_color"
-            3 "Create a new Fun Fact! splashscreen"
+            3 "Create a new Fun Facts! splashscreen"
             #~ 4 "Enable at boot"
             #~ 5 "Disable at boot"
             4 "Enable/Disable at boot ($option_boot)"
@@ -443,7 +443,7 @@ function get_options() {
                 fi
                 ;;
 
-#H --create-fun-fact            	        Create Fun Fact! splashscreen.
+#H --create-fun-fact            	        Create Fun Facts! splashscreen.
             --create-fun-fact)
                 CREATE_SPLASH_FLAG=1
                 ;;
