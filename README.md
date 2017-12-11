@@ -126,7 +126,7 @@ sudo ./es-fun-facts-splashscreens.sh --disable-boot
 
 Start GUI.
 
-It let's you perform all the previous functions, but in a more friendly manner.
+It lets you perform all the previous functions, but in a more friendly manner.
 
 #### Example
 
