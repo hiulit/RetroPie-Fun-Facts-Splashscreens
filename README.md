@@ -17,21 +17,21 @@ For now, this is the best way to show the Fun Facts! splashcreen in RetroPie:
 
 ```
 cd /home/pi/
-git clone https://github.com/hiulit/es-fun-facts-splashscreens.git
-cd es-fun-facts-splashscreens/
-sudo chmod +x es-fun-facts-splashscreens.sh
+git clone https://github.com/hiulit/retropie-fun-facts-splashscreens.git
+cd retropie-fun-facts-splashscreens/
+sudo chmod +x fun-facts-splashscreens.sh
 ```
 
 ## Usage
 
 ```
-sudo ./es-fun-facts-splashscreens.sh [options]
+sudo ./fun-facts-splashscreens.sh [options]
 ```
 
 If no options are passed, you will be prompted with a usage example:
 
 ```
-USAGE: sudo ./es-fun-facts-splashscreens.sh [options]
+USAGE: sudo ./fun-facts-splashscreens.sh [options]
 
 Use '--help' to see all the options
 ```
@@ -57,7 +57,7 @@ Print the help message and exit.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --help
+sudo ./fun-facts-splashscreens.sh --help
 ```
 
 ### `--splash [options]`
@@ -71,7 +71,7 @@ Set which splashscreen to use.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --splash /home/pi/Downloads/retropie-2014.png
+sudo ./fun-facts-splashscreens.sh --splash /home/pi/Downloads/retropie-2014.png
 ```
 
 ### `--text-color [options]`
@@ -85,7 +85,7 @@ Set which text color to use.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --text-color black
+sudo ./fun-facts-splashscreens.sh --text-color black
 ```
 
 ### `--create-fun-fact`
@@ -95,7 +95,7 @@ Create a new Fun Facts! splashscreen.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --create-fun-fact
+sudo ./fun-facts-splashscreens.sh --create-fun-fact
 ```
 
 ### `--enable-boot`
@@ -107,7 +107,7 @@ Enable script to be launch at boot.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --enable-boot
+sudo ./fun-facts-splashscreens.sh --enable-boot
 ```
 
 ### `--disable-boot`
@@ -119,7 +119,7 @@ Disable script to be launch at boot.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --disable-boot
+sudo ./fun-facts-splashscreens.sh --disable-boot
 ```
 
 ### `--gui`
@@ -131,7 +131,7 @@ It lets you perform all the previous functions, but in a more friendly manner.
 #### Example
 
 ```
-sudo ./es-fun-facts-splashscreens.sh --gui
+sudo ./fun-facts-splashscreens.sh --gui
 ```
 
 ##### Set splashscreen (`--splash`)
