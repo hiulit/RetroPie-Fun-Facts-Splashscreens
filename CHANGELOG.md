@@ -2,13 +2,13 @@
 
 ## Unreleased
 
--
+* Up to date.
 
 ## v1.0.0 (December 11th 2017)
 
 #### Added
 
-* Merged #4 from [@meleu](https://github.com/meleu).
+* Merged [#4](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/pull/4) from [@meleu](https://github.com/meleu).
     * Added `--splash` argument.
     * Added `--text-color` argument.
 * Added `--gui` argument. All the functions can be performed in a more friendly manner.
