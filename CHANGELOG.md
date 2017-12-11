@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+-
+
+## v1.0.0 (December 11th 2017)
+
 #### Added
 
 * Merged #4 from [@meleu](https://github.com/meleu).
