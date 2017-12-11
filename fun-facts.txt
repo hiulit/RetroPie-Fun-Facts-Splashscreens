@@ -30,3 +30,23 @@ Space Invaders, manufactured in 1978 by Taito, was the first game to include a c
 The first game to feature true background music was Namco's Rally-X in 1980.
 The graphic finishing moves known as 'Fatalities' in Midway's Mortal Kombat led to the creation of the Entertainment Software Rating Board to give age-appropriate content ratings for video games.
 Donkey Kong, Mario, and Princess Peach are based on characters from the cartoon series Popeye. Nintendo created them after they failed to obtain a license to make a Popeye video game.
+The Sega Dreamcast was the first console to implement online play over a phone line, calling the system Sega Net.
+The Microsoft Xbox was the first video game system to provide full support for HDTV.
+Popular Science recognized the Sega Dreamcast as one of the most important and innovative products of 1999.
+The Magnavox Odyssey, released in 1972, contained 40 transistors and no microprocessor. The Pentium 4 microprocessor contains 42 million transistors on the chip itself!
+The PlayStation 2 was the first system to have graphics capability better than that of the leading-edge personal computer at the time of its release.
+The Nintendo N64 marked the first time that computer graphics workstation manufacturer Silicon Graphics Inc. (SGI) developed game hardware technology.
+The Atari Pong video game console was the No. 1 selling item for the holiday season in 1975.
+The first console to have games available in the form of add-on cartridges was the Fairchild Channel F console, introduced in August 1976.
+The PlayStation 2 was the first video game system to use DVD technology.
+On the original Magnavox Odyssey, players had to keep score themselves because the machine couldn't.
+The Nintendo GameCube's proprietary disc held 1.5 gigabytes of data -- 190 times more than what an N64 game cartridge could hold.
+On the market from 1991 till 2004, the SNK NeoGeo AES has tied the Atari 2600 (1977-1990) as the longest supported gaming console in history.
+The Sega Genesis featured a version of the same Motorola processor that powered the original Apple Macintosh computer.
+Mattel's Intellivison system, introduced in 1980, featured an add-on called "PlayCable", which delivered games by cable TV.
+Nintendo's Game Boy was the most successful game system ever, with more than 100 million units sold worldwide.
+The word atari comes from the ancient Japanese game of Go and means "you are about to be engulfed." Technically, it is the word used by a player to inform his opponent that he is about to lose, similar to "check" in chess.
+In the 1980s, a service called Gameline allowed users to download games to the Atari 2600 over regular phone lines. It was not a success, but did form part of the foundation for America Online, the world's largest Internet service provider.
+The first color portable video game system was the Atari Lynx, introduced in 1989 and priced at $149.
+Introduced in 1993, the 3DO was the first video game system to be based entirely on CD technology.
+The Sony PlayStation was originally intended as a CD add-on to the Super Nintendo. When licensing problems and other issues arose, Sony decided to develop the PlayStation as a machine of its own.
