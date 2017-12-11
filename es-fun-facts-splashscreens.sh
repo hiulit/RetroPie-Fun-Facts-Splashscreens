@@ -385,10 +385,10 @@ function gui() {
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
-                        disable_boot_script && local output="Script disabled at boot." || local output="ERROR: failed to disable script at boot."
+                        disable_boot_script && local output="Fun Facts! script disabled at boot." || local output="ERROR: failed to disable Fun Facts! script at boot."
                     else
                         check_config
-                        enable_boot_script && local output="Script enabled at boot." || local output="ERROR: failed to enable script at boot."
+                        enable_boot_script && local output="Fun Facts! script enabled at boot." || local output="ERROR: failed to enable Fun Facts! script at boot."
                     fi
                     dialog \
                         --backtitle "$backtitle" \
@@ -498,11 +498,11 @@ function main() {
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
         check_config
-        enable_boot_script || echo "ERROR: failed to enable script at boot." >&2
+        enable_boot_script || echo "ERROR: failed to enable Fun Facts! script at boot." >&2
     fi
 
     if [[ "$DISABLE_BOOT_FLAG" -eq 1 ]]; then
-        disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
+        disable_boot_script || echo "ERROR: failed to disable Fun Facts! script at boot." >&2
     fi
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
