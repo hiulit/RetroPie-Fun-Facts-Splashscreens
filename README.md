@@ -46,7 +46,7 @@ Use '--help' to see all the options
 * `--disable-boot`: Disable script to be launch at boot.
 * `--gui`: Start GUI.
 
-If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `retropie-default.png` and `white`, respectively.
+If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `default-splashscreen.png` and `white`, respectively.
 
 ## Examples
 

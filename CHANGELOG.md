@@ -16,7 +16,7 @@
 
 ### Changes
 
-* Default splashscreen is now `retropie-default.png`.
+* Default splashscreen is now `default-splashscreen.png`.
 * Resulting Fun Facts! splashscreen is now `fun-facts-splashscreen.png`.
 * Use of `--splash` to set splashscreen path.
 * Use of `--text-color` to set text color.
