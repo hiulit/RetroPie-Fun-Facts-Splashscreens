@@ -90,7 +90,7 @@ function check_config() {
     if [[ "$GUI_FLAG" -eq 0 ]]; then
         echo
         echo "\"splashscreen_path\" = \"$SPLASH\""
-        echo "\"text_color\"   = \"$TEXT_COLOR\""
+        echo "\"text_color\" = \"$TEXT_COLOR\""
     fi
 }
 
