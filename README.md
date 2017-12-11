@@ -17,8 +17,8 @@ For now, this is the best way to show the Fun Facts! splashcreen in RetroPie:
 
 ```
 cd /home/pi/
-git clone https://github.com/hiulit/RetroPie-fun-facts-splashscreens.git
-cd RetroPie-fun-facts-splashscreens/
+git clone https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens.git
+cd RetroPie-Fun-Facts-Splashscreens/
 sudo chmod +x fun-facts-splashscreens.sh
 ```
 
