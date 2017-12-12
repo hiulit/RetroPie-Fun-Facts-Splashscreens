@@ -6,7 +6,7 @@
 
 ## v1.0.0 (December 12th 2017)
 
-#### Added
+### Added
 
 * Merged [#4](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/pull/4) from [@meleu](https://github.com/meleu).
     * Added `--splash` argument.
