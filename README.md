@@ -22,6 +22,8 @@ cd RetroPie-Fun-Facts-Splashscreens/
 sudo chmod +x fun-facts-splashscreens.sh
 ```
 
+You can also install **Fun Facts! Splashscreens** as a scriptmodule via the [RetroPie-Extra](https://github.com/zerojay/RetroPie-Extra) repository. Check the [supplementary](https://github.com/zerojay/RetroPie-Extra/#supplementary) section.
+
 ## Usage
 
 ```
@@ -202,8 +204,9 @@ Me 😛 [@hiulit](https://github.com/hiulit).
 
 Thanks to:
 
-* [Parviglumis](https://retropie.org.uk/forum/user/parviglumis) - For the idea of creating the [Fun Facts Splashscreens](https://retropie.org.uk/forum/topic/13630).
+* [Parviglumis](https://retropie.org.uk/forum/user/parviglumis) - For the idea of creating the [Fun Facts! Splashscreens](https://retropie.org.uk/forum/topic/13630).
 * [meleu](https://github.com/meleu/) - For all his help and wisdom with the code and for all the PRs! :D
+* [zerojay](https://github.com/zerojay/) - For adding **Fun Facts! Splashscreens** to the [RetroPie-Extra](https://github.com/zerojay/RetroPie-Extra) repository.
 * All the people at the [RetroPie Forum](https://retropie.org.uk/forum/).
 
 ## License
