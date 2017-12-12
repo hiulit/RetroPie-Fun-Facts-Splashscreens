@@ -13,6 +13,7 @@
     * Added `--text-color` argument.
 * Added `--gui` argument. All the functions can be performed in a more friendly manner.
 * Created `fun-facts-settings.cfg` config file.
+* Added a bunch of new **Fun Facts!**.
 
 ### Changes
 
