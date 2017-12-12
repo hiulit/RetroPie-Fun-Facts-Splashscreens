@@ -4,7 +4,7 @@
 
 * Up to date.
 
-## v1.0.0 (December 11th 2017)
+## v1.0.0 (December 12th 2017)
 
 #### Added
 
