@@ -7,7 +7,7 @@ rp_module_help="$rp_module_help\n\nSet \"Enable at boot\" to create a new Fun Fa
 rp_module_section="exp"
 rp_module_flags="noinstclean !x86 !osmc !xbian !mali !kms"
 
-function depends_fun-facts_splashscreens() {
+function depends_fun-facts-splashscreens() {
     getDepends "imagemagick"
 }
 
