@@ -4,6 +4,12 @@
 
 * Up to date.
 
+## v1.0.1 (December 13th 2017)
+
+### Fixed
+
+* Fixed a typo that was making `getDepends` not working in the scriptmodule.
+
 ## v1.0.0 (December 12th 2017)
 
 ### Added
