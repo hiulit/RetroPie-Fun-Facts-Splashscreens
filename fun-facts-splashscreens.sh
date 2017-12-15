@@ -49,6 +49,7 @@ function check_dependencies() {
 
 function set_config() {
     sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$FUN_FACTS_CFG"
+    
     if [[ "$GUI_FLAG" -eq 0 ]]; then
         echo "\"$1\" set to \"$2\"."
     fi
@@ -114,16 +115,17 @@ function apply_splash() {
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
                 --backtitle "$backtitle" \
-                --msgbox "Fun Facts! splashscreen is already in use..." 5 50 2>&1 >/dev/tty
+                --msgbox "\nFun Facts! splashscreen is already in use.\n" 7 50 2>&1 >/dev/tty
         else
-            echo "Fun Facts! splashscreen is already in use..."
+            echo
+            echo "Fun Facts! splashscreen is already in use."
         fi
     else
         echo "$RESULT_SPLASH" >"$SPLASH_LIST"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
                 --backtitle "$backtitle" \
-                --msgbox "Fun Facts! splashscreen set succesfully!" 5 50 2>&1 >/dev/tty
+                --msgbox "\nFun Facts! splashscreen set succesfully!\n" 7 50 2>&1 >/dev/tty
         else
             echo "Fun Facts! splashscreen set succesfully!"
         fi
@@ -184,7 +186,7 @@ function create_fun_fact() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$backtitle" \
-            --infobox "Creating Fun Facts! splashscreen ..." 3 40 2>&1 >/dev/tty
+            --infobox "\nCreating Fun Facts! splashscreen ...\n" 5 50 2>&1 >/dev/tty
     else
         echo
         echo "Creating Fun Facts! splashscreen ..."
@@ -201,7 +203,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$backtitle" --msgbox "Fun Facts! splashscreen successfully created!" 6 40 2>&1 || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$backtitle" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 || echo "Fun Facts! splashscreen successfully created!"
 }
 
 function validate_splash() {
@@ -301,9 +303,9 @@ function gui() {
         check_apply_splash
         return_value="$?"
         if [[ "$return_value" -eq 0 ]]; then
-            option_apply_splash="Apply splashscreen (already in use)"
+            option_apply_splash="Apply Fun Facts! splashscreen (already in use)"
         else
-            option_apply_splash="Apply splashscreen"
+            option_apply_splash="Apply Fun Facts! splashscreen"
         fi
 
         check_boot_script
@@ -344,7 +346,7 @@ function gui() {
                         if [[ -n "$validation" ]]; then
                             dialog \
                                 --backtitle "$backtitle" \
-                                --msgbox "$validation" 10 40 2>&1 >/dev/tty
+                                --msgbox "$validation" 10 50 2>&1 >/dev/tty
                         else
                             if [[ -z "$validation" ]]; then
                                 SPLASH="$DEFAULT_SPLASH"
@@ -355,7 +357,7 @@ function gui() {
                             fi
                             dialog \
                                 --backtitle "$backtitle" \
-                                --msgbox "Splashscreen path set to \"$SPLASH\"" 10 40 2>&1 >/dev/tty
+                                --msgbox "Splashscreen path set to \"$SPLASH\"" 10 50 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -407,7 +409,7 @@ function gui() {
                             fi
                             dialog \
                                 --backtitle "$backtitle" \
-                                --msgbox "Text color set to \"$TEXT_COLOR\"" 6 40 2>&1 >/dev/tty
+                                --msgbox "\nText color set to \"$TEXT_COLOR\"" 7 50 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -423,14 +425,14 @@ function gui() {
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
-                        disable_boot_script && local output="Fun Facts! script disabled at boot." || local output="ERROR: failed to disable Fun Facts! script at boot."
+                        disable_boot_script && local output="Fun Facts! script DISABLED at boot." || local output="ERROR: failed to DISABLE Fun Facts! script at boot."
                     else
                         check_config
-                        enable_boot_script && local output="Fun Facts! script enabled at boot." || local output="ERROR: failed to enable Fun Facts! script at boot."
+                        enable_boot_script && local output="Fun Facts! script ENABLED at boot." || local output="ERROR: failed to ENABLE Fun Facts! script at boot."
                     fi
                     dialog \
                         --backtitle "$backtitle" \
-                        --msgbox "$output" 6 40 2>&1 >/dev/tty
+                        --msgbox "\n$output\n" 7 40 2>&1 >/dev/tty
                     ;;
                 6)
                     check_updates
