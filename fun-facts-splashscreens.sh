@@ -18,6 +18,7 @@ readonly DEFAULT_SPLASH="$SCRIPT_DIR/default-splashscreen.png"
 readonly DEFAULT_COLOR="white"
 readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-facts-splashscreen.png"
 readonly RCLOCAL="/etc/rc.local"
+readonly SPLASH_LIST="/etc/splashscreen.list"
 
 SPLASH=
 TEXT_COLOR=
@@ -100,6 +101,33 @@ function assure_safe_exit_boot_script() {
 
 function check_boot_script() {
     grep -q "$SCRIPT_DIR" "$RCLOCAL"
+}
+
+function check_use_splash() {
+    grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
+}
+
+function use_splash() {
+    check_use_splash
+    return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            dialog \
+                --backtitle "$backtitle" \
+                --msgbox "Fun Facts! splashscreen is already in use..." 5 50 2>&1 >/dev/tty
+        else
+            echo "Fun Facts! splashscreen is already in use..."
+        fi
+    else
+        echo "$RESULT_SPLASH" >"$SPLASH_LIST"
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            dialog \
+                --backtitle "$backtitle" \
+                --msgbox "Fun Facts! splashscreen set succesfully!" 5 50 2>&1 >/dev/tty
+        else
+            echo "Fun Facts! splashscreen set succesfully!"
+        fi
+    fi
 }
 
 function enable_boot_script() {
@@ -257,13 +285,21 @@ function gui() {
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens Config Menu" \
-            --menu "Choose and option" 15 60 4)
+            --menu "Choose and option" 15 60 5)
 
-        option_splash="Set splashscreen (default: $DEFAULT_SPLASH)"
-        [[ -n "$SPLASH" ]] && option_splash="Set splashscreen ($SPLASH)"
+        option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
+        [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
 
         option_color="Set text color (default: $DEFAULT_COLOR)"
         [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
+        
+        check_use_splash
+        return_value="$?"
+        if [[ "$return_value" -eq 0 ]]; then
+            option_use_splash="Use splashscreen (already in use)"
+        else
+            option_use_splash="Use splashscreen"
+        fi
 
         check_boot_script
         return_value="$?"
@@ -277,9 +313,8 @@ function gui() {
             1 "$option_splash"
             2 "$option_color"
             3 "Create a new Fun Facts! splashscreen"
-            #~ 4 "Enable at boot"
-            #~ 5 "Disable at boot"
-            4 "Enable/Disable at boot ($option_boot)"
+            4 "$option_use_splash"
+            5 "Enable/Disable at boot ($option_boot)"
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -292,8 +327,8 @@ function gui() {
                     CONFIG_FLAG=0
                     splash="$(dialog \
                         --backtitle "$backtitle" \
-                        --title "Set splashscreen" \
-                        --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 40 2>&1 >/dev/tty)"
+                        --title "Set splashscreen path" \
+                        --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
 
                     result_value="$?"
 
@@ -374,14 +409,11 @@ function gui() {
                     check_config
                     create_fun_fact
                     ;;
-                #~ 4)
-                    #~ check_config
-                    #~ enable_boot_script || echo "ERROR: failed to enable script at boot." >&2
-                    #~ ;;
-                #~ 5)
-                    #~ disable_boot_script || echo "ERROR: failed to disable script at boot." >&2
-                    #~ ;;
                 4)
+                    check_config
+                    use_splash
+                    ;;
+                5)
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
@@ -410,7 +442,7 @@ function get_options() {
 
     while [[ -n "$1" ]]; do
         case "$1" in
-#H -h, --help                   	        Print the help message and exit.
+#H -h, --help                                   Print the help message and exit.
             -h|--help)
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
@@ -419,8 +451,8 @@ function get_options() {
                 exit 0
                 ;;
 
-#H -s, --splash [path/to/splashscreen]     Set which splashscreen to use.
-            -s|--splash)
+#H -s, --splash-path [path/to/splashscreen]     Set which splashscreen to use.
+            -s|--splash-path)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_splash "$1"
@@ -431,8 +463,8 @@ function get_options() {
                 fi
                 ;;
 
-#H --text-color [color]           	        Set which text color to use.
-            --text-color)
+#H -t, --text-color [color]                     Set which text color to use.
+            -t|--text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_color "$1"
@@ -443,23 +475,29 @@ function get_options() {
                 fi
                 ;;
 
-#H --create-fun-fact            	        Create a new Fun Facts! splashscreen.
-            --create-fun-fact)
+#H -c, --create-fun-fact                        Create a new Fun Facts! splashscreen.
+            -c|--create-fun-fact)
                 CREATE_SPLASH_FLAG=1
                 ;;
 
-#H --enable-boot                	        Enable script to be launch at boot.
-            --enable-boot)
+#H -a, --apply-splash                           Apply splashscreen.
+            -u|--use-splash)
+                check_config
+                use_splash
+                ;;
+
+#H -e, --enable-boot                            Enable script to be launch at boot.
+            -e|--enable-boot)
                 ENABLE_BOOT_FLAG=1
                 ;;
 
-#H --disable-boot               	        Disable script to be launch at boot.
-            --disable-boot)
+#H -d, --disable-boot                           Disable script to be launch at boot.
+            -d|--disable-boot)
                 DISABLE_BOOT_FLAG=1
                 ;;
 
-#H --gui              	                Start GUI.
-            --gui)
+#H -g, --gui                                    Start GUI.
+            -g|--gui)
                 GUI_FLAG=1
                 ;;
 
