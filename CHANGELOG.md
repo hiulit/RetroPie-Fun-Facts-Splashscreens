@@ -4,8 +4,8 @@
 
 ### Added
 
+* `--apply-splash` to use the generated **Fun Facts!** splashscreen.
 * `--update` to check if the **Fun Facts!** script needs updates.
-* `--apply-splash` to use the **Fun Facts!** splashscreen.
 
 ### Deprecated
 
