@@ -276,6 +276,11 @@ function check_argument() {
     fi
 }
 
+function check_updates() {
+    echo "Let's see if there are any updates ..."
+    git pull origin
+}
+
 function gui() {
     local backtitle="Fun Facts! Splashscreens for RetroPie"
 
@@ -285,7 +290,7 @@ function gui() {
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens Config Menu" \
-            --menu "Choose and option" 15 60 5)
+            --menu "Choose and option" 15 60 6)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
@@ -315,6 +320,7 @@ function gui() {
             3 "Create a new Fun Facts! splashscreen"
             4 "$option_use_splash"
             5 "Enable/Disable at boot ($option_boot)"
+            6 "Update script"
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -425,6 +431,9 @@ function gui() {
                     dialog \
                         --backtitle "$backtitle" \
                         --msgbox "$output" 6 40 2>&1 >/dev/tty
+                    ;;
+                6)
+                    check_updates
                     ;;
             esac
         else
