@@ -2,7 +2,14 @@
 
 ## Unreleased
 
-* Up to date.
+### Added
+
+* `--update` to check if the **Fun Facts!** script needs updates.
+* `--apply-splash` to use the **Fun Facts!** splashscreen.
+
+### Deprecated
+
+* ~~`--splash`~~ is now `--splash-path`.
 
 ## v1.0.1 (December 13th 2017)
 
