@@ -103,12 +103,12 @@ function check_boot_script() {
     grep -q "$SCRIPT_DIR" "$RCLOCAL"
 }
 
-function check_use_splash() {
+function check_apply_splash() {
     grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
 }
 
-function use_splash() {
-    check_use_splash
+function apply_splash() {
+    check_apply_splash
     return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
@@ -298,12 +298,12 @@ function gui() {
         option_color="Set text color (default: $DEFAULT_COLOR)"
         [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
         
-        check_use_splash
+        check_apply_splash
         return_value="$?"
         if [[ "$return_value" -eq 0 ]]; then
-            option_use_splash="Use splashscreen (already in use)"
+            option_apply_splash="Apply splashscreen (already in use)"
         else
-            option_use_splash="Use splashscreen"
+            option_apply_splash="Apply splashscreen"
         fi
 
         check_boot_script
@@ -318,7 +318,7 @@ function gui() {
             1 "$option_splash"
             2 "$option_color"
             3 "Create a new Fun Facts! splashscreen"
-            4 "$option_use_splash"
+            4 "$option_apply_splash"
             5 "Enable/Disable at boot ($option_boot)"
             6 "Update script"
         )
@@ -417,7 +417,7 @@ function gui() {
                     ;;
                 4)
                     check_config
-                    use_splash
+                    apply_splash
                     ;;
                 5)
                     check_boot_script
@@ -489,10 +489,10 @@ function get_options() {
                 CREATE_SPLASH_FLAG=1
                 ;;
 
-#H -a, --apply-splash                           Apply splashscreen.
-            -u|--use-splash)
+#H -a, --apply-splash                           Apply Fun Facts! splashscreen.
+            -a|--apply-splash)
                 check_config
-                use_splash
+                apply_splash
                 ;;
 
 #H -e, --enable-boot                            Enable script to be launch at boot.
@@ -510,6 +510,10 @@ function get_options() {
                 GUI_FLAG=1
                 ;;
 
+#H -u, --update                                 Update script.
+            -u|--update)
+                check_updates
+                ;;
             *)
                 echo "ERROR: invalid option \"$1\"" >&2
                 exit 2
