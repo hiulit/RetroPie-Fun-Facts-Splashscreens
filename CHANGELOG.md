@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Up to date.
+
+## v1.1.0 (December 18th 2017)
+
 ### Added
 
 * `--apply-splash` to use the generated **Fun Facts!** splashscreen.
