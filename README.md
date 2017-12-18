@@ -87,7 +87,7 @@ sudo ./fun-facts-splashscreens.sh --text-color black
 
 Create a new Fun Facts! splashscreen.
 
-The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens`.
+The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
 
 #### Example
 
