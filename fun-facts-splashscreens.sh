@@ -289,13 +289,14 @@ function gui() {
     check_config
 
     while true; do
-        local version="1.0.0 ($(git -C "$SCRIPT_DIR" log -1 --pretty=format:%h))"
-        local commit=$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")
+        local version="$(git tag | sort -V | tail -1)"
+        local commit="$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
 
         cmd=(dialog \
             --backtitle "$backtitle"
-            --title "Fun Facts! Splashscreens Config Menu" \
-            --menu "Choose an option\nVersion: $version\nCommit: $commit" 15 60 6)
+            --title "Fun Facts! Splashscreens" \
+            --cancel-label "Exit" \
+            --menu "Version: $version\nLast Commit: $commit" 15 60 6)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
@@ -324,7 +325,7 @@ function gui() {
             2 "$option_color"
             3 "Create a new Fun Facts! splashscreen"
             4 "$option_apply_splash"
-            5 "Enable/Disable at boot ($option_boot)"
+            5 "Enable/Disable script at boot ($option_boot)"
             6 "Update script"
         )
 
@@ -339,6 +340,7 @@ function gui() {
                     splash="$(dialog \
                         --backtitle "$backtitle" \
                         --title "Set splashscreen path" \
+                        --cancel-label "Back" \
                         --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
 
                     result_value="$?"
@@ -383,6 +385,7 @@ function gui() {
                     cmd=(dialog \
                         --backtitle "$backtitle" \
                         --title "Set text color" \
+                        --cancel-label "Back" \
                         --menu "Choose a color" 15 60 "${#color_list[@]}")
 
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
