@@ -281,6 +281,7 @@ function check_argument() {
 function check_updates() {
     echo "Let's see if there are any updates ..."
     cd "$SCRIPT_DIR"
+    echo "$SCRIPT_DIR"
     git pull origin
     cd "$OLDPWD"
 }
