@@ -292,11 +292,15 @@ function gui() {
     check_config
 
     while true; do
-	cd "$SCRIPT_DIR"
-        local version="$(git tag | sort -V | tail -1)"
+        cd "$SCRIPT_DIR"
+        #~ local version="$(git tag | sort -V | tail -1)"
+        local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
+        grep '"tag_name":' |
+        sed -E 's/.*"([^"]+)".*/\1/')"
+
         local commit="$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
-	cd "$OLDPWD"
-	
+        cd "$OLDPWD"
+    
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens" \
