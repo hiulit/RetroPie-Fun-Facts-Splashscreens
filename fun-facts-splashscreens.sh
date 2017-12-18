@@ -49,7 +49,7 @@ function check_dependencies() {
 
 function set_config() {
     sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$FUN_FACTS_CFG"
-    
+
     if [[ "$GUI_FLAG" -eq 0 ]]; then
         echo "\"$1\" set to \"$2\"."
     fi
@@ -220,9 +220,9 @@ function validate_splash() {
             return 1
         else
             echo >&2
-            echo "ERROR: \"$1\" file not found!"  >&2
+            echo "ERROR: \"$1\" file not found!" >&2
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""  >&2
+                echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\"" >&2
             fi
             echo >&2
 
@@ -299,7 +299,7 @@ function gui() {
 
         option_color="Set text color (default: $DEFAULT_COLOR)"
         [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
-        
+
         check_apply_splash
         return_value="$?"
         if [[ "$return_value" -eq 0 ]]; then
