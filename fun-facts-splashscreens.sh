@@ -289,10 +289,13 @@ function gui() {
     check_config
 
     while true; do
+        local version="1.0.0 ($(git -C "$scriptdir" log -1 --pretty=format:%h))"
+        local commit=$(git -C "$scriptdir" log -1 --pretty=format:"%cr (%h)")
+
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens Config Menu" \
-            --menu "Choose and option" 15 60 6)
+            --menu "Choose an option\nVersion: $version\nCommit: $commit" 15 60 6)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
