@@ -41,7 +41,7 @@ Use '--help' to see all the options
 ## Options
 
 * `--help`: Print the help message and exit.
-* `--splash [options]`: Set which splashscreen to use.
+* `--splash-path [options]`: Set which splashscreen to use.
 * `--text-color [options]`: Set which text color to use.
 * `--create-fun-fact`: Create a new Fun Facts! splashscreen.
 * `--enable-boot`: Enable script to be launch at boot.
@@ -49,7 +49,7 @@ Use '--help' to see all the options
 * `--gui`: Start GUI.
 * `--update`: Update script.
 
-If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `default-splashscreen.png` and `white`, respectively.
+If `--splash-path` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `default-splashscreen.png` and `white`, respectively.
 
 ## Examples
 
@@ -63,7 +63,7 @@ Print the help message and exit.
 sudo ./fun-facts-splashscreens.sh --help
 ```
 
-### `--splash [options]`
+### `--splash-path [options]`
 
 Set which splashscreen to use.
 
@@ -74,7 +74,7 @@ Set which splashscreen to use.
 #### Example
 
 ```
-sudo ./fun-facts-splashscreens.sh --splash /home/pi/Downloads/retropie-2014.png
+sudo ./fun-facts-splashscreens.sh --splash-path /home/pi/Downloads/retropie-2014.png
 ```
 
 ### `--text-color [options]`
@@ -137,7 +137,7 @@ It lets you perform all the previous functions, but in a more friendly manner.
 sudo ./fun-facts-splashscreens.sh --gui
 ```
 
-##### Set splashscreen (`--splash`)
+##### Set splashscreen path (`--splash-path`)
 ![Fun Facts Splashscreens GUI - 01](gui-examples/fun-facts-splashscreens-gui-01.jpg)
 ##### Enter path to splashscreen
 ![Fun Facts Splashscreens GUI - 02](gui-examples/fun-facts-splashscreens-gui-02.jpg)
@@ -164,7 +164,7 @@ sudo ./fun-facts-splashscreens.sh --update
 
 ## Config file
 
-When setting the splashscreen path using `--splash` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-settings.cfg`.
+When setting the splashscreen path using `--splash-path` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-settings.cfg`.
 
 ```
 # Settings for Fun Facts!
@@ -188,7 +188,7 @@ splashscreen_path = ""
 text_color = ""
 ```
 
-You can edit this file directly instead of using `--splash` or `--text-color`.
+You can edit this file directly instead of using `--splash-path` or `--text-color`.
 
 ## Add a new Fun Fact!
 
