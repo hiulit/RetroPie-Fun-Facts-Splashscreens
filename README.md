@@ -47,6 +47,7 @@ Use '--help' to see all the options
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--gui`: Start GUI.
+* `--update`: Update script.
 
 If `--splash` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `default-splashscreen.png` and `white`, respectively.
 
@@ -150,6 +151,16 @@ sudo ./fun-facts-splashscreens.sh --gui
 ![Fun Facts Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
 ##### Disable at boot (`--disable-boot`)
 ![Fun Facts Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
+
+### `--update`
+
+Updates script.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --update
+```
 
 ## Config file
 
