@@ -280,7 +280,9 @@ function check_argument() {
 
 function check_updates() {
     echo "Let's see if there are any updates ..."
+    cd "$SCRIPT_DIR"
     git pull origin
+    cd "$OLDPWD"
 }
 
 function gui() {
@@ -289,9 +291,11 @@ function gui() {
     check_config
 
     while true; do
+	cd "$SCRIPT_DIR"
         local version="$(git tag | sort -V | tail -1)"
         local commit="$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
-
+	cd "$OLDPWD"
+	
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens" \
