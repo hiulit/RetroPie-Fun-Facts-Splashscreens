@@ -289,8 +289,8 @@ function gui() {
     check_config
 
     while true; do
-        local version="1.0.0 ($(git -C "$scriptdir" log -1 --pretty=format:%h))"
-        local commit=$(git -C "$scriptdir" log -1 --pretty=format:"%cr (%h)")
+        local version="1.0.0 ($(git -C "$SCRIPT_DIR" log -1 --pretty=format:%h))"
+        local commit=$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")
 
         cmd=(dialog \
             --backtitle "$backtitle"
