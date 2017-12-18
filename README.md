@@ -4,15 +4,6 @@ This script generates splashscreens for RetroPie with random **Fun Facts!**.
 
 **WARNING: Splashscreens are only available on the Raspberry Pi.**
 
-## Show the Fun Facts! splashcreen in RetroPie
-
-For now, this is the best way to show the Fun Facts! splashcreen in RetroPie:
-
-* Create a new **Fun Facts!** splashscreen. See the instructions for [installation](#installation) and [usage](#usage) below.
-* In RetroPie, go to the **Splashscreen Menu** (the Splashscreen Menu can be accessed from the RetroPie Menu in EmulationStation or from the setup script under option 3).
-* Select the option `Choose Own Splashscreen`. See the [Splashscreen wiki](https://github.com/retropie/retropie-setup/wiki/splashscreen).
-* Select the recently created **Fun Facts!** splashscreen.
-
 ## Installation
 
 ```
@@ -44,6 +35,7 @@ Use '--help' to see all the options
 * `--splash-path [options]`: Set which splashscreen to use.
 * `--text-color [options]`: Set which text color to use.
 * `--create-fun-fact`: Create a new Fun Facts! splashscreen.
+* `--apply-splash`: Apply Fun Facts! splashscreen.
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--gui`: Start GUI.
@@ -95,10 +87,24 @@ sudo ./fun-facts-splashscreens.sh --text-color black
 
 Create a new Fun Facts! splashscreen.
 
+The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens`.
+
 #### Example
 
 ```
 sudo ./fun-facts-splashscreens.sh --create-fun-fact
+```
+
+### `--apply-splash`
+
+Apply Fun Facts! splashscreen.
+
+This command must be run in order to use the **Fun Facts!** splashscreen.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --apply-splash
 ```
 
 ### `--enable-boot`
@@ -147,14 +153,18 @@ sudo ./fun-facts-splashscreens.sh --gui
 ![Fun Facts Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
 ##### Create a new Fun Facts! splashscreen (`--create-fun-fact`)
 ![Fun Facts Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
-##### Enable at boot (`--enable-boot`)
+##### Apply Fun Facts! splashscreen (`--apply-splash`)
 ![Fun Facts Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
-##### Disable at boot (`--disable-boot`)
+##### Enable at boot (`--enable-boot`)
 ![Fun Facts Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
+##### Disable at boot (`--disable-boot`)
+![Fun Facts Splashscreens GUI - 08](gui-examples/fun-facts-splashscreens-gui-08.jpg)
+##### Update script (`--update`)
+![Fun Facts Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
 
 ### `--update`
 
-Updates script.
+Update script.
 
 #### Example
 
