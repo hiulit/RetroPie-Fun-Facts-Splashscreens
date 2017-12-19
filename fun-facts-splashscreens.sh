@@ -303,6 +303,16 @@ function gui() {
         sed -E 's/.*"([^"]+)".*/\1/' |
         tail -1)"
         commit="$(echo "$commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
+                
+        local date1="$commit"
+        local time1="$(date --date="$date1" "+%s")"
+        local date2="$(date +%Y-%m-%d\ %H:%M:%S)"
+        local time2="$(date --date="$date2" "+%s")"
+
+        time_diff="$(($time1-$time2))"
+        hour_diff="$(($time_diff/3600))"
+
+        commit="$hour_diff hours ago"
     
         cmd=(dialog \
             --backtitle "$backtitle"
