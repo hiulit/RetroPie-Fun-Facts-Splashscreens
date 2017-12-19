@@ -281,7 +281,6 @@ function check_argument() {
 function check_updates() {
     echo "Let's see if there are any updates ..."
     cd "$SCRIPT_DIR"
-    echo "$SCRIPT_DIR"
     git pull origin
     cd "$OLDPWD"
 }
@@ -309,10 +308,25 @@ function gui() {
         local date2="$(date +%Y-%m-%d\ %H:%M:%S)"
         local time2="$(date --date="$date2" "+%s")"
 
-        time_diff="$(($time1-$time2))"
-        hour_diff="$(($time_diff/3600))"
+        local time_diff="$(($time1-$time2))"
+        
+        if [[ "$(($time_diff/60))" < 60 ]]; then
+            local divide=60
+        else
+            local divide=3600
+        fi
 
-        commit="$hour_diff hours ago"
+        local hour_diff="$(($time_diff/$divide))"
+        
+        [[ "$hour_diff" -lt 0 ]] && hour_diff="$(($hour_diff*-1))"
+        
+        if [[ "$hour_diff" -eq 1 ]]; then
+            local mhd="hour"
+        else
+            local mhd="hours"
+        fi
+
+        commit="$hour_diff $mhd ago"
     
         cmd=(dialog \
             --backtitle "$backtitle"
