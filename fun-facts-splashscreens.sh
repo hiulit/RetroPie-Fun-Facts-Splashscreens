@@ -292,14 +292,17 @@ function gui() {
     check_config
 
     while true; do
-        cd "$SCRIPT_DIR"
         #~ local version="$(git tag | sort -V | tail -1)"
         local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
         grep '"tag_name":' |
         sed -E 's/.*"([^"]+)".*/\1/')"
 
-        local commit="$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
-        cd "$OLDPWD"
+        #~ local commit="$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
+        local commit="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
+        grep '"date":' |
+        sed -E 's/.*"([^"]+)".*/\1/' |
+        tail -1)"
+        commit="$(echo "$commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
     
         cmd=(dialog \
             --backtitle "$backtitle"
