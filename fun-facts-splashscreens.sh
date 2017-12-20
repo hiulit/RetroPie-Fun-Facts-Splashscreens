@@ -312,6 +312,10 @@ function date_diff() {
     echo "$((diff_sec/sec*abs))"
 }
 
+function round() {
+    echo "$((($1 + $2 / 2) / $2))"
+}
+
 function gui() {
     local backtitle="Fun Facts! Splashscreens for RetroPie"
 
@@ -339,16 +343,16 @@ function gui() {
             smh="minutes"
             time_diff="$((($diff_s / 60)))"
         elif (( "diff_s" > 3600 )); then
-            smh"hours"
-            time_diff="$((($diff_s / 3600)))"
+            smh="hours"
+            time_diff="$(round $diff_s 3600)"
         fi
-        last_commit="$time_diff $smh ago"
+        last_commit="About $time_diff $smh ago"
     
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
-            --menu "Version: $version\nLast Commit: $last_commit" 15 60 6)
+            --menu "Version: $version\nLast commit: $last_commit" 15 60 6)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
