@@ -322,13 +322,13 @@ function gui() {
     check_config
 
     while true; do
+        local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
+        grep '"tag_name":' |
+        sed -E 's/.*"([^"]+)".*/\1/')"
         local now="$(date +%F\ %T)"
         local offset="$(date +%::z)"
         offset="${offset#+}"
         local offset_s="$(echo "$offset" | awk -F: '{print ($1*3600) + ($2*60) + $3}')"
-        local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
-        grep '"tag_name":' |
-        sed -E 's/.*"([^"]+)".*/\1/')"
         local last_commit="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
         grep '"date":' |
         sed -E 's/.*"([^"]+)".*/\1/' |
@@ -337,13 +337,13 @@ function gui() {
         last_commit="$(date --date "$last_commit $offset_s sec" +%F\ %T)"
         local diff_s="$(date_diff "$last_commit" "$now")"
         if (( "diff_s" <= 60 )); then
-            smh="seconds"
+            [[ "$time_diff" -eq 1 ]] && smh="second" || smh="seconds"
             time_diff="$diff_s"
         elif (( "$diff_s" > 60 && "$diff_s" <= 3600 )); then
-            smh="minutes"
+            [[ "$time_diff" -eq 1 ]] && smh="minute" || smh="minutes"
             time_diff="$((($diff_s / 60)))"
         elif (( "diff_s" > 3600 )); then
-            smh="hours"
+            [[ "$time_diff" -eq 1 ]] && smh="hour" || smh="hours"
             time_diff="$(round $diff_s 3600)"
         fi
         last_commit="About $time_diff $smh ago"
