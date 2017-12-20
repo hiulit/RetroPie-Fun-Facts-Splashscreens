@@ -507,7 +507,13 @@ function gui() {
                         --msgbox "\n$output\n" 7 40 2>&1 >/dev/tty
                     ;;
                 6)
-                    check_updates
+                    if [[ "$SCRIPTMODULE_FLAG" -eq 1 ]]; then
+                        dialog \
+                            --backtitle "$backtitle" \
+                            --msgbox "Can't update the script when using it in RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
+                    else
+                        check_updates
+                    fi
                     ;;
             esac
         else
