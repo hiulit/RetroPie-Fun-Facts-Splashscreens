@@ -325,14 +325,14 @@ function gui() {
     check_config
 
     while true; do
-        local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
+        local version="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
         grep '"tag_name":' |
         sed -E 's/.*"([^"]+)".*/\1/')"
         local now="$(date +%F\ %T)"
         local offset="$(date +%::z)"
         offset="${offset#+}"
         local offset_s="$(echo "$offset" | awk -F: '{print ($1*3600) + ($2*60) + $3}')"
-        local last_commit="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
+        local last_commit="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
         grep '"date":' |
         sed -E 's/.*"([^"]+)".*/\1/' |
         tail -1)"
