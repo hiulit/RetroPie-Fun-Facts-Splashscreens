@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-* Up to date.
+### Fixed
+
+* Fixed **Version** and **Last commit**.
+* Fixed `--update` function to show a message box when using the script as a scriptmodule.
 
 ## v1.1.0 (December 18th 2017)
 
