@@ -507,7 +507,7 @@ function gui() {
                         --msgbox "\n$output\n" 7 40 2>&1 >/dev/tty
                     ;;
                 6)
-                    if [[ "$SCRIPTMODULE_FLAG" -eq 1 ]]; then
+                    if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
                         dialog \
                             --backtitle "$backtitle" \
                             --msgbox "Can't update the script when using it in RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
