@@ -299,6 +299,9 @@ function date_diff() {
         -m) sec=60; shift;;
         -h) sec=3600; shift;;
         -d) sec=86400; shift;;
+        -w) sec=604800; shift;;
+        -M) sec=2629744; shift;;
+        -y) sec=31556926; shift;;
         *) sec=1;;
     esac
     date1="$(date_to_stamp "$1")"
@@ -336,15 +339,27 @@ function gui() {
         last_commit="$(echo "$last_commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
         last_commit="$(date --date "$last_commit $offset_s sec" +%F\ %T)"
         local diff_s="$(date_diff "$last_commit" "$now")"
-        if (( "diff_s" <= 60 )); then
-            [[ "$time_diff" -eq 1 ]] && smh="second" || smh="seconds"
+        if (( "$diff_s" < 60 )); then
             time_diff="$diff_s"
-        elif (( "$diff_s" > 60 && "$diff_s" <= 3600 )); then
+            [[ "$time_diff" -eq 1 ]] && smh="second" || smh="seconds"
+        elif (( "$diff_s" >= 60 && "$diff_s" < 3600 )); then
+            time_diff="$(round $diff_s 60)"
             [[ "$time_diff" -eq 1 ]] && smh="minute" || smh="minutes"
-            time_diff="$((($diff_s / 60)))"
-        elif (( "diff_s" > 3600 )); then
-            [[ "$time_diff" -eq 1 ]] && smh="hour" || smh="hours"
+        elif (( "diff_s" >= 3600 && "$diff_s" < 86400  )); then
             time_diff="$(round $diff_s 3600)"
+            [[ "$time_diff" -eq 1 ]] && smh="hour" || smh="hours"
+        elif (( "$diff_s" >= 86400 && "$diff_s" < 604800 )); then
+            time_diff="$(round $diff_s 86400)"
+            [[ "$time_diff" -eq 1 ]] && smh="day" || smh="days"
+        elif (( "$diff_s" >= 604800 && "$diff_s" < 2629744 )); then
+            time_diff="$(round $diff_s 604800)"
+            [[ "$time_diff" -eq 1 ]] && smh="week" || smh="weeks"
+        elif (( "$diff_s" >= 2629744 && "$diff_s" < 31556926 )); then
+            time_diff="$(round $diff_s 2629744)"
+            [[ "$time_diff" -eq 1 ]] && smh="month" || smh="months"
+        elif (( "$diff_s" >= 31556926 )); then
+            time_diff="$(round $diff_s 31556926)"
+            [[ "$time_diff" -eq 1 ]] && smh="year" || smh="years"
         fi
         last_commit="About $time_diff $smh ago"
     
