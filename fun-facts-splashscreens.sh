@@ -299,7 +299,7 @@ function date_diff() {
         -m) sec=60; shift;;
         -h) sec=3600; shift;;
         -d) sec=86400; shift;;
-        *) sec=3600;;
+        *) sec=1;;
     esac
     date1="$(date_to_stamp "$1")"
     date2="$(date_to_stamp "$2")"
@@ -331,7 +331,18 @@ function gui() {
         tail -1)"
         last_commit="$(echo "$last_commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
         last_commit="$(date --date "$last_commit $offset_s sec" +%F\ %T)"
-        last_commit="$(date_diff -h "$last_commit" "$now") hours ago"
+        local diff_s="$(date_diff "$last_commit" "$now")"
+        if (( "diff_s" <= 60 )); then
+            smh="seconds"
+            time_diff="$diff_s"
+        elif (( "$diff_s" > 60 && "$diff_s" <= 3600 )); then
+            smh="minutes"
+            time_diff="$((($diff_s / 60)))"
+        elif (( "diff_s" > 3600 )); then
+            smh"hours"
+            time_diff="$((($diff_s / 3600)))"
+        fi
+        last_commit="$time_diff $smh ago"
     
         cmd=(dialog \
             --backtitle "$backtitle"
