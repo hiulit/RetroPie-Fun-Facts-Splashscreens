@@ -166,6 +166,15 @@ sudo ./fun-facts-splashscreens.sh --gui
 
 Update script.
 
+If you're using **Fun Facts! Splashscreens** via RetroPie-Setup (if you installed it as a scriptmodule via the [RetroPie-Extra](https://github.com/zerojay/RetroPie-Extra) repository), this function won't work. The scriptmodules have their own update function.
+
+If that's the case, go to:
+
+* Manage packages
+* Manage experimental packages
+* fun-facts-splashscreens
+* Update from source
+
 #### Example
 
 ```
