@@ -115,10 +115,10 @@ function apply_splash() {
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
                 --backtitle "$backtitle" \
-                --msgbox "\nFun Facts! splashscreen is already in use.\n" 7 50 2>&1 >/dev/tty
+                --msgbox "\nFun Facts! splashscreen is already applied.\n" 7 50 2>&1 >/dev/tty
         else
             echo
-            echo "Fun Facts! splashscreen is already in use."
+            echo "Fun Facts! splashscreen is already applied."
         fi
     else
         echo "$RESULT_SPLASH" >"$SPLASH_LIST"
@@ -285,54 +285,55 @@ function check_updates() {
     cd "$OLDPWD"
 }
 
+function date_to_stamp() {
+    date --utc --date "$1" +%s
+}
+
+function stamp_to_date() {
+    date --utc --date "1970-01-01 $1 sec" "+%Y-%m-%d %T"
+}
+
+function date_diff() {
+    case "$1" in
+        -s) sec=1; shift;;
+        -m) sec=60; shift;;
+        -h) sec=3600; shift;;
+        -d) sec=86400; shift;;
+        *) sec=3600;;
+    esac
+    date1="$(date_to_stamp "$1")"
+    date2="$(date_to_stamp "$2")"
+    diff_sec="$((date2-date1))"
+    if [[ "$diff_sec" -lt 0 ]]; then
+        abs=-1
+    else
+        abs=1
+    fi
+    echo "$((diff_sec/sec*abs))"
+}
+
 function gui() {
     local backtitle="Fun Facts! Splashscreens for RetroPie"
 
     check_config
 
     while true; do
-        #~ local version="$(git tag | sort -V | tail -1)"
+        local now="$(date +%Y-%m-%d\ %H:%M)"
         local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
         grep '"tag_name":' |
         sed -E 's/.*"([^"]+)".*/\1/')"
-
-        #~ local commit="$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
-        local commit="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
+        local last_commit="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
         grep '"date":' |
         sed -E 's/.*"([^"]+)".*/\1/' |
         tail -1)"
-        commit="$(echo "$commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
-                
-        local date1="$commit"
-        local time1="$(date --date="$date1" "+%s")"
-        local date2="$(date +%Y-%m-%d\ %H:%M:%S)"
-        local time2="$(date --date="$date2" "+%s")"
-
-        local time_diff="$(($time1-$time2))"
-        
-        if [[ "$(($time_diff/60))" < 60 ]]; then
-            local divide=60
-        else
-            local divide=3600
-        fi
-
-        local hour_diff="$(($time_diff/$divide))"
-        
-        [[ "$hour_diff" -lt 0 ]] && hour_diff="$(($hour_diff*-1))"
-        
-        if [[ "$hour_diff" -eq 1 ]]; then
-            local mhd="hour"
-        else
-            local mhd="hours"
-        fi
-
-        commit="$hour_diff $mhd ago"
+        last_commit="$(echo "$last_commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
+        last_commit="$(date_diff -h "$last_commit" "$now") hours ago"
     
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
-            --menu "Version: $version\nLast Commit: $commit" 15 60 6)
+            --menu "Version: $version\nLast Commit: $last_commit" 15 60 6)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
@@ -343,7 +344,7 @@ function gui() {
         check_apply_splash
         return_value="$?"
         if [[ "$return_value" -eq 0 ]]; then
-            option_apply_splash="Apply Fun Facts! splashscreen (already in use)"
+            option_apply_splash="Apply Fun Facts! splashscreen (already applied)"
         else
             option_apply_splash="Apply Fun Facts! splashscreen"
         fi
@@ -366,9 +367,7 @@ function gui() {
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-
-        result_value="$?"
-
+        
         if [[ -n "$choice" ]]; then
             case "$choice" in
                 1)
@@ -380,7 +379,6 @@ function gui() {
                         --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
 
                     result_value="$?"
-
                     if [[ "$result_value" -eq 0 ]]; then
                         local validation="$(validate_splash $splash)"
 
@@ -425,9 +423,7 @@ function gui() {
                         --menu "Choose a color" 15 60 "${#color_list[@]}")
 
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-
                     result_value="$?"
-
                     if [[ "$result_value" -eq 0 ]]; then
                         if [[ "$choice" -eq 1 ]]; then
                             local color=""
