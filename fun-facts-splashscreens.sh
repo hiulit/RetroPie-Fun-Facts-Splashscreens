@@ -318,7 +318,10 @@ function gui() {
     check_config
 
     while true; do
-        local now="$(date +%Y-%m-%d\ %H:%M)"
+        local now="$(date +%F\ %T)"
+        local offset="$(date +%::z)"
+        offset="${offset#+}"
+        local offset_s="$(echo "$offset" | awk -F: '{print ($1*3600) + ($2*60) + $3}')"
         local version="$(curl --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
         grep '"tag_name":' |
         sed -E 's/.*"([^"]+)".*/\1/')"
@@ -327,6 +330,7 @@ function gui() {
         sed -E 's/.*"([^"]+)".*/\1/' |
         tail -1)"
         last_commit="$(echo "$last_commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
+        last_commit="$(date --date "$last_commit $offset_s sec" +%F\ %T)"
         last_commit="$(date_diff -h "$last_commit" "$now") hours ago"
     
         cmd=(dialog \
