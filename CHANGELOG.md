@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Up to date
+
+## v1.2.0 (December 21st 2017)
+
 ### Added
 
 * Check to see if **Fun Facts!** splashscreen is already created before trying to apply it.
