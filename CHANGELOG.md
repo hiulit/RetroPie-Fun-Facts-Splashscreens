@@ -4,7 +4,7 @@
 
 ### Added
 
-* Check to see if **Fun Facts"** splashscreen is already created before trying to apply it.
+* Check to see if **Fun Facts!** splashscreen is already created before trying to apply it.
 
 ### Fixed
 
