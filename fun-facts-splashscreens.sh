@@ -491,7 +491,13 @@ function gui() {
                     ;;
                 4)
                     check_config
-                    apply_splash
+                    if [[ ! -f "$RESULT_SPLASH" ]]; then
+                        dialog \
+                            --backtitle "$backtitle" \
+                            --msgbox "ERROR: create a Fun Facts! splashscreen before applying it." 7 50 2>&1 >/dev/tty
+                    else
+                        apply_splash
+                    fi
                     ;;
                 5)
                     check_boot_script
@@ -572,7 +578,16 @@ function get_options() {
 #H -a, --apply-splash                           Apply Fun Facts! splashscreen.
             -a|--apply-splash)
                 check_config
-                apply_splash
+                if [[ ! -f "$RESULT_SPLASH" ]]; then
+                    echo >&2
+                    echo "ERROR: create a Fun Facts! splashscreen before applying it." >&2
+                    echo >&2
+                    echo "Try \"sudo $0 --help\" for more info." >&2
+                    echo >&2
+                    exit 1
+                else
+                    apply_splash
+                fi
                 ;;
 
 #H -e, --enable-boot                            Enable script to be launch at boot.
