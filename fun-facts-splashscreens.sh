@@ -543,6 +543,10 @@ function get_options() {
                 echo "Fun Facts! splashscreens for RetroPie."
                 echo "A tool for RetroPie to create splashscreens with random video game related fun facts."
                 echo
+                echo "USAGE: sudo $0 [options]"
+                echo
+                echo "OPTIONS:"
+                echo
                 sed '/^#H /!d; s/^#H //' "$0"
                 echo
 
