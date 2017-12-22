@@ -362,7 +362,7 @@ function gui() {
             [[ "$time_diff" -eq 1 ]] && smh="year" || smh="years"
         fi
         last_commit="About $time_diff $smh ago"
-    
+
         cmd=(dialog \
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens" \
@@ -401,7 +401,7 @@ function gui() {
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-        
+
         if [[ -n "$choice" ]]; then
             case "$choice" in
                 1)
@@ -539,6 +539,9 @@ function get_options() {
         case "$1" in
 #H -h, --help                                   Print the help message and exit.
             -h|--help)
+                echo
+                echo "Fun Facts! splashscreens for RetroPie."
+                echo "A tool for RetroPie to create splashscreens with random video game related fun facts."
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
                 echo
