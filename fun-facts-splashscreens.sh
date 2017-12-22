@@ -285,6 +285,23 @@ function check_updates() {
     cd "$OLDPWD"
 }
 
+function check_version() {
+    local tag="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
+        grep '"tag_name":' |
+        sed -E 's/.*"([^"]+)".*/\1/')"
+    echo "$tag"
+}
+
+funtion get_last_commit() {
+    local last_commit="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
+    grep '"date":' |
+    sed -E 's/.*"([^"]+)".*/\1/' |
+    tail -1)"
+    last_commit="$(echo "$last_commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
+    last_commit="$(date --date "$last_commit $offset_s sec" +%F\ %T)"
+    echo "$last_commit"
+}
+
 function date_to_stamp() {
     date --utc --date "$1" +%s
 }
@@ -325,19 +342,12 @@ function gui() {
     check_config
 
     while true; do
-        local version="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/releases/latest" |
-        grep '"tag_name":' |
-        sed -E 's/.*"([^"]+)".*/\1/')"
+        local version="$(check_version)"
         local now="$(date +%F\ %T)"
         local offset="$(date +%::z)"
         offset="${offset#+}"
         local offset_s="$(echo "$offset" | awk -F: '{print ($1*3600) + ($2*60) + $3}')"
-        local last_commit="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
-        grep '"date":' |
-        sed -E 's/.*"([^"]+)".*/\1/' |
-        tail -1)"
-        last_commit="$(echo "$last_commit" | sed 's/\(.*\)T\([0-9]*:[0-9]*\).*/\1 \2/')"
-        last_commit="$(date --date "$last_commit $offset_s sec" +%F\ %T)"
+        local last_commit="$(get_last_commit)"
         local diff_s="$(date_diff "$last_commit" "$now")"
         if (( "$diff_s" < 60 )); then
             time_diff="$diff_s"
@@ -613,6 +623,10 @@ function get_options() {
 #H -u, --update                                 Update script.
             -u|--update)
                 check_updates
+                ;;
+#H -v, --version                            Check script version.
+            -v|--version)
+                check_version
                 ;;
             *)
                 echo "ERROR: invalid option \"$1\"" >&2
