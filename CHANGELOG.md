@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-* Up to date
+### Added
+
+* Updated help info when using `--help`.
+
+### Changed
+
+* Removed `check_config` for `apply_splash` (not needed).
 
 ## v1.2.0 (December 21st 2017)
 
