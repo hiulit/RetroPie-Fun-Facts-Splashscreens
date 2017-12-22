@@ -4,6 +4,8 @@
 
 ### Added
 
+* Added `--version` to check the version of the script.
+* Added `check_version` and `get_last_commit` functions.
 * Updated help info when using `--help`.
 
 ### Changed
