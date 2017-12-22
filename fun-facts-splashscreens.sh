@@ -292,7 +292,7 @@ function check_version() {
     echo "$tag"
 }
 
-funtion get_last_commit() {
+function get_last_commit() {
     local last_commit="$(curl -u "hiulit:a07204881fe7a38dc8fcd4f37f6f49544a21848a" --silent "https://api.github.com/repos/hiulit/RetroPie-Fun-Facts-Splashscreens/commits/master" |
     grep '"date":' |
     sed -E 's/.*"([^"]+)".*/\1/' |
