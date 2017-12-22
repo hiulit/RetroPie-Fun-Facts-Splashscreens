@@ -490,7 +490,6 @@ function gui() {
                     create_fun_fact
                     ;;
                 4)
-                    check_config
                     if [[ ! -f "$RESULT_SPLASH" ]]; then
                         dialog \
                             --backtitle "$backtitle" \
@@ -584,7 +583,6 @@ function get_options() {
 
 #H -a, --apply-splash                           Apply Fun Facts! splashscreen.
             -a|--apply-splash)
-                check_config
                 if [[ ! -f "$RESULT_SPLASH" ]]; then
                     echo >&2
                     echo "ERROR: create a Fun Facts! splashscreen before applying it." >&2
