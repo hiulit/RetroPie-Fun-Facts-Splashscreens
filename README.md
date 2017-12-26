@@ -237,6 +237,7 @@ Thanks to:
 * [Parviglumis](https://retropie.org.uk/forum/user/parviglumis) - For the idea of creating the [Fun Facts! Splashscreens](https://retropie.org.uk/forum/topic/13630).
 * [meleu](https://github.com/meleu/) - For all his help and wisdom with the code and for all the PRs! :D
 * [zerojay](https://github.com/zerojay/) - For adding **Fun Facts! Splashscreens** to the [RetroPie-Extra](https://github.com/zerojay/RetroPie-Extra) repository.
+* [Thunderforge](https://github.com/Thunderforge) - For adding more [**Fun Facts!**](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/pull/13).
 * All the people at the [RetroPie Forum](https://retropie.org.uk/forum/).
 
 ## License

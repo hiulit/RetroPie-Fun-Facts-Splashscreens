@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+* Up to date
+
+## v1.3.0 (December 26th 2017)
+
 ### Added
 
+* Merged [#13](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/pull/13) - More **Fun FActs!** thanks to [Thunderforge](https://github.com/Thunderforge).
 * Added `--version` to check the version of the script.
 * Added `check_version` and `get_last_commit` functions.
 * Updated help info when using `--help`.
