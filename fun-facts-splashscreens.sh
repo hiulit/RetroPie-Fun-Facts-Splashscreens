@@ -294,7 +294,7 @@ function check_updates() {
         updates_output="there are updates"
     elif [[ "$REMOTE" == "$BASE" ]]; then
         updates_status="needs-to-push"
-        updates_output="did you make any changes to the script?"
+        updates_output="did you make any changes??"
     else
         updates_status="diverged"
         updates_output="diverged"
