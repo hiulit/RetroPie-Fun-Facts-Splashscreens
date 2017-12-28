@@ -279,10 +279,28 @@ function check_argument() {
 }
 
 function check_updates() {
-    echo "Let's see if there are any updates ..."
+    [[ "$GUI_FLAG" -eq 0 ]] && echo "Let's see if there are any updates ..."
     cd "$SCRIPT_DIR"
-    git pull origin
+    git remote update > /dev/null
+    UPSTREAM="$1@{u}"
+    LOCAL="$(git rev-parse @)"
+    REMOTE="$(git rev-parse $UPSTREAM)"
+    BASE="$(git merge-base @ $UPSTREAM)"
+    if [[ "$LOCAL" == "$REMOTE" ]]; then
+        updates_status="up-to-date"
+        updates_output="up to date"
+    elif [[ "$LOCAL" == "$BASE" ]]; then
+        updates_status="needs-to-pull"
+        updates_output="there are updates"
+    elif [[ "$REMOTE" == "$BASE" ]]; then
+        updates_status="needs-to-push"
+        updates_output="did you make any changes to the script?"
+    else
+        updates_status="diverged"
+        updates_output="diverged"
+    fi
     cd "$OLDPWD"
+    [[ "$GUI_FLAG" -eq 0 ]] && echo "${updates_output^}"
 }
 
 function check_version() {
@@ -400,6 +418,9 @@ function gui() {
         else
             option_boot="disabled"
         fi
+        
+        check_updates
+        option_updates="Update script ($updates_output)"
 
         options=(
             1 "$option_splash"
@@ -407,7 +428,7 @@ function gui() {
             3 "Create a new Fun Facts! splashscreen"
             4 "$option_apply_splash"
             5 "Enable/Disable script at boot ($option_boot)"
-            6 "Update script"
+            6 "$option_updates"
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -527,7 +548,11 @@ function gui() {
                             --backtitle "$backtitle" \
                             --msgbox "Can't update the script when using it in RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
                     else
-                        check_updates
+                        if [[ "$updates_status" == "needs-to-pull" ]]; then
+                            git pull
+                        else
+                            :
+                        fi
                     fi
                     ;;
             esac
@@ -623,6 +648,9 @@ function get_options() {
 #H -u, --update                                 Update script.
             -u|--update)
                 check_updates
+                if [[ "$updates_status" == "needs-to-pull" ]]; then
+                    git pull
+                fi
                 ;;
 #H -v, --version                            Check script version.
             -v|--version)
