@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-* Up to date
+### Added
+
+* Check if there are updates to download.
 
 ## v1.3.0 (December 26th 2017)
 
