@@ -395,7 +395,7 @@ function gui() {
             --backtitle "$backtitle"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
-            --menu "Version: $version\nLast commit: $last_commit" 15 60 6)
+            --menu "Version: $version\nLast commit: $last_commit" 15 60 8)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
@@ -467,53 +467,135 @@ function gui() {
                     ;;
                 2)
                     CONFIG_FLAG=0
-                    local i=1
-                    local color_list=()
-                    options=("$i" "default: white")
-
-                    while IFS= read -r line; do
-                        color_list+=("$line")
-                    done < <(convert -list color | grep "srgb" | grep -Eo "^[^ ]+")
-
-                    for color in "${color_list[@]}"; do
-                        ((i++))
-                        options+=("$i" "$color")
-                        #~ ((i++))
-                    done
-
+                    
                     cmd=(dialog \
                         --backtitle "$backtitle" \
                         --title "Set text color" \
                         --cancel-label "Back" \
-                        --menu "Choose a color" 15 60 "${#color_list[@]}")
-
+                        --menu "Choose an option" 15 60 8)
+                    
+                    options=(
+                        1 "Basic colors"
+                        2 "Full list of colors"
+                    )
+                    
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                    result_value="$?"
-                    if [[ "$result_value" -eq 0 ]]; then
-                        if [[ "$choice" -eq 1 ]]; then
-                            local color=""
-                        else
-                            local color="${options[$((choice*2-1))]}"
-                        fi
 
-                        local validation="$(validate_color $color)"
+                    if [[ -n "$choice" ]]; then
+                        case "$choice" in
+                            1)
+                                local i=1
+                                local color_list=(
+                                    "white (default)"
+                                    "black"
+                                    "gray"
+                                    "gray10"
+                                    "gray25"
+                                    "gray50"
+                                    "gray75"
+                                    "gray90"
+                                    "pink"
+                                    "red"
+                                    "orange"
+                                    "yellow"
+                                    "green"
+                                    "silver"
+                                    "blue"
+                                    "cyan"
+                                    "purple"
+                                    "brown"
+                                )
+                                
+                                options=()
+                                
+                                for color in "${color_list[@]}"; do
+                                    options+=("$i" "$color")
+                                    ((i++))
+                                done
 
-                         if [[ -n "$validation" ]]; then
-                            dialog \
-                                --backtitle "$backtitle" \
-                                --msgbox "$validation" 6 40 2>&1 >/dev/tty
-                        else
-                            if [[ -z "$color" ]]; then
-                                TEXT_COLOR="$DEFAULT_COLOR"
-                                set_config "text_color" ""
-                            else
-                                TEXT_COLOR="$color"
-                                set_config "text_color" "$TEXT_COLOR"
-                            fi
-                            dialog \
-                                --backtitle "$backtitle" \
-                                --msgbox "\nText color set to \"$TEXT_COLOR\"" 7 50 2>&1 >/dev/tty
-                        fi
+                                cmd=(dialog \
+                                    --backtitle "$backtitle" \
+                                    --title "Set text color" \
+                                    --cancel-label "Back" \
+                                    --menu "Choose a color" 15 60 "${#color_list[@]}")
+
+                                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                                result_value="$?"
+                                if [[ "$result_value" -eq 0 ]]; then
+                                    if [[ "$choice" -eq 1 ]]; then
+                                        local color=""
+                                    else
+                                        local color="${options[$((choice*2-1))]}"
+                                    fi
+
+                                    local validation="$(validate_color $color)"
+
+                                     if [[ -n "$validation" ]]; then
+                                        dialog \
+                                            --backtitle "$backtitle" \
+                                            --msgbox "$validation" 6 40 2>&1 >/dev/tty
+                                    else
+                                        if [[ -z "$color" ]]; then
+                                            TEXT_COLOR="$DEFAULT_COLOR"
+                                            set_config "text_color" ""
+                                        else
+                                            TEXT_COLOR="$color"
+                                            set_config "text_color" "$TEXT_COLOR"
+                                        fi
+                                        dialog \
+                                            --backtitle "$backtitle" \
+                                            --msgbox "\nText color set to \"$TEXT_COLOR\"" 7 50 2>&1 >/dev/tty
+                                    fi
+                                fi
+                                ;;
+                            2)
+                                local i=1
+                                local color_list=()
+                                options=()
+
+                                while IFS= read -r line; do
+                                    color_list+=("$line")
+                                done < <(convert -list color | grep "srgb" | grep -Eo "^[^ ]+")
+
+                                for color in "${color_list[@]}"; do
+                                    options+=("$i" "$color")
+                                    ((i++))
+                                done
+
+                                cmd=(dialog \
+                                    --backtitle "$backtitle" \
+                                    --title "Set text color" \
+                                    --cancel-label "Back" \
+                                    --menu "Choose a color" 15 60 "${#color_list[@]}")
+
+                                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                                result_value="$?"
+                                if [[ "$result_value" -eq 0 ]]; then                                    
+                                    local color="${options[$((choice*2-1))]}"
+
+                                    local validation="$(validate_color $color)"
+
+                                     if [[ -n "$validation" ]]; then
+                                        dialog \
+                                            --backtitle "$backtitle" \
+                                            --msgbox "$validation" 6 40 2>&1 >/dev/tty
+                                    else
+                                        if [[ -z "$color" ]]; then
+                                            TEXT_COLOR="$DEFAULT_COLOR"
+                                            set_config "text_color" ""
+                                        else
+                                            TEXT_COLOR="$color"
+                                            set_config "text_color" "$TEXT_COLOR"
+                                        fi
+                                        dialog \
+                                            --backtitle "$backtitle" \
+                                            --msgbox "\nText color set to \"$TEXT_COLOR\"" 7 50 2>&1 >/dev/tty
+                                    fi
+                                fi
+                                ;;
+                        esac
+                    else
+                        break
                     fi
                     ;;
                 3)
