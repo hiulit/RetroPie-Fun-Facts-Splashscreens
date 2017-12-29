@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+* Up to date
+
+## v1.4.0 (December 29th 2017)
+
 ### Added
 
-* Check if there are updates to download.
+* Check if there are updates to download [#12](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/12).
+* Split colors into **basic colors** and **full list of colors** [#9](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/9).
 
 ## v1.3.0 (December 26th 2017)
 
