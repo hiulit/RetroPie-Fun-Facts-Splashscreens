@@ -3,7 +3,7 @@
 rp_module_id="fun-facts-splashscreens"
 rp_module_desc="Generate splashscreens with random video game related fun facts."
 rp_module_help="Follow the instructions on the dialogs to set the splashscreen and the text color to create a new Fun Facts! splashscreen."
-rp_module_help="$rp_module_help\n\nApply the splash after creating it to use it."
+rp_module_help="$rp_module_help\n\nApply the splashscreen after creating it to use it."
 rp_module_help="$rp_module_help\n\nSet \"Enable at boot\" to create a new Fun Facts! splashscreen automatically at each system boot."
 rp_module_section="exp"
 rp_module_flags="noinstclean !x86 !osmc !xbian !mali !kms"
