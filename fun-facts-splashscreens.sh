@@ -419,9 +419,13 @@ function gui() {
             option_boot="disabled"
         fi
         
-        check_updates
-        option_updates="Update script ($updates_output)"
-
+        if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
+            option_updates="Update script"
+        else
+            check_updates
+            option_updates="Update script ($updates_output)"
+        fi
+        
         options=(
             1 "$option_splash"
             2 "$option_color"
