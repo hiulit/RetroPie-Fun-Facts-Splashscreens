@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* Up to date
+* Updated help for the scriptmodule.
 
 ## v1.4.1 (December 30th 2017)
 
