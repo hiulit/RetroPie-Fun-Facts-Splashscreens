@@ -632,7 +632,7 @@ function gui() {
                     if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
                         dialog \
                             --backtitle "$backtitle" \
-                            --msgbox "Can't update the script when using it in RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
+                            --msgbox "Can't update the script when using it from RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
                     else
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
                             git pull
