@@ -8,7 +8,7 @@
 
 ### Fixed
 
-* Don't check for updates when using script as scriptmodule
+* Don't check for updates when using script as scriptmodule.
 
 ## v1.4.0 (December 29th 2017)
 
