@@ -4,7 +4,7 @@ The PlayStation1 was able to render textures with about 700kb of video memory. T
 The N64 had 4mb of RAM compared to the PS1's 2mb, allowing for larger 3D worlds, better draw distances, and higher resolution.
 Around 650MB of data could fit on a PS1 CD, as opposed to about 64MB on an N64 cartridge. This usually led to movie-style cutscenes, higher quality music, and voice acting on the PlayStation.
 The most valuable NES game today is Nintendo World Championships Gold. Only 26 copies were produced and given out by Nintendo in 1990 as a contest prize. It has sold for more than $25,000!
-The highest grossing arcade game of all time is Pac-Man, estimated to have earned $2.5 billion in quarters from its release in 1980 to 1990.
+The highest grossing arcade game of all time, not considering inflation, is Space Invaders, estimated to have earned $2.7 billion in quarters between 1978 and 1982.
 Nintendo offered repair service for the original GameBoy, released in 1989, until 2007.
 When Space Invaders was released in Japan, it caused a temporary shortage of the 100 yen coin.
 Mario first appeared in 1981 as the playable character in Nintendo's arcade game Donkey Kong. However, he was a carpenter known only as Jumpman.
@@ -86,3 +86,8 @@ The PlayStation 2 is the best-selling video game console of all time with over 1
 The 1976 Atari game Breakout was created by Apple co-founders Steve Jobs and Steve Wozniak.
 The second player controller on the Famicom lacked Start and Select buttons, but included a microphone.
 The Commodore 64 is the best-selling single computer model of all time with over 17 million units sold.
+Tetris is the best-selling video game of all time with over 170 million copies sold across dozens of platforms.
+Pac-Man is the best-selling arcade game with over 400,000 cabinets sold.
+Due to their cultural impact, Dragon's Lair, Pac-Man, and Pong are the only three video games on permanent display at the Smithsonian Institution in Washington, D.C., USA.
+Sega's 1991 FMV game Time Traveler is the first arcade game to feature a holographic display.
+Sega's 1983 rail shooter Astron Belt was the first laserdisc video game, being released just over a month before the more popular Dragon's Lair.
