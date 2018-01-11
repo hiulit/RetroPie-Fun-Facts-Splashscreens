@@ -18,22 +18,22 @@ You can also install **Fun Facts! Splashscreens** as a scriptmodule via the [Ret
 ## Usage
 
 ```
-sudo ./fun-facts-splashscreens.sh [options]
+sudo ./fun-facts-splashscreens.sh [OPTIONS]
 ```
 
 If no options are passed, you will be prompted with a usage example:
 
 ```
-USAGE: sudo ./fun-facts-splashscreens.sh [options]
+USAGE: sudo ./fun-facts-splashscreens.sh [OPTIONS]
 
-Use '--help' to see all the options
+Use '--help' to see all the options.
 ```
 
 ## Options
 
 * `--help`: Print the help message and exit.
-* `--splash-path [options]`: Set which splashscreen to use.
-* `--text-color [options]`: Set which text color to use.
+* `--splash-path [OPTIONS]`: Set which splashscreen to use.
+* `--text-color [OPTIONS]`: Set which text color to use.
 * `--create-fun-fact`: Create a new Fun Facts! splashscreen.
 * `--apply-splash`: Apply Fun Facts! splashscreen.
 * `--enable-boot`: Enable script to be launch at boot.
@@ -55,7 +55,7 @@ Print the help message and exit.
 sudo ./fun-facts-splashscreens.sh --help
 ```
 
-### `--splash-path [options]`
+### `--splash-path [OPTIONS]`
 
 Set which splashscreen to use.
 
@@ -69,7 +69,7 @@ Set which splashscreen to use.
 sudo ./fun-facts-splashscreens.sh --splash-path /home/pi/Downloads/retropie-2014.png
 ```
 
-### `--text-color [options]`
+### `--text-color [OPTIONS]`
 
 Set which text color to use.
 
