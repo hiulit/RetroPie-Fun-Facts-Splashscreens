@@ -29,7 +29,7 @@ GUI_FLAG=0
 
 function usage() {
     echo
-    echo "USAGE: sudo $0 [options]"
+    echo "USAGE: sudo $0 [OPTIONS]"
     echo
     echo "Use '--help' to see all the options."
     echo
@@ -651,7 +651,6 @@ function gui() {
 function get_options() {
     if [[ -z "$1" ]]; then
         usage
-
         exit 0
     fi
 
@@ -663,7 +662,7 @@ function get_options() {
                 echo "Fun Facts! splashscreens for RetroPie."
                 echo "A tool for RetroPie to create splashscreens with random video game related fun facts."
                 echo
-                echo "USAGE: sudo $0 [options]"
+                echo "USAGE: sudo $0 [OPTIONS]"
                 echo
                 echo "OPTIONS:"
                 echo
