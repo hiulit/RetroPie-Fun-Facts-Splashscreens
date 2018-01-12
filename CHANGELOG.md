@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+
+* Merged [#16](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/pull/16) - More **Fun Facts!** thanks to [Thunderforge](https://github.com/Thunderforge).
+
+### Changed
+
 * Updated help for the scriptmodule.
 
 ## v1.4.1 (December 30th 2017)
