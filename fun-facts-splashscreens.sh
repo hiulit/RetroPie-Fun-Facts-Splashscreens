@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
-
+# fun-facts-splashscreens.sh
+#
 # Fun Facts! splashscreens for RetroPie.
 # A tool for RetroPie to create splashscreens with random video game related fun facts.
+#
+# Author: hiulit
+# Repository: https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens
+# License: MIT License https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/blob/master/LICENSE
 #
 # Requirements:
 # - Retropie 4.x.x
 # - Imagemagick package
+
+
+# Globals #############################################
 
 home="$(find /home -type d -name RetroPie -print -quit 2>/dev/null)"
 home="${home%/RetroPie}"
@@ -21,6 +29,9 @@ readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-facts-splashscreen.png"
 readonly RCLOCAL="/etc/rc.local"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 
+
+# Variables ############################################
+
 SPLASH=
 TEXT_COLOR=
 ENABLE_BOOT_FLAG=0
@@ -28,17 +39,13 @@ DISABLE_BOOT_FLAG=0
 CONFIG_FLAG=0
 GUI_FLAG=0
 
-function usage() {
-    echo
-    echo "USAGE: sudo $0 [OPTIONS]"
-    echo
-    echo "Use '--help' to see all the options."
-    echo
-}
+
+# Functions ############################################
 
 function is_retropie() {
     [[ -d "$home/RetroPie" && -d "$home/.emulationstation" && -d "/opt/retropie" ]]
 }
+
 
 function check_dependencies() {
     if ! which convert > /dev/null; then
@@ -47,6 +54,21 @@ function check_dependencies() {
         exit 1
     fi
 }
+
+
+function check_argument() {
+    # XXX: this method doesn't accept arguments starting with '-'.
+    if [[ -z "$2" || "$2" =~ ^- ]]; then
+        echo >&2
+        echo "ERROR: \"$1\" is missing an argument." >&2
+        echo >&2
+        echo "Try \"sudo $0 --help\" for more info." >&2
+        echo >&2
+
+        return 1
+    fi
+}
+
 
 function set_config() {
     sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$FUN_FACTS_CFG"
@@ -97,17 +119,46 @@ function check_config() {
     fi
 }
 
+
+function usage() {
+    echo
+    echo "USAGE: sudo $0 [OPTIONS]"
+    echo
+    echo "Use '--help' to see all the options."
+    echo
+}
+
+
+function enable_boot_script() {
+    local command="\"$SCRIPT_DIR/$(basename "$0")\" --create-fun-fact \&"
+    disable_boot_script # deleting any previous config (do nothing if there isn't).
+    sed -i "s|^exit 0$|${command}\\nexit 0|" "$RCLOCAL"
+    assure_safe_exit_boot_script
+    check_boot_script
+}
+
+
+function disable_boot_script() {
+    sed -i "/$(basename "$0")/d" "$RCLOCAL"
+    assure_safe_exit_boot_script
+    ! check_boot_script
+}
+
+
 function assure_safe_exit_boot_script() {
     grep -q '^exit 0$' "$RCLOCAL" || echo "exit 0" >> "$RCLOCAL"
 }
+
 
 function check_boot_script() {
     grep -q "$SCRIPT_DIR" "$RCLOCAL"
 }
 
+
 function check_apply_splash() {
     grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
 }
+
 
 function apply_splash() {
     check_apply_splash
@@ -133,23 +184,11 @@ function apply_splash() {
     fi
 }
 
-function enable_boot_script() {
-    local command="\"$SCRIPT_DIR/$(basename "$0")\" --create-fun-fact \&"
-    disable_boot_script # deleting any previous config (do nothing if there isn't).
-    sed -i "s|^exit 0$|${command}\\nexit 0|" "$RCLOCAL"
-    assure_safe_exit_boot_script
-    check_boot_script
-}
-
-function disable_boot_script() {
-    sed -i "/$(basename "$0")/d" "$RCLOCAL"
-    assure_safe_exit_boot_script
-    ! check_boot_script
-}
 
 function get_current_theme() {
     sed -n "/name=\"ThemeSet\"/ s/^.*value=['\"]\(.*\)['\"].*/\1/p" "$home/.emulationstation/es_settings.cfg"
 }
+
 
 function get_font() {
     local theme="$(get_current_theme)"
@@ -170,9 +209,9 @@ function get_font() {
             exit 1
         fi
     fi
-
     echo "$font"
 }
+
 
 function create_fun_fact() {
     local splash="$1"
@@ -207,6 +246,7 @@ function create_fun_fact() {
     && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$backtitle" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 || echo "Fun Facts! splashscreen successfully created!"
 }
 
+
 function validate_splash() {
     [[ -z "$1" ]] && return 0
 
@@ -217,7 +257,6 @@ function validate_splash() {
             else
                 echo "ERROR: \"$1\" file not found!"
             fi
-
             return 1
         else
             echo >&2
@@ -226,11 +265,11 @@ function validate_splash() {
                 echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\"" >&2
             fi
             echo >&2
-
             exit 1
         fi
     fi
 }
+
 
 function validate_color() {
     [[ -z "$1" ]] && return 0
@@ -244,7 +283,6 @@ function validate_color() {
             else
                 echo "ERROR: invalid color \"$1\"."
             fi
-
             return 1
         else
             echo >&2
@@ -260,24 +298,11 @@ function validate_color() {
             echo >&2
             echo "TIP: run the 'convert -list color' command to get a full list." >&2
             echo >&2
-
             exit 1
         fi
     fi
 }
 
-function check_argument() {
-    # XXX: this method doesn't accept arguments starting with '-'.
-    if [[ -z "$2" || "$2" =~ ^- ]]; then
-        echo >&2
-        echo "ERROR: \"$1\" is missing an argument." >&2
-        echo >&2
-        echo "Try \"sudo $0 --help\" for more info." >&2
-        echo >&2
-
-        return 1
-    fi
-}
 
 function check_updates() {
     [[ "$GUI_FLAG" -eq 0 ]] && echo "Let's see if there are any updates ..."
@@ -304,9 +329,11 @@ function check_updates() {
     [[ "$GUI_FLAG" -eq 0 ]] && echo "${updates_output^}"
 }
 
+
 function get_last_commit() {
     echo "$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
 }
+
 
 function gui() {
     local backtitle="Fun Facts! Splashscreens for RetroPie"
@@ -573,6 +600,7 @@ function gui() {
     done
 }
 
+
 function get_options() {
     if [[ -z "$1" ]]; then
         usage
@@ -593,7 +621,6 @@ function get_options() {
                 echo
                 sed '/^#H /!d; s/^#H //' "$0"
                 echo
-
                 exit 0
                 ;;
 
@@ -676,17 +703,17 @@ function get_options() {
 }
 
 function main() {
+    if ! is_retropie; then
+        echo "ERROR: RetroPie is not installed. Aborting ..." >&2
+        exit 1
+    fi
+    
     check_dependencies
 
     # check if sudo is used.
     if [[ "$(id -u)" -ne 0 ]]; then
         echo "ERROR: Script must be run under sudo." >&2
         usage
-        exit 1
-    fi
-
-    if ! is_retropie; then
-        echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
     fi
 
