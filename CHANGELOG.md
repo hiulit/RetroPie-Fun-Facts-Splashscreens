@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Up to date
+
+## v1.5.0 (January 15th 2018)
+
 ### Fixed
 
 * Fixed issue in `create_fun_fact()` which was not getting proper values and therefore making the function not to work.
@@ -15,6 +19,7 @@
 
 ### Changed
 
+* Applied the [style guide](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#style-guide) to **Fun Facts!**.
 * Updated help for the scriptmodule.
 * Cleaned up code and comments.
 * Changed some outputs that were too much verbose.

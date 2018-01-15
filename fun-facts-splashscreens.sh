@@ -23,7 +23,7 @@ readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
 
-readonly SCRIPT_VERSION="1.4.1"
+readonly SCRIPT_VERSION="1.5.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
 readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
