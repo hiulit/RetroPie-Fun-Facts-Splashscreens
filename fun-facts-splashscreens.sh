@@ -100,8 +100,14 @@ function check_config() {
     SPLASH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
 
-    [[ -z "$SPLASH" ]] && SPLASH="$DEFAULT_SPLASH" && echo  -e "No 'splashscreen_path' set. Switching to defaults ..."
-    [[ -z "$TEXT_COLOR" ]] && TEXT_COLOR="$DEFAULT_COLOR"  && echo  -e "No 'text_color' set. Switching to defaults ..."
+    if [[ -z "$SPLASH" ]]; then
+        SPLASH="$DEFAULT_SPLASH"
+        [[ "$GUI_FLAG" -eq 0 ]] && echo "No 'splashscreen_path' set. Switching to defaults ..."
+    fi
+    if [[ -z "$TEXT_COLOR" ]]; then
+        TEXT_COLOR="$DEFAULT_COLOR"
+        [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "No 'text_color' set. Switching to defaults ..."
+    fi
 
     validate_splash "$SPLASH"
     validate_color "$TEXT_COLOR"
