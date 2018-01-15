@@ -38,7 +38,7 @@ readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/default-splashscreen.png"
 readonly DEFAULT_COLOR="white"
 
-SPLASH=
+SPLASH_PATH=
 TEXT_COLOR=
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
@@ -97,11 +97,11 @@ function check_config() {
     
     [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "\nChecking config ..."
     
-    SPLASH="$(get_config "splashscreen_path")"
+    SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
 
     if [[ -z "$SPLASH" ]]; then
-        SPLASH="$DEFAULT_SPLASH"
+        SPLASH_PATH="$DEFAULT_SPLASH"
         [[ "$GUI_FLAG" -eq 0 ]] && echo "No 'splashscreen_path' set. Switching to defaults ..."
     fi
     if [[ -z "$TEXT_COLOR" ]]; then
@@ -408,10 +408,10 @@ function gui() {
                                 --msgbox "$validation" 10 50 2>&1 >/dev/tty
                         else
                             if [[ -z "$validation" ]]; then
-                                SPLASH="$DEFAULT_SPLASH"
+                                SPLASH_PATH="$DEFAULT_SPLASH"
                                 set_config "splashscreen_path" ""
                             else
-                                SPLASH="$splash"
+                                SPLASH_PATH="$splash"
                                 set_config "splashscreen_path" "$SPLASH"
                             fi
                             dialog \
@@ -630,7 +630,7 @@ function get_options() {
                 validate_splash "$1"
                 return_value="$?"
                 if [[ "$return_value" != 1 ]]; then
-                    SPLASH="$1"
+                    SPLASH_PATH="$1"
                     set_config "splashscreen_path" "$SPLASH"
                 fi
                 ;;
