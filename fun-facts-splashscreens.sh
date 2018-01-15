@@ -18,19 +18,25 @@
 home="$(find /home -type d -name RetroPie -print -quit 2>/dev/null)"
 home="${home%/RetroPie}"
 
+readonly RP_DIR="$home/RetroPie"
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
-readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-readonly SCRIPT_VERSION="1.4.1"
-readonly FUN_FACTS_CFG="$SCRIPT_DIR/fun-facts-settings.cfg"
-readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
-readonly DEFAULT_SPLASH="$SCRIPT_DIR/default-splashscreen.png"
-readonly DEFAULT_COLOR="white"
-readonly RESULT_SPLASH="$home/RetroPie/splashscreens/fun-facts-splashscreen.png"
-readonly RCLOCAL="/etc/rc.local"
 readonly SPLASH_LIST="/etc/splashscreen.list"
+readonly RCLOCAL="/etc/rc.local"
 
+readonly SCRIPT_VERSION="1.4.1"
+readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
+readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-settings.cfg"
+readonly SCRIPT_TITLE="Fun Facts! splashscreens for RetroPie"
+readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
 
 # Variables ############################################
+
+readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
+readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
+readonly DEFAULT_SPLASH="$SCRIPT_DIR/default-splashscreen.png"
+readonly DEFAULT_COLOR="white"
 
 SPLASH=
 TEXT_COLOR=
@@ -43,7 +49,7 @@ GUI_FLAG=0
 # Functions ############################################
 
 function is_retropie() {
-    [[ -d "$home/RetroPie" && -d "$home/.emulationstation" && -d "/opt/retropie" ]]
+    [[ -d "$RP_DIR" && -d "$home/.emulationstation" && -d "/opt/retropie" ]]
 }
 
 
@@ -60,9 +66,9 @@ function check_argument() {
     # XXX: this method doesn't accept arguments starting with '-'.
     if [[ -z "$2" || "$2" =~ ^- ]]; then
         echo >&2
-        echo "ERROR: \"$1\" is missing an argument." >&2
+        echo "ERROR: '$1' is missing an argument." >&2
         echo >&2
-        echo "Try \"sudo $0 --help\" for more info." >&2
+        echo "Try 'sudo $0 --help' for more info." >&2
         echo >&2
 
         return 1
@@ -71,16 +77,16 @@ function check_argument() {
 
 
 function set_config() {
-    sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$FUN_FACTS_CFG"
+    sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$SCRIPT_CFG"
 
     if [[ "$GUI_FLAG" -eq 0 ]]; then
-        echo "\"$1\" set to \"$2\"."
+        echo "'$1' set to '$2'."
     fi
 }
 
 function get_config() {
     local config
-    config="$(grep -Po "(?<=^$1 = ).*" "$FUN_FACTS_CFG")"
+    config="$(grep -Po "(?<=^$1 = ).*" "$SCRIPT_CFG")"
     config="${config%\"}"
     config="${config#\"}"
     echo "$config"
@@ -94,7 +100,7 @@ function check_config() {
     if [[ -z "$SPLASH" ]]; then
         if [[ "$GUI_FLAG" -eq 0 ]]; then
             echo
-            echo "\"splashscreen_path\" is not defined in \"$FUN_FACTS_CFG\""
+            echo "'splashscreen_path' is not defined in '$SCRIPT_CFG'"
             echo "Switching to default splashscreen."
         fi
         SPLASH="$DEFAULT_SPLASH"
@@ -103,7 +109,7 @@ function check_config() {
     if [[ -z "$TEXT_COLOR" ]]; then
         if [[ "$GUI_FLAG" -eq 0 ]]; then
             echo
-            echo "\"text_color\" is not defined in \"$FUN_FACTS_CFG\""
+            echo "'text_color' is not defined in '$SCRIPT_CFG'"
             echo "Switching to default color."
         fi
         TEXT_COLOR="$DEFAULT_COLOR"
@@ -114,8 +120,8 @@ function check_config() {
 
     if [[ "$GUI_FLAG" -eq 0 ]]; then
         echo
-        echo "\"splashscreen_path\" = \"$SPLASH\""
-        echo "\"text_color\" = \"$TEXT_COLOR\""
+        echo "'splashscreen_path' = '$SPLASH'"
+        echo "'text_color' = '$TEXT_COLOR'"
     fi
 }
 
@@ -130,7 +136,7 @@ function usage() {
 
 
 function enable_boot_script() {
-    local command="\"$SCRIPT_DIR/$(basename "$0")\" --create-fun-fact \&"
+    local command="\"$SCRIPT_FULL\" --create-fun-fact \&"
     disable_boot_script # deleting any previous config (do nothing if there isn't).
     sed -i "s|^exit 0$|${command}\\nexit 0|" "$RCLOCAL"
     assure_safe_exit_boot_script
@@ -166,7 +172,7 @@ function apply_splash() {
     if [[ "$return_value" -eq 0 ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
-                --backtitle "$backtitle" \
+                --backtitle "$SCRIPT_TITLE" \
                 --msgbox "\nFun Facts! splashscreen is already applied.\n" 7 50 2>&1 >/dev/tty
         else
             echo
@@ -176,7 +182,7 @@ function apply_splash() {
         echo "$RESULT_SPLASH" >"$SPLASH_LIST"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
-                --backtitle "$backtitle" \
+                --backtitle "$SCRIPT_TITLE" \
                 --msgbox "\nFun Facts! splashscreen set succesfully!\n" 7 50 2>&1 >/dev/tty
         else
             echo "Fun Facts! splashscreen set succesfully!"
@@ -192,6 +198,7 @@ function get_current_theme() {
 
 function get_font() {
     local theme="$(get_current_theme)"
+    
     [[ -z "$theme" ]] && theme="carbon"
 
     local font="$(xmlstarlet sel -t -v \
@@ -204,7 +211,7 @@ function get_font() {
         # note: the find below returns the full path file name.
         font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
         if [[ -z "$font" ]]; then
-            echo "ERROR: Unable to get the font from the \"$theme\" theme files." >&2
+            echo "ERROR: Unable to get the font from the '$theme' theme files." >&2
             echo "Aborting ..." >&2
             exit 1
         fi
@@ -225,7 +232,7 @@ function create_fun_fact() {
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
-            --backtitle "$backtitle" \
+            --backtitle "$SCRIPT_TITLE" \
             --infobox "\nCreating Fun Facts! splashscreen ...\n" 5 50 2>&1 >/dev/tty
     else
         echo
@@ -243,7 +250,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$backtitle" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 || echo "Fun Facts! splashscreen successfully created!"
 }
 
 
@@ -253,16 +260,16 @@ function validate_splash() {
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\""
+                echo "ERROR: check the 'splashscreen_path' value in '$SCRIPT_CFG'"
             else
-                echo "ERROR: \"$1\" file not found!"
+                echo "ERROR: '$1' file not found!"
             fi
             return 1
         else
             echo >&2
-            echo "ERROR: \"$1\" file not found!" >&2
+            echo "ERROR: '$1' file not found!" >&2
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "Check the \"splashscreen_path\" value in \"$FUN_FACTS_CFG\"" >&2
+                echo "Check the 'splashscreen_path' value in '$SCRIPT_CFG'" >&2
             fi
             echo >&2
             exit 1
@@ -279,16 +286,16 @@ function validate_color() {
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: check the \"text_color\" value in \"$FUN_FACTS_CFG\""
+                echo "ERROR: check the 'text_color' value in '$SCRIPT_CFG'"
             else
-                echo "ERROR: invalid color \"$1\"."
+                echo "ERROR: invalid color '$1'."
             fi
             return 1
         else
             echo >&2
-            echo "ERROR: invalid color \"$1\"." >&2
+            echo "ERROR: invalid color '$1'." >&2
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "Check the \"text_color\" value in \"$FUN_FACTS_CFG\"" >&2
+                echo "Check the 'text_color' value in '$SCRIPT_CFG'" >&2
             fi
             echo >&2
             echo "Short list of available colors:" >&2
@@ -336,15 +343,13 @@ function get_last_commit() {
 
 
 function gui() {
-    local backtitle="Fun Facts! Splashscreens for RetroPie"
-
     check_config
 
     while true; do
         local last_commit="$(get_last_commit)"
 
         cmd=(dialog \
-            --backtitle "$backtitle"
+            --backtitle "$SCRIPT_TITLE"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
             --menu "Version: $SCRIPT_VERSION\nLast commit: $last_commit" 15 60 8)
@@ -394,7 +399,7 @@ function gui() {
                 1)
                     CONFIG_FLAG=0
                     splash="$(dialog \
-                        --backtitle "$backtitle" \
+                        --backtitle "$SCRIPT_TITLE" \
                         --title "Set splashscreen path" \
                         --cancel-label "Back" \
                         --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
@@ -405,7 +410,7 @@ function gui() {
 
                         if [[ -n "$validation" ]]; then
                             dialog \
-                                --backtitle "$backtitle" \
+                                --backtitle "$SCRIPT_TITLE" \
                                 --msgbox "$validation" 10 50 2>&1 >/dev/tty
                         else
                             if [[ -z "$validation" ]]; then
@@ -416,8 +421,8 @@ function gui() {
                                 set_config "splashscreen_path" "$SPLASH"
                             fi
                             dialog \
-                                --backtitle "$backtitle" \
-                                --msgbox "Splashscreen path set to \"$SPLASH\"" 10 50 2>&1 >/dev/tty
+                                --backtitle "$SCRIPT_TITLE" \
+                                --msgbox "Splashscreen path set to '$SPLASH'" 10 50 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -425,7 +430,7 @@ function gui() {
                     CONFIG_FLAG=0
 
                     cmd=(dialog \
-                        --backtitle "$backtitle" \
+                        --backtitle "$SCRIPT_TITLE" \
                         --title "Set text color" \
                         --cancel-label "Back" \
                         --menu "Choose an option" 15 60 8)
@@ -470,7 +475,7 @@ function gui() {
                                 done
 
                                 cmd=(dialog \
-                                    --backtitle "$backtitle" \
+                                    --backtitle "$SCRIPT_TITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
                                     --menu "Choose a color" 15 60 "${#color_list[@]}")
@@ -488,7 +493,7 @@ function gui() {
 
                                      if [[ -n "$validation" ]]; then
                                         dialog \
-                                            --backtitle "$backtitle" \
+                                            --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "$validation" 6 40 2>&1 >/dev/tty
                                     else
                                         if [[ -z "$color" ]]; then
@@ -499,8 +504,8 @@ function gui() {
                                             set_config "text_color" "$TEXT_COLOR"
                                         fi
                                         dialog \
-                                            --backtitle "$backtitle" \
-                                            --msgbox "\nText color set to \"$TEXT_COLOR\"" 7 50 2>&1 >/dev/tty
+                                            --backtitle "$SCRIPT_TITLE" \
+                                            --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
                                     fi
                                 fi
                                 ;;
@@ -519,7 +524,7 @@ function gui() {
                                 done
 
                                 cmd=(dialog \
-                                    --backtitle "$backtitle" \
+                                    --backtitle "$SCRIPT_TITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
                                     --menu "Choose a color" 15 60 "${#color_list[@]}")
@@ -533,7 +538,7 @@ function gui() {
 
                                      if [[ -n "$validation" ]]; then
                                         dialog \
-                                            --backtitle "$backtitle" \
+                                            --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "$validation" 6 40 2>&1 >/dev/tty
                                     else
                                         if [[ -z "$color" ]]; then
@@ -544,8 +549,8 @@ function gui() {
                                             set_config "text_color" "$TEXT_COLOR"
                                         fi
                                         dialog \
-                                            --backtitle "$backtitle" \
-                                            --msgbox "\nText color set to \"$TEXT_COLOR\"" 7 50 2>&1 >/dev/tty
+                                            --backtitle "$SCRIPT_TITLE" \
+                                            --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
                                     fi
                                 fi
                                 ;;
@@ -561,7 +566,7 @@ function gui() {
                 4)
                     if [[ ! -f "$RESULT_SPLASH" ]]; then
                         dialog \
-                            --backtitle "$backtitle" \
+                            --backtitle "$SCRIPT_TITLE" \
                             --msgbox "ERROR: create a Fun Facts! splashscreen before applying it." 7 50 2>&1 >/dev/tty
                     else
                         apply_splash
@@ -577,13 +582,13 @@ function gui() {
                         enable_boot_script && local output="Fun Facts! Splashscreens script ENABLED at boot." || local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
                     fi
                     dialog \
-                        --backtitle "$backtitle" \
+                        --backtitle "$SCRIPT_TITLE" \
                         --msgbox "\n$output\n" 7 55 2>&1 >/dev/tty
                     ;;
                 6)
                     if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
                         dialog \
-                            --backtitle "$backtitle" \
+                            --backtitle "$SCRIPT_TITLE" \
                             --msgbox "Can't update the script when using it from RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
                     else
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
@@ -612,8 +617,8 @@ function get_options() {
 #H -h, --help                                   Print the help message and exit.
             -h|--help)
                 echo
-                echo "Fun Facts! splashscreens for RetroPie."
-                echo "A tool for RetroPie to create splashscreens with random video game related fun facts."
+                echo "$SCRIPT_TITLE"
+                echo "$SCRIPT_DESCRIPTION"
                 echo
                 echo "USAGE: sudo $0 [OPTIONS]"
                 echo
@@ -659,7 +664,7 @@ function get_options() {
                     echo >&2
                     echo "ERROR: create a Fun Facts! splashscreen before applying it." >&2
                     echo >&2
-                    echo "Try \"sudo $0 --help\" for more info." >&2
+                    echo "Try 'sudo $0 --help' for more info." >&2
                     echo >&2
                     exit 1
                 else
@@ -694,7 +699,7 @@ function get_options() {
                 echo "$SCRIPT_VERSION"
                 ;;
             *)
-                echo "ERROR: invalid option \"$1\"" >&2
+                echo "ERROR: invalid option '$1'" >&2
                 exit 2
                 ;;
         esac
@@ -717,7 +722,7 @@ function main() {
         exit 1
     fi
 
-    mkdir -p "$home/RetroPie/splashscreens"
+    mkdir -p "$RP_DIR/splashscreens"
 
     get_options "$@"
 
