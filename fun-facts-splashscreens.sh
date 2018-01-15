@@ -94,9 +94,9 @@ function get_config() {
 
 function check_config() {
     CONFIG_FLAG=1
-    
+
     [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "\nChecking config ..."
-    
+
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
 
@@ -192,7 +192,7 @@ function get_current_theme() {
 
 function get_font() {
     local theme="$(get_current_theme)"
-    
+
     [[ -z "$theme" ]] && theme="carbon"
 
     local font="$(xmlstarlet sel -t -v \
@@ -705,7 +705,7 @@ function main() {
         echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
     fi
-    
+
     check_dependencies
 
     # check if sudo is used.
