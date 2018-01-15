@@ -722,7 +722,7 @@ function main() {
 
     if [[ "$CREATE_SPLASH_FLAG" -eq 1 ]]; then
         check_config
-        create_fun_fact "$SPLASH_PATH" "$TEXT_COLOR"
+        create_fun_fact
     fi
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
