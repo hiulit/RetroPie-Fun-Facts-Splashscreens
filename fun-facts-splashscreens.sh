@@ -94,34 +94,22 @@ function get_config() {
 
 function check_config() {
     CONFIG_FLAG=1
-    SPLASH="$(get_config splashscreen_path)"
-    TEXT_COLOR="$(get_config text_color)"
+    
+    [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "\nChecking config ..."
+    
+    SPLASH="$(get_config "splashscreen_path")"
+    TEXT_COLOR="$(get_config "text_color")"
 
-    if [[ -z "$SPLASH" ]]; then
-        if [[ "$GUI_FLAG" -eq 0 ]]; then
-            echo
-            echo "'splashscreen_path' is not defined in '$SCRIPT_CFG'"
-            echo "Switching to default splashscreen."
-        fi
-        SPLASH="$DEFAULT_SPLASH"
-    fi
-
-    if [[ -z "$TEXT_COLOR" ]]; then
-        if [[ "$GUI_FLAG" -eq 0 ]]; then
-            echo
-            echo "'text_color' is not defined in '$SCRIPT_CFG'"
-            echo "Switching to default color."
-        fi
-        TEXT_COLOR="$DEFAULT_COLOR"
-    fi
+    [[ -z "$SPLASH" ]] && SPLASH="$DEFAULT_SPLASH" && echo  -e "No 'splashscreen_path' set. Switching to defaults ..."
+    [[ -z "$TEXT_COLOR" ]] && TEXT_COLOR="$DEFAULT_COLOR"  && echo  -e "No 'text_color' set. Switching to defaults ..."
 
     validate_splash "$SPLASH"
     validate_color "$TEXT_COLOR"
 
     if [[ "$GUI_FLAG" -eq 0 ]]; then
         echo
-        echo "'splashscreen_path' = '$SPLASH'"
-        echo "'text_color' = '$TEXT_COLOR'"
+        echo "'splashscreen_path'   = '$SPLASH'"
+        echo "'text_color'          = '$TEXT_COLOR'"
     fi
 }
 
