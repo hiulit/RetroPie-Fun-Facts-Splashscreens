@@ -1,6 +1,6 @@
 # Fun Facts! Splashscreens for RetroPie
 
-This script generates splashscreens for RetroPie with random **Fun Facts!**.
+A tool for RetroPie to generate splashscreens with random video game related fun facts.
 
 **WARNING: Splashscreens are only available on the Raspberry Pi.**
 
@@ -40,6 +40,7 @@ Use '--help' to see all the options.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--gui`: Start GUI.
 * `--update`: Update script.
+* `--version`: Show script version.
 
 If `--splash-path` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `default-splashscreen.png` and `white`, respectively.
 
@@ -180,6 +181,16 @@ If that's the case, go to:
 * Manage experimental packages
 * fun-facts-splashscreens
 * Update from source
+
+### `--version`
+
+Show script version.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --version
+```
 
 ## Config file
 
