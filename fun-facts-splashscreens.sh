@@ -94,9 +94,9 @@ function get_config() {
 
 function check_config() {
     CONFIG_FLAG=1
-
+    
     [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "\nChecking config ..."
-
+    
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
 
@@ -192,7 +192,7 @@ function get_current_theme() {
 
 function get_font() {
     local theme="$(get_current_theme)"
-
+    
     [[ -z "$theme" ]] && theme="carbon"
 
     local font="$(xmlstarlet sel -t -v \
@@ -482,7 +482,7 @@ function gui() {
                                         local color="${options[$((choice*2-1))]}"
                                     fi
 
-                                    local validation="$(validate_color $color)"
+                                    local validation="$(validate_color "$color")"
 
                                      if [[ -n "$validation" ]]; then
                                         dialog \
@@ -491,11 +491,10 @@ function gui() {
                                     else
                                         if [[ -z "$color" ]]; then
                                             TEXT_COLOR="$DEFAULT_COLOR"
-                                            set_config "text_color" ""
                                         else
                                             TEXT_COLOR="$color"
-                                            set_config "text_color" "$TEXT_COLOR"
                                         fi
+                                        set_config "text_color" "$color"
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
@@ -536,11 +535,10 @@ function gui() {
                                     else
                                         if [[ -z "$color" ]]; then
                                             TEXT_COLOR="$DEFAULT_COLOR"
-                                            set_config "text_color" ""
                                         else
                                             TEXT_COLOR="$color"
-                                            set_config "text_color" "$TEXT_COLOR"
                                         fi
+                                        set_config "text_color" "$color"
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
@@ -587,7 +585,9 @@ function gui() {
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
                             git pull
                         else
-                            :
+                            dialog \
+                                --backtitle "$SCRIPT_TITLE" \
+                                --msgbox "\nFun Facts! Splashscreens is $updates_output!\n" 7 50 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -705,7 +705,7 @@ function main() {
         echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
     fi
-
+    
     check_dependencies
 
     # check if sudo is used.
