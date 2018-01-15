@@ -223,7 +223,17 @@ You can edit this file directly instead of using `--splash-path` or `--text-colo
 ## Add a new Fun Fact!
 
 * Open `fun-facts.txt`.
-* Add a new **Fun Fact!** (each **Fun Fact!** must be in one line).
+* Add a new **Fun Fact!** (see [style guide](#style-guide)).
+
+### Style guide
+
+* Each **Fun Fact!** must be in one line.
+* All video game names must be enclosed in double quotes (e.g. "Sonic the Hedgehog").
+* Check the names using the [TheGamesDB](http://thegamesdb.net/) or any other reliable source.
+* **Fun Facts!** aren't funnier even if they're written with exclamations marks. Don't use them.
+* Tacky **Fun Facts!** aren't funnier either.
+* Stick to **Fun Facts!** about video games that can be played with RetroPie (see [supported systems](https://github.com/retropie/retropie-setup/wiki/Supported-Systems)).
+* Try not to make **Fun Facts!** too long.
 
 If you have an awesome **Fun Fact!** that you'd like to share, you can create a [new issue]((/CONTRIBUTING.md)) with your awesome **Fun Fact!** and I'll gladly add it to the repository for everyone to enjoy! 😃🎉
 
