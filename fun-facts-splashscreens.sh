@@ -100,7 +100,7 @@ function check_config() {
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
 
-    if [[ -z "$SPLASH" ]]; then
+    if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
         [[ "$GUI_FLAG" -eq 0 ]] && echo "No 'splashscreen_path' set. Switching to defaults ..."
     fi
@@ -109,12 +109,12 @@ function check_config() {
         [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "No 'text_color' set. Switching to defaults ..."
     fi
 
-    validate_splash "$SPLASH"
+    validate_splash "$SPLASH_PATH"
     validate_color "$TEXT_COLOR"
 
     if [[ "$GUI_FLAG" -eq 0 ]]; then
         echo
-        echo "'splashscreen_path'   = '$SPLASH'"
+        echo "'splashscreen_path'   = '$SPLASH_PATH'"
         echo "'text_color'          = '$TEXT_COLOR'"
     fi
 }
@@ -349,7 +349,7 @@ function gui() {
             --menu "Version: $SCRIPT_VERSION\nLast commit: $last_commit" 15 60 8)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
-        [[ -n "$SPLASH" ]] && option_splash="Set splashscreen path ($SPLASH)"
+        [[ -n "$SPLASH_PATH" ]] && option_splash="Set splashscreen path ($SPLASH_PATH)"
 
         option_color="Set text color (default: $DEFAULT_COLOR)"
         [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
@@ -400,7 +400,7 @@ function gui() {
 
                     result_value="$?"
                     if [[ "$result_value" -eq 0 ]]; then
-                        local validation="$(validate_splash $splash)"
+                        local validation="$(validate_splash "$splash")"
 
                         if [[ -n "$validation" ]]; then
                             dialog \
@@ -412,11 +412,11 @@ function gui() {
                                 set_config "splashscreen_path" ""
                             else
                                 SPLASH_PATH="$splash"
-                                set_config "splashscreen_path" "$SPLASH"
+                                set_config "splashscreen_path" "$SPLASH_PATH"
                             fi
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --msgbox "Splashscreen path set to '$SPLASH'" 10 50 2>&1 >/dev/tty
+                                --msgbox "Splashscreen path set to '$SPLASH_PATH'" 10 50 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -631,7 +631,7 @@ function get_options() {
                 return_value="$?"
                 if [[ "$return_value" != 1 ]]; then
                     SPLASH_PATH="$1"
-                    set_config "splashscreen_path" "$SPLASH"
+                    set_config "splashscreen_path" "$SPLASH_PATH"
                 fi
                 ;;
 
@@ -722,7 +722,7 @@ function main() {
 
     if [[ "$CREATE_SPLASH_FLAG" -eq 1 ]]; then
         check_config
-        create_fun_fact "$SPLASH" "$TEXT_COLOR"
+        create_fun_fact "$SPLASH_PATH" "$TEXT_COLOR"
     fi
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
