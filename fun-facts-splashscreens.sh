@@ -407,16 +407,15 @@ function gui() {
                                 --backtitle "$SCRIPT_TITLE" \
                                 --msgbox "$validation" 10 50 2>&1 >/dev/tty
                         else
-                            if [[ -z "$validation" ]]; then
+                            if [[ -z "$splash" ]]; then
                                 SPLASH_PATH="$DEFAULT_SPLASH"
-                                set_config "splashscreen_path" ""
                             else
                                 SPLASH_PATH="$splash"
-                                set_config "splashscreen_path" "$SPLASH_PATH"
                             fi
+                            set_config "splashscreen_path" "$splash"
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --msgbox "Splashscreen path set to '$SPLASH_PATH'" 10 50 2>&1 >/dev/tty
+                                --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 10 50 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
