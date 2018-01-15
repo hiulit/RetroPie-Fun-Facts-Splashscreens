@@ -2,13 +2,22 @@
 
 ## Unreleased
 
+### Fixed
+
+* Fixed issue in `create_fun_fact()` which was not getting proper values and therefore making the function not to work.
+* Fixed issue in `Set splashscreen path` option which was setting the path incorrectly.
+
 ### Added
 
 * Merged [#16](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/pull/16) - More **Fun Facts!** thanks to [Thunderforge](https://github.com/Thunderforge).
+* Added documentation for `--version`.
+* Added a [style guide](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#style-guide) for adding new **Fun Facts!**.
 
 ### Changed
 
 * Updated help for the scriptmodule.
+* Cleaned up code and comments.
+* Changed some outputs that were too much verbose.
 
 ## v1.4.1 (December 30th 2017)
 
