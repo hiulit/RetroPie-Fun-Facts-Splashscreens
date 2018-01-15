@@ -1,93 +1,86 @@
 The original Nintendo Entertainment System had a resolution of 256 x 224 pixels. In comparison, the Nintendo Switch can run games at 1920 x 1080.
-The Light Gun that was included with some Nintendo Entertainment Systems does not work on modern HDTV screens, due to image processing causing a display lag of about 20 to 50 milliseconds.
-The PlayStation1 was able to render textures with about 700kb of video memory. The N64 only had 4kb, resulting in more cartoony styled games and clever programming tricks to add detail to the environment.
-The N64 had 4mb of RAM compared to the PS1's 2mb, allowing for larger 3D worlds, better draw distances, and higher resolution.
-Around 650MB of data could fit on a PS1 CD, as opposed to about 64MB on an N64 cartridge. This usually led to movie-style cutscenes, higher quality music, and voice acting on the PlayStation.
-The most valuable NES game today is Nintendo World Championships Gold. Only 26 copies were produced and given out by Nintendo in 1990 as a contest prize. It has sold for more than $25,000!
-The highest grossing arcade game of all time, not considering inflation, is Space Invaders, estimated to have earned $2.7 billion in quarters between 1978 and 1982.
+The Light Gun that was included with some Nintendo Entertainment Systems does not work on modern HDTV screens due to image processing causing a display lag of about 20 to 50 milliseconds.
+The PlayStation was able to render textures with about 700kb of video memory. The N64 only had 4kb, resulting in more cartoony styled games and clever programming tricks to add detail to the environment.
+The N64 had 4 MB of RAM compared to the PlayStation's 2 MB, allowing for larger 3D worlds, better draw distances, and higher resolution.
+Around 650 MB of data could fit on a PlayStation CD, as opposed to about 64 MB on an N64 cartridge. This usually led to movie-style cutscenes, higher quality music, and voice acting on the PlayStation.
+The most valuable NES game today is "Nintendo World Championships" Gold. Only 26 copies were produced and given out by Nintendo in 1990 as a contest prize. It has sold for more than $25,000.
+The highest grossing arcade game of all time, not considering inflation, is "Space Invaders", estimated to have earned $2.7 billion in quarters between 1978 and 1982.
 Nintendo offered repair service for the original GameBoy, released in 1989, until 2007.
-When Space Invaders was released in Japan, it caused a temporary shortage of the 100 yen coin.
-Mario first appeared in 1981 as the playable character in Nintendo's arcade game Donkey Kong. However, he was a carpenter known only as Jumpman.
-NBA Jam creator Mark Turmell, a Pistons fan, admitted that there is special code in the game that diminishes the Bulls' chances of making a last second shot.
-The Final Fantasy series is so named because the developer, Square Enix, was going bankrupt and it was thought this could be their last game. However, it was a massive success and has led to over 15 installments and spin-offs.
-In the original Civilization game, Gandhi's aggression rating began at the lowest setting of 1. If it was lowered, a bug caused it to loop around to the maximum of 255, turning Gandhi into a nuke-flinging warmonger.
-Pac-Man was originally going to be called Puck-Man in the United States, but that was changed after considering how easy it would be to vandalize the arcade cabinets to say... something else.
-A cheat code giving the player all power ups was inserted into the game Gradius by the developers for testing purposes, and was left in upon release. The Konami Code, as it is now called, has made appearances in many games since.
-Ice Climber was the first game that Kazuaki Morita worked on. He would go on to refine the game's formula for his next title at Nintendo: Super Mario Bros.
-Balloon Fight was one of the first games Satoru Iwata worked on at Nintendo. He later went on to become president and CEO of the company, and oversaw the launches of the Nintendo DS and Wii.
-Metroid and Kid Icarus were both developed by the same team at Nintendo.
-Ninja Gaiden was the first console game to have the story presented with cinematic cutscenes.
-In The Legend of Zelda, the player character was originally envisioned to be able to travel throughout time periods with the help of the Triforce. Thus he was named Link after his connection between the eras.
+When "Space Invaders" was released in Japan, it caused a temporary shortage of the 100 yen coin.
+Mario first appeared in 1981 as the playable character in Nintendo's arcade game "Donkey Kong". However, he was a carpenter known only as Jumpman.
+"NBA Jam" creator Mark Turmell, a Pistons fan, admitted that there is special code in the game that diminishes the Bulls' chances of making a last second shot.
+The "Final Fantasy" series is so named because the developer, Square Enix, was going bankrupt and it was thought this could be their last game. However, it was a massive success and has led to over 15 installments and spin-offs.
+In the original "Civilization" game, Gandhi's aggression rating began at the lowest setting of 1. If it was lowered, a bug caused it to loop around to the maximum of 255, turning Gandhi into a nuke-flinging warmonger.
+"Pac-Man" was originally going to be called "Puck-Man" in the United States, but that was changed after considering how easy it would be to vandalize the arcade cabinets to say something else.
+A cheat code giving the player all power ups was inserted into the game "Gradius" by the developers for testing purposes, and was left in upon release. The Konami Code, as it is now called, has made appearances in many games since.
+"Ice Climber" was the first game that Kazuaki Morita worked on. He would go on to refine the game's formula for his next title at Nintendo: "Super Mario Bros".
+"Balloon Fight" was one of the first games Satoru Iwata worked on at Nintendo. He later went on to become president and CEO of the company, and oversaw the launches of the Nintendo DS and Wii.
+"Metroid" and "Kid Icarus" were both developed by the same team at Nintendo.
+"Ninja Gaiden" was the first console game to have the story presented with cinematic cutscenes.
+In "The Legend of Zelda", the player character was originally envisioned to be able to travel throughout time periods with the help of the Triforce. Thus he was named Link after his connection between the eras.
 According to a calendar in Nintendo Power volume 2, Mario's birthday is October 11.
 Nintendo was founded in 1889 as a playing card and toy manufacturer.
-In the original Super Mario Brothers for NES, the clouds and bushes are the same graphic.
+In the original "Super Mario Bros." for NES, the clouds and bushes are the same graphic.
 The console that was to be the SNES sequel was a originally a collaboration between Nintendo and Sony. However, Nintendo backed out of the deal leading Sony to independently develop what would become the PlayStation.
-At its release in 1996, the N64 had only two games: Super Mario 64 and Pilotwings 64.
-The look of Donkey Kong County was achieved through use of rasterization: the graphics were rendered in 3D on a more powerful system, then converted into 2D for the 16-bit SNES.
+At its release in 1996, the N64 had only two games: "Super Mario 64" and "Pilotwings 64".
+The look of "Donkey Kong Country" was achieved through use of rasterization: the graphics were rendered in 3D on a more powerful system, then converted into 2D for the 16-bit SNES.
 In 1982, the arcade video game industry's revenue in quarters was estimated at $8 billion, surpassing the annual revenue of pop music ($4 billion) and Hollywood films ($3 billion) combined.
-Zaxxon, released in by Sega in 1982, was the first game to feature isometric graphics.
-Space Invaders, manufactured in 1978 by Taito, was the first game to include a continuous background soundtrack, even though it was comprised of only four notes that changed pace with the stage.
-The first game to feature true background music was Namco's Rally-X in 1980.
-The graphic finishing moves known as 'Fatalities' in Midway's Mortal Kombat led to the creation of the Entertainment Software Rating Board to give age-appropriate content ratings for video games.
+"Zaxxon", released in by Sega in 1982, was the first game to feature isometric graphics.
+"Space Invaders", manufactured in 1978 by Taito, was the first game to include a continuous background soundtrack, even though it was comprised of only four notes that changed pace with the stage.
+The first game to feature true background music was Namco's "Rally-X" in 1980.
+The graphic finishing moves known as 'Fatalities' in Midway's "Mortal Kombat" led to the creation of the Entertainment Software Rating Board to give age-appropriate content ratings for video games.
 Donkey Kong, Mario, and Princess Peach are based on characters from the cartoon series Popeye. Nintendo created them after they failed to obtain a license to make a Popeye video game.
 The Sega Dreamcast was the first console to implement online play over a phone line, calling the system Sega Net.
-The Microsoft Xbox was the first video game system to provide full support for HDTV.
 Popular Science recognized the Sega Dreamcast as one of the most important and innovative products of 1999.
-The Magnavox Odyssey, released in 1972, contained 40 transistors and no microprocessor. The Pentium 4 microprocessor contains 42 million transistors on the chip itself!
-The PlayStation 2 was the first system to have graphics capability better than that of the leading-edge personal computer at the time of its release.
-The Nintendo N64 marked the first time that computer graphics workstation manufacturer Silicon Graphics Inc. (SGI) developed game hardware technology.
-The Atari Pong video game console was the No. 1 selling item for the holiday season in 1975.
+The Magnavox Odyssey, released in 1972, contained 40 transistors and no microprocessor. In comparison, the Pentium 4 microprocessor contains 42 million transistors on the chip itself.
+The N64 marked the first time that computer graphics workstation manufacturer Silicon Graphics Inc. (SGI) developed game hardware technology.
+The Atari "Pong" video game console was the No. 1 selling item for the holiday season in 1975.
 The first console to have games available in the form of add-on cartridges was the Fairchild Channel F console, introduced in August 1976.
-The PlayStation 2 was the first video game system to use DVD technology.
 On the original Magnavox Odyssey, players had to keep score themselves because the machine couldn't.
-The Nintendo GameCube's proprietary disc held 1.5 gigabytes of data -- 190 times more than what an N64 game cartridge could hold.
 On the market from 1991 till 2004, the SNK NeoGeo AES has tied the Atari 2600 (1977-1990) as the longest supported gaming console in history.
-The Sega Genesis featured a version of the same Motorola processor that powered the original Apple Macintosh computer.
-Mattel's Intellivison system, introduced in 1980, featured an add-on called "PlayCable", which delivered games by cable TV.
+The Sega Megadrive/Genesis featured a version of the same Motorola processor that powered the original Apple Macintosh computer.
+Mattel's Intellivison system, introduced in 1980, featured an add-on called 'PlayCable', which delivered games by cable TV.
 Nintendo's Game Boy was the most successful game system ever, with more than 100 million units sold worldwide.
-The word atari comes from the ancient Japanese game of Go and means "you are about to be engulfed." Technically, it is the word used by a player to inform his opponent that he is about to lose, similar to "check" in chess.
+The word 'Atari' comes from the ancient Japanese game of Go and means "You are about to be engulfed." Technically, it is the word used by a player to inform his opponent that he is about to lose, similar to "check" in chess.
 In the 1980s, a service called Gameline allowed users to download games to the Atari 2600 over regular phone lines. It was not a success, but did form part of the foundation for America Online, the world's largest Internet service provider.
 The first color portable video game system was the Atari Lynx, introduced in 1989 and priced at $149.
 Introduced in 1993, the 3DO was the first video game system to be based entirely on CD technology.
-The Sony PlayStation was originally intended as a CD add-on to the Super Nintendo. When licensing problems and other issues arose, Sony decided to develop the PlayStation as a machine of its own.
-DMA Designs is a company best known for Lemmings – or at least, they were. After creating Body Harvest for the Nintendo 64, DMA became Rockstar North and produced Grand Theft Auto III.
-If you look hard enough, you can spot Pac-Man in the Disney movie Tron.
-Pac-Man creator Toru Iwatani revealed that the character was designed to appeal to women.
-Sonic the Hedgehog originally had a human girlfriend named Madonna.
-E.T. - The Extra Terrestrial for Atari 2600 actually sold more than Space Invaders. E.T. moved 1.5 million units, while Space Invaders only moved 1 million.
+The PlayStation was originally intended as a CD add-on to the Super Nintendo. When licensing problems and other issues arose, Sony decided to develop the PlayStation as a machine of its own.
+DMA Designs is a company best known for "Lemmings" – or at least, they were. After creating "Body Harvest" for the Nintendo 64, DMA became Rockstar North and produced "Grand Theft Auto III".
+If you look hard enough, you can spot "Pac-Man" in the Disney movie Tron.
+"Pac-Man" creator Toru Iwatani revealed that the character was designed to appeal to women.
+"Sonic the Hedgehog" originally had a human girlfriend named Madonna.
+"E.T. - The Extra Terrestrial" for Atari 2600 actually sold more than Space Invaders. E.T. moved 1.5 million units, while Space Invaders only moved 1 million.
 Jen Taylor, who has voiced Princess Peach and Toad in several Mario games is also Halo's female lead, Cortana.
-Ryo Hazuki, Shenmue's protagonist, had a bicycle in early development to quickly traverse town.
-In Super Mario 64, Boo's laugh is actually a sped up version of Bowser's laugh.
-GunValkyrie was originally developed as a Dreamcast game, and was supposed to be played with a controller and light gun at the same time.
-The Legend of Zelda's beta version gives players the choice between a sword and a boomerang at the beginning.
-Street Fighter 2 names didn't fully translate from Japan to North America. In the states, M. Bison is Balrog, Vega is M. Bison, and Balrog is Vega.
-Tingle from the Zelda series looks suspiciously like series composer Koji Kondo.
-In Pokemon Red & Blue, the three legendary birds Arcticuno, Zapdos and Moltres actually mean "One Two Three" in Spanish! Artic-UNO, Zap-DOS, Mol-TRES.
-The music from Super Mario Bros. 3's water world is the same as the fairy music from Ocarina of Time.
-NES title Snake Rattle 'n' Roll gives a shout-out to another platform by spelling out "GAMEBOY" in the ground's tiles.
-Sonic the Hedgehog's debug mode reveals an unused item – air goggles. These goggles would allow Sonic to breathe underwater.
-Ooccoo, the dungeon-warping bird in Twilight Princess, has a strange connection with Link. "00CC00" is the hexadecimal code for the green in Link's tunic in The Legend of Zelda.
-Link was originally planned to be in the Wii version of Marvel Ultimate Alliance.
-Half-Life 2: Episode 2 features a hidden room inspired by the television show "Lost". Desmond, push the button!
-Pokemon was inspired by butterflies! Satoshi Tajiri, the series' creator, used to collect caterpillars and watched them turn into butterflies, as a kid.
-Super Mario's last name is also Mario, making his full name Mario Mario.
+Ryo Hazuki, "Shenmue"'s protagonist, had a bicycle in early development to quickly traverse town.
+In "Super Mario 64", Boo's laugh is actually a sped up version of Bowser's laugh.
+"GunValkyrie" was originally developed as a Dreamcast game, and was supposed to be played with a controller and light gun at the same time.
+"The Legend of Zelda"'s beta version gives players the choice between a sword and a boomerang at the beginning.
+"Street Fighter II" names didn't fully translate from Japan to North America. In the states, M. Bison is Balrog, Vega is M. Bison, and Balrog is Vega.
+Tingle from the "The Legend of Zelda" series looks suspiciously like series composer Koji Kondo.
+In "Pokémon Red & Blue" versions, the three legendary birds Arcticuno, Zapdos and Moltres actually mean "One, Two, Three" in Spanish. Artic-UNO, Zap-DOS, Mol-TRES.
+The music from "Super Mario Bros. 3"'s water world is the same as the fairy music from "The Legend of Zelda: Ocarina of Time".
+NES title "Snake Rattle 'n' Roll" gives a shout-out to another platform by spelling out "GAMEBOY" in the ground's tiles.
+"Sonic the Hedgehog"'s debug mode reveals an unused item – air goggles. These goggles would allow Sonic to breathe underwater.
+Ooccoo, the dungeon-warping bird in "The Legend of Zelda: Twilight Princess", has a strange connection with Link. "00CC00" is the hexadecimal code for the green in Link's tunic in "The Legend of Zelda".
+Link was originally planned to be in the Wii version of "Marvel: Ultimate Alliance".
+Pokémon was inspired by butterflies. Satoshi Tajiri, the series' creator, used to collect caterpillars and watched them turn into butterflies as a kid.
+Mario's last name is also Mario, making his full name Mario Mario.
 Lara Croft's breast size was actually an accident. The developers wanted to increase her breast size by 50%, but accidentally increased it by 150%.
-The maximum score anyone can achieve in Pac-Man is 3333360.
-Mario actually doesn't hit the bricks with his head, but actually punches them if look closely.
-The highest grossing game of all time so far is 'World of Warcraft' and has made an insane 10 billion dollars over its lifetime.
-Devil May Cry started out as a failed Resident Evil game.
-If you name yourself Zelda instead of Link in The Legend Of Zelda, you will be able to skip the first quest entirely.
-Sonic the Hedgehog's first appearance in any video game ever was as an air fresher emblem in the Sega video game Rad Mobile.
+The maximum score anyone can achieve in "Pac-Man" is 3333360.
+Mario actually doesn't hit the bricks with his head, but actually punches them if, looked closely.
+"Devil May Cry" started out as a failed "Resident Evil" game.
+If you name yourself Zelda instead of Link in "The Legend of Zelda", you will be able to skip the first quest entirely.
+"Sonic the Hedgehog"'s first appearance in any video game ever was as an air fresher emblem in the Sega video game Rad Mobile.
 Link was directly inspired by Peter Pan, according to its designer Shigeru Miyamoto.
 The Nintendo Wii Supreme is the most expensive console ever made, with a case made of 22 karat gold and 19.5 carat diamonds.
 The 3DO cost a staggering $700 during its 1993 launch, equivalent to over $1200 today.
-Lemmings is one of the most widely ported games, receiving official releases for 25 platforms.
-The PlayStation 2 is the best-selling video game console of all time with over 155 million units sold.
-The 1976 Atari game Breakout was created by Apple co-founders Steve Jobs and Steve Wozniak.
+"Lemmings" is one of the most widely ported games, receiving official releases for 25 platforms.
+The 1976 Atari game "Breakout" was created by Apple co-founders Steve Jobs and Steve Wozniak.
 The second player controller on the Famicom lacked Start and Select buttons, but included a microphone.
 The Commodore 64 is the best-selling single computer model of all time with over 17 million units sold.
-Tetris is the best-selling video game of all time with over 170 million copies sold across dozens of platforms.
-Pac-Man is the best-selling arcade game with over 400,000 cabinets sold.
-Due to their cultural impact, Dragon's Lair, Pac-Man, and Pong are the only three video games on permanent display at the Smithsonian Institution in Washington, D.C., USA.
-Sega's 1991 FMV game Time Traveler is the first arcade game to feature a holographic display.
-Sega's 1983 rail shooter Astron Belt was the first laserdisc video game, being released just over a month before the more popular Dragon's Lair.
+"Tetris" is the best-selling video game of all time with over 170 million copies sold across dozens of platforms.
+"Pac-Man" is the best-selling arcade game with over 400,000 cabinets sold.
+Due to their cultural impact, "Dragon's Lair", "Pac-Man", and "Pong" are the only three video games on permanent display at the Smithsonian Institution in Washington, D.C., USA.
+Sega's 1991 FMV game "Time Traveler" is the first arcade game to feature a holographic display.
+Sega's 1983 rail shooter "Astron Belt" was the first laserdisc video game, being released just over a month before the more popular "Dragon's Lair".
