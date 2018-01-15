@@ -209,8 +209,8 @@ function get_font() {
 
 
 function create_fun_fact() {
-    local splash="$1"
-    local color="$2"
+    local splash="$(get_config "splashscreen_path")"
+    local color="$(get_config "text_color")"
     local font="$(get_font)"
 
     [[ -f "$splash" ]] || splash="$DEFAULT_SPLASH"
