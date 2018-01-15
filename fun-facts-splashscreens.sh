@@ -571,14 +571,14 @@ function gui() {
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
-                        disable_boot_script && local output="Fun Facts! script DISABLED at boot." || local output="ERROR: failed to DISABLE Fun Facts! script at boot."
+                        disable_boot_script && local output="Fun Facts! Splashscreens script DISABLED at boot." || local output="ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
                     else
                         check_config
-                        enable_boot_script && local output="Fun Facts! script ENABLED at boot." || local output="ERROR: failed to ENABLE Fun Facts! script at boot."
+                        enable_boot_script && local output="Fun Facts! Splashscreens script ENABLED at boot." || local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
                     fi
                     dialog \
                         --backtitle "$backtitle" \
-                        --msgbox "\n$output\n" 7 40 2>&1 >/dev/tty
+                        --msgbox "\n$output\n" 7 55 2>&1 >/dev/tty
                     ;;
                 6)
                     if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
