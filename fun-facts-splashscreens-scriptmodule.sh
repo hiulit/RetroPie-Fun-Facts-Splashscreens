@@ -20,7 +20,7 @@ function install_fun-facts-splashscreens() {
     md_ret_files=(
         'fun-facts-splashscreens.sh'
         'fun-facts.txt'
-        'fun-facts-settings.cfg'
+        'fun-facts-splashscreens-settings.cfg'
         'default-splashscreen.png'
     )
 }

@@ -27,7 +27,7 @@ readonly SCRIPT_VERSION="1.5.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
 readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
-readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-settings.cfg"
+readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
 
@@ -97,9 +97,9 @@ function get_config() {
 
 function check_config() {
     CONFIG_FLAG=1
-    
+
     [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "\nChecking config ..."
-    
+
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
@@ -108,12 +108,12 @@ function check_config() {
         SPLASH_PATH="$DEFAULT_SPLASH"
         [[ "$GUI_FLAG" -eq 0 ]] && echo "'splashscreen_path' not set. Switching to defaults ..."
     fi
-    
+
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
         [[ "$GUI_FLAG" -eq 0 ]] && echo "'text_color' not set. Switching to defaults ..."
     fi
-    
+
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
         disable_boot_script
@@ -208,7 +208,7 @@ function get_current_theme() {
 
 function get_font() {
     local theme="$(get_current_theme)"
-    
+
     [[ -z "$theme" ]] && theme="carbon"
 
     local font="$(xmlstarlet sel -t -v \
@@ -354,7 +354,7 @@ function get_last_commit() {
 
 function gui() {
     local last_commit="$(get_last_commit)"
-    
+
     while true; do
         cmd=(dialog \
             --backtitle "$SCRIPT_TITLE"
@@ -583,14 +583,14 @@ function gui() {
                         if disable_boot_script; then
                             set_config "boot_script" "false" >/dev/null
                             local output="Fun Facts! Splashscreens script DISABLED at boot."
-                         else   
+                         else
                             local output="ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
                         fi
                     else
                         if enable_boot_script; then
                             set_config "boot_script" "true" >/dev/null
                             local output="Fun Facts! Splashscreens script ENABLED at boot."
-                         else   
+                         else
                             local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
                         fi
                     fi
@@ -727,7 +727,7 @@ function main() {
         echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
     fi
-    
+
     check_dependencies
 
     # check if sudo is used.
@@ -740,7 +740,7 @@ function main() {
     mkdir -p "$RP_DIR/splashscreens"
 
     check_config >/dev/null
-        
+
     get_options "$@"
 
     if [[ "$CREATE_SPLASH_FLAG" -eq 1 ]]; then

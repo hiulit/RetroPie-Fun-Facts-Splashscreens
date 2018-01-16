@@ -194,7 +194,7 @@ sudo ./fun-facts-splashscreens.sh --version
 
 ## Config file
 
-When setting the splashscreen path using `--splash-path` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-settings.cfg`.
+When setting the splashscreen path using `--splash-path` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
 
 ```
 # Settings for Fun Facts!
