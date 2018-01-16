@@ -103,26 +103,26 @@ function check_config() {
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
-
+    
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
         [[ "$GUI_FLAG" -eq 0 ]] && echo "'splashscreen_path' not set. Switching to defaults ..."
+        set_config "splashscreen_path" "$SPLASH_PATH"
     fi
 
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
         [[ "$GUI_FLAG" -eq 0 ]] && echo "'text_color' not set. Switching to defaults ..."
+        set_config "text_color" "$TEXT_COLOR"
     fi
 
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        disable_boot_script
         [[ "$GUI_FLAG" -eq 0 ]] && echo "'boot_script' not set. Switching to defaults ..."
-    elif [[ "$BOOT_SCRIPT" == "false" ]]; then
-        disable_boot_script
-    elif [[ "$BOOT_SCRIPT" == "true" ]]; then
-        enable_boot_script
+        set_config "boot_script" "$BOOT_SCRIPT"
     fi
+    
+    [[ "$BOOT_SCRIPT" == "false" ]] && disable_boot_script || enable_boot_script
 
     validate_splash "$SPLASH_PATH"
     validate_color "$TEXT_COLOR"
@@ -426,7 +426,7 @@ function gui() {
                             else
                                 SPLASH_PATH="$splash"
                             fi
-                            set_config "splashscreen_path" "$splash"
+                            set_config "splashscreen_path" "$SPLASH_PATH"
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
                                 --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 10 50 2>&1 >/dev/tty
@@ -508,7 +508,7 @@ function gui() {
                                         else
                                             TEXT_COLOR="$color"
                                         fi
-                                        set_config "text_color" "$color"
+                                        set_config "text_color" "$TEXT_COLOR"
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
@@ -552,7 +552,7 @@ function gui() {
                                         else
                                             TEXT_COLOR="$color"
                                         fi
-                                        set_config "text_color" "$color"
+                                        set_config "text_color" "$TEXT_COLOR"
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
@@ -643,7 +643,6 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-
 #H -s, --splash-path [path/to/splashscreen]     Set which splashscreen to use.
             -s|--splash-path)
                 check_argument "$1" "$2" || exit 1
@@ -655,7 +654,6 @@ function get_options() {
                     set_config "splashscreen_path" "$SPLASH_PATH"
                 fi
                 ;;
-
 #H -t, --text-color [color]                     Set which text color to use.
             -t|--text-color)
                 check_argument "$1" "$2" || exit 1
@@ -667,12 +665,10 @@ function get_options() {
                     set_config "text_color" "$TEXT_COLOR"
                 fi
                 ;;
-
 #H -c, --create-fun-fact                        Create a new Fun Facts! splashscreen.
             -c|--create-fun-fact)
                 CREATE_SPLASH_FLAG=1
                 ;;
-
 #H -a, --apply-splash                           Apply Fun Facts! splashscreen.
             -a|--apply-splash)
                 if [[ ! -f "$RESULT_SPLASH" ]]; then
@@ -686,22 +682,18 @@ function get_options() {
                     apply_splash
                 fi
                 ;;
-
 #H -e, --enable-boot                            Enable script to be launch at boot.
             -e|--enable-boot)
                 ENABLE_BOOT_FLAG=1
                 ;;
-
 #H -d, --disable-boot                           Disable script to be launch at boot.
             -d|--disable-boot)
                 DISABLE_BOOT_FLAG=1
                 ;;
-
 #H -g, --gui                                    Start GUI.
             -g|--gui)
                 GUI_FLAG=1
                 ;;
-
 #H -u, --update                                 Update script.
             -u|--update)
                 check_updates
