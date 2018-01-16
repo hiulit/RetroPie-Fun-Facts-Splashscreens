@@ -101,7 +101,8 @@ function check_config() {
     if [[ ! -f "$DEFAULT_SPLASH" ]]; then
         echo "Downloading default splashscreen ..."
         curl -s "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "retropie-default.png" > /dev/null
-        echo "Setting permissions to default splashscreen ..."
+        echo "Downloading default splashscreen ... OK"
+	echo "Setting permissions to default splashscreen ..."
         chown -R "$user":"$user" "retropie-default.png"
         echo "Setting permissions to default splashscreen ... OK"
     fi
@@ -109,7 +110,8 @@ function check_config() {
     if [[ ! -f "$SCRIPT_CFG" ]]; then
         echo "Downloading config file ..."
         curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg" > /dev/null
-        echo "Setting permissions to config file ..."
+        echo "Downloading config file ... OK"
+	echo "Setting permissions to config file ..."
         chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
         echo "Setting permissions to config file ... OK"
     fi
