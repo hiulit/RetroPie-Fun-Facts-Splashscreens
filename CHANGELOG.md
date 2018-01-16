@@ -9,6 +9,7 @@
 ### Changed
 
 * Changed `fun-facts-settings.cfg` for `fun-facts-splashscreens-settings.cfg`.
+* Removed `CODE_OF_CONDUCT.md`, `ISSUE_TEMAPLATE.md` and `PULL_REQUEST_TEMPLATE.md` as nobody, not even me, was using them :)
 
 ## v1.5.0 (January 15th 2018)
 
