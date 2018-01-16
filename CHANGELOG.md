@@ -10,10 +10,12 @@
 
 * Added functionality to enable/disable script at boot in config file.
 * Added functionality to download the config file if it doesn't exist.
+* Added functionality to download the default RetroPie's splashscreen if it doesn't exist.
 
 ### Changed
 
 * Updated **Fun Facts!**.
+* Changed `default-splashscreen.png` for `retropie-default.png`.
 * Changed `fun-facts-settings.cfg` for `fun-facts-splashscreens-settings.cfg`.
 * Silenced some outputs.
 * Removed `CODE_OF_CONDUCT.md`, `ISSUE_TEMAPLATE.md` and `PULL_REQUEST_TEMPLATE.md` as nobody, not even me, was using them :)

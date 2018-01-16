@@ -21,7 +21,7 @@ function install_fun-facts-splashscreens() {
         'fun-facts-splashscreens.sh'
         'fun-facts.txt'
         'fun-facts-splashscreens-settings.cfg'
-        'default-splashscreen.png'
+        'retropie-default.png'
     )
 }
 

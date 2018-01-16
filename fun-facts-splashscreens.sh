@@ -39,7 +39,7 @@ readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with ra
 
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
 readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
-readonly DEFAULT_SPLASH="$SCRIPT_DIR/default-splashscreen.png"
+readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_COLOR="white"
 readonly DEFAULT_BOOT_SCRIPT="false"
 
@@ -97,7 +97,15 @@ function get_config() {
 
 function check_config() {
     CONFIG_FLAG=1
-    
+
+    if [[ ! -f "$DEFAULT_SPLASH" ]]; then
+        echo "Downloading default splashscreen ..."
+        curl -s "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "retropie-default.png" > /dev/null
+        echo "Setting permissions to default splashscreen ..."
+        chown -R "$user":"$user" "retropie-default.png"
+        echo "Setting permissions to default splashscreen ... OK"
+    fi
+
     if [[ ! -f "$SCRIPT_CFG" ]]; then
         echo "Downloading config file ..."
         curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg" > /dev/null
@@ -105,21 +113,21 @@ function check_config() {
         chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
         echo "Setting permissions to config file ... OK"
     fi
-    
+
     echo "Checking config file ..."
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
-    
+
     validate_splash "$SPLASH_PATH"
     validate_color "$TEXT_COLOR"
     validate_boot_script "$BOOT_SCRIPT"
-    
+
     echo "Checking config file ... OK"
-    
+
     echo "Setting config file ..."
-    
+
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
         echo "'splashscreen_path' not set. Switching to defaults ..."
@@ -137,7 +145,7 @@ function check_config() {
         echo "'boot_script' not set. Switching to defaults ..."
         set_config "boot_script" "$BOOT_SCRIPT"
     fi
-    
+
     echo "Setting config file ... OK"
 
     echo
@@ -147,7 +155,7 @@ function check_config() {
     echo "'text_color'          = '$TEXT_COLOR'"
     echo "'boot_script'         = '$BOOT_SCRIPT'"
     echo
-    
+
     if [[ "$BOOT_SCRIPT" == "false" ]]; then
         disable_boot_script
     elif [[ "$BOOT_SCRIPT" == "true" ]]; then
@@ -339,7 +347,7 @@ function validate_color() {
 
 function validate_boot_script() {
     [[ -z "$1" ]] && return 0
-    
+
     if [[ "$1" != "false" && "$1" != "true" ]]; then
         echo >&2
         echo "ERROR: Invalid boolean '$1'" >&2
