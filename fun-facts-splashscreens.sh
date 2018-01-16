@@ -15,6 +15,9 @@
 
 # Globals #############################################
 
+user="$SUDO_USER"
+[[ -z "$user" ]] && user="$(id -un)"
+
 home="$(find /home -type d -name RetroPie -print -quit 2>/dev/null)"
 home="${home%/RetroPie}"
 
@@ -81,10 +84,7 @@ function check_argument() {
 
 function set_config() {
     sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$SCRIPT_CFG"
-
-    if [[ "$GUI_FLAG" -eq 0 ]]; then
-        echo "'$1' set to '$2'."
-    fi
+    echo "'$1' set to '$2'."
 }
 
 function get_config() {
@@ -97,41 +97,61 @@ function get_config() {
 
 function check_config() {
     CONFIG_FLAG=1
-
-    [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "\nChecking config ..."
+    
+    if [[ ! -f "$SCRIPT_CFG" ]]; then
+        echo "Downloading config file ..."
+        curl "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg"
+        echo "Setting permissions to config file ..."
+        chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
+        echo "Setting permissions to config file ... OK"
+    fi
+    
+    echo "Checking config file ..."
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
     
+    validate_splash "$SPLASH_PATH"
+    validate_color "$TEXT_COLOR"
+    validate_boot_script "$BOOT_SCRIPT"
+    
+    echo "Checking config file ... OK"
+    
+    echo "Setting config file ..."
+    
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
-        [[ "$GUI_FLAG" -eq 0 ]] && echo "'splashscreen_path' not set. Switching to defaults ..."
+        echo "'splashscreen_path' not set. Switching to defaults ..."
         set_config "splashscreen_path" "$SPLASH_PATH"
     fi
 
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
-        [[ "$GUI_FLAG" -eq 0 ]] && echo "'text_color' not set. Switching to defaults ..."
+        echo "'text_color' not set. Switching to defaults ..."
         set_config "text_color" "$TEXT_COLOR"
     fi
 
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        [[ "$GUI_FLAG" -eq 0 ]] && echo "'boot_script' not set. Switching to defaults ..."
+        echo "'boot_script' not set. Switching to defaults ..."
         set_config "boot_script" "$BOOT_SCRIPT"
     fi
     
-    [[ "$BOOT_SCRIPT" == "false" ]] && disable_boot_script || enable_boot_script
+    echo "Setting config file ... OK"
 
-    validate_splash "$SPLASH_PATH"
-    validate_color "$TEXT_COLOR"
-
-    if [[ "$GUI_FLAG" -eq 0 ]]; then
-        echo
-        echo "'splashscreen_path'   = '$SPLASH_PATH'"
-        echo "'text_color'          = '$TEXT_COLOR'"
-        echo "'boot_script'         = '$BOOT_SCRIPT'"
+    echo
+    echo "Config file"
+    echo "-----------"
+    echo "'splashscreen_path'   = '$SPLASH_PATH'"
+    echo "'text_color'          = '$TEXT_COLOR'"
+    echo "'boot_script'         = '$BOOT_SCRIPT'"
+    echo
+    
+    if [[ "$BOOT_SCRIPT" == "false" ]]; then
+        disable_boot_script
+    elif [[ "$BOOT_SCRIPT" == "true" ]]; then
+        enable_boot_script
     fi
 }
 
@@ -267,7 +287,7 @@ function validate_splash() {
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: check the 'splashscreen_path' value in '$SCRIPT_CFG'" >&2
+                echo "ERROR: Check the 'splashscreen_path' value in '$SCRIPT_CFG'" >&2
             else
                 echo "ERROR: '$1' file not found!" >&2
             fi
@@ -293,14 +313,14 @@ function validate_color() {
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: check the 'text_color' value in '$SCRIPT_CFG'" >&2
+                echo "ERROR: Check the 'text_color' value in '$SCRIPT_CFG'" >&2
             else
-                echo "ERROR: invalid color '$1'." >&2
+                echo "ERROR: Invalid color '$1'." >&2
             fi
             return 1
         else
             echo >&2
-            echo "ERROR: invalid color '$1'." >&2
+            echo "ERROR: Invalid color '$1'." >&2
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
                 echo "Check the 'text_color' value in '$SCRIPT_CFG'" >&2
             fi
@@ -314,6 +334,17 @@ function validate_color() {
             echo >&2
             exit 1
         fi
+    fi
+}
+
+function validate_boot_script() {
+    [[ -z "$1" ]] && return 0
+    
+    if [[ "$1" != "false" && "$1" != "true" ]]; then
+        echo >&2
+        echo "ERROR: Invalid boolean '$1'" >&2
+        echo "Check the 'boot_script' value in '$SCRIPT_CFG'" >&2
+        exit 1
     fi
 }
 
