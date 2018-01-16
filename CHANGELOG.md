@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Fixed
+
+* Fixed files permissions after updating the script.
+
 ### Added
 
 * Added functionality to enable/disable script at boot in config file.
+* Added functionality to download the config file if it doesn't exist.
 
 ### Changed
 
