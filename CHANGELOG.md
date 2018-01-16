@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-* Up to date
+### Added
+
+* Added functionality to enable/disable script at boot in config file.
+
+### Changed
+
+* Changed `fun-facts-settings.cfg` for `fun-facts-splashscreens-settings.cfg`.
 
 ## v1.5.0 (January 15th 2018)
 
@@ -86,7 +92,7 @@
     * Added `--splash` argument.
     * Added `--text-color` argument.
 * Added `--gui` argument. All the functions can be performed in a more friendly manner.
-* Created `fun-facts-settings.cfg` config file.
+* Created `fun-facts-splashscreens-settings.cfg` config file.
 * Added a bunch of new **Fun Facts!**.
 
 ### Changes
@@ -95,7 +101,7 @@
 * Resulting Fun Facts! splashscreen is now `fun-facts-splashscreen.png`.
 * Use of `--splash` to set splashscreen path.
 * Use of `--text-color` to set text color.
-* `fun-facts-settings.cfg` can be edited directly instead of using `--splash` or `--text-color` to store the splashscreen path and the text color values.
+* `fun-facts-splashscreens-settings.cfg` can be edited directly instead of using `--splash` or `--text-color` to store the splashscreen path and the text color values.
 
 ### Deprecated
 
