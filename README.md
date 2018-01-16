@@ -39,6 +39,7 @@ Use '--help' to see all the options.
 * `--enable-boot`: Enable script to be launch at boot.
 * `--disable-boot`: Disable script to be launch at boot.
 * `--gui`: Start GUI.
+* `--reset-config`: Reset config file.
 * `--update`: Update script.
 * `--version`: Show script version.
 
@@ -163,6 +164,18 @@ sudo ./fun-facts-splashscreens.sh --gui
 ##### Update script (`--update`)
 ![Fun Facts Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
 
+### `--reset-config`
+
+Reset config file.
+
+Removes all values from the config file. Next time you execute the script, it will populate the config file with defaults.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --reset-config
+```
+
 ### `--update`
 
 Update script.
@@ -197,16 +210,14 @@ sudo ./fun-facts-splashscreens.sh --version
 When setting the splashscreen path using `--splash-path` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
 
 ```
-# Settings for Fun Facts!
+# Settings for Fun Facts Splashscreens.
 
-# Splashscreen path
+# Set splashscreen path
 #
-# Must be an absolute path.
-# (e.g /home/pi/my-awesome-splashscreen.png)
-
+# Must be an absolute path (e.g /home/pi/my-awesome-splashscreen.png).
 splashscreen_path = ""
 
-# Text color
+# Set splashscreen text color
 #
 # Short list of available colors:
 #
@@ -214,8 +225,12 @@ splashscreen_path = ""
 # pink, red, orange, yellow, green, silver, blue, cyan, purple, brown.
 #
 # TIP: run the 'convert -list color' command to get a full list.
-
 text_color = ""
+
+# Enable/disable script at boot
+#
+# Boolean: true/false.
+boot_script = ""
 ```
 
 You can edit this file directly instead of using `--splash-path` or `--text-color`.
