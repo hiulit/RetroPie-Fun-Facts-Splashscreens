@@ -8,6 +8,7 @@
 
 ### Added
 
+* Added `--reset-config` option to reset the config file.
 * Added functionality to enable/disable script at boot in config file.
 * Added functionality to download the config file if it doesn't exist.
 * Added functionality to download the default RetroPie's splashscreen if it doesn't exist.
