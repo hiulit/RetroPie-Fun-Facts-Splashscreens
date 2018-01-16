@@ -50,7 +50,7 @@ ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
 CONFIG_FLAG=0
 GUI_FLAG=0
-
+RESET_CONFIG_FLAG=0
 
 # Functions ############################################
 
@@ -102,7 +102,7 @@ function check_config() {
         echo "Downloading default splashscreen ..."
         curl -s "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "retropie-default.png" > /dev/null
         echo "Downloading default splashscreen ... OK"
-	echo "Setting permissions to default splashscreen ..."
+    echo "Setting permissions to default splashscreen ..."
         chown -R "$user":"$user" "retropie-default.png"
         echo "Setting permissions to default splashscreen ... OK"
     fi
@@ -111,7 +111,7 @@ function check_config() {
         echo "Downloading config file ..."
         curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg" > /dev/null
         echo "Downloading config file ... OK"
-	echo "Setting permissions to config file ..."
+    echo "Setting permissions to config file ..."
         chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
         echo "Setting permissions to config file ... OK"
     fi
@@ -165,6 +165,11 @@ function check_config() {
     fi
 }
 
+function reset_config() {
+    set_config "splashscreen_path" ""
+    set_config "text_color" ""
+    set_config "boot_script" ""
+}
 
 function usage() {
     echo
@@ -732,6 +737,10 @@ function get_options() {
             -g|--gui)
                 GUI_FLAG=1
                 ;;
+#H -r, --reset-config                           Reset config file.
+            -r|--reset-config)
+                RESET_CONFIG_FLAG=1
+                ;;
 #H -u, --update                                 Update script.
             -u|--update)
                 check_updates
@@ -797,6 +806,10 @@ function main() {
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         gui
+    fi
+    
+    if [[ "$RESET_CONFIG_FLAG" -eq 1 ]]; then
+        reset_config
     fi
 }
 
