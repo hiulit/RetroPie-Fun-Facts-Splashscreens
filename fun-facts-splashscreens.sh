@@ -31,15 +31,18 @@ readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
 
+
 # Variables ############################################
 
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
 readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/default-splashscreen.png"
 readonly DEFAULT_COLOR="white"
+readonly DEFAULT_BOOT_SCRIPT="false"
 
 SPLASH_PATH=
 TEXT_COLOR=
+BOOT_SCRIPT=
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
 CONFIG_FLAG=0
@@ -99,14 +102,26 @@ function check_config() {
     
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
+    BOOT_SCRIPT="$(get_config "boot_script")"
 
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
-        [[ "$GUI_FLAG" -eq 0 ]] && echo "No 'splashscreen_path' set. Switching to defaults ..."
+        [[ "$GUI_FLAG" -eq 0 ]] && echo "'splashscreen_path' not set. Switching to defaults ..."
     fi
+    
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
-        [[ "$GUI_FLAG" -eq 0 ]] && echo  -e "No 'text_color' set. Switching to defaults ..."
+        [[ "$GUI_FLAG" -eq 0 ]] && echo "'text_color' not set. Switching to defaults ..."
+    fi
+    
+    if [[ -z "$BOOT_SCRIPT" ]]; then
+        BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
+        disable_boot_script
+        [[ "$GUI_FLAG" -eq 0 ]] && echo "'boot_script' not set. Switching to defaults ..."
+    elif [[ "$BOOT_SCRIPT" == "false" ]]; then
+        disable_boot_script
+    elif [[ "$BOOT_SCRIPT" == "true" ]]; then
+        enable_boot_script
     fi
 
     validate_splash "$SPLASH_PATH"
@@ -116,6 +131,7 @@ function check_config() {
         echo
         echo "'splashscreen_path'   = '$SPLASH_PATH'"
         echo "'text_color'          = '$TEXT_COLOR'"
+        echo "'boot_script'         = '$BOOT_SCRIPT'"
     fi
 }
 
@@ -244,7 +260,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
 
 
@@ -254,9 +270,9 @@ function validate_splash() {
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: check the 'splashscreen_path' value in '$SCRIPT_CFG'"
+                echo "ERROR: check the 'splashscreen_path' value in '$SCRIPT_CFG'" >&2
             else
-                echo "ERROR: '$1' file not found!"
+                echo "ERROR: '$1' file not found!" >&2
             fi
             return 1
         else
@@ -280,9 +296,9 @@ function validate_color() {
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: check the 'text_color' value in '$SCRIPT_CFG'"
+                echo "ERROR: check the 'text_color' value in '$SCRIPT_CFG'" >&2
             else
-                echo "ERROR: invalid color '$1'."
+                echo "ERROR: invalid color '$1'." >&2
             fi
             return 1
         else
@@ -337,11 +353,9 @@ function get_last_commit() {
 
 
 function gui() {
-    check_config
-
+    local last_commit="$(get_last_commit)"
+    
     while true; do
-        local last_commit="$(get_last_commit)"
-
         cmd=(dialog \
             --backtitle "$SCRIPT_TITLE"
             --title "Fun Facts! Splashscreens" \
@@ -551,7 +565,6 @@ function gui() {
                     fi
                     ;;
                 3)
-                    check_config
                     create_fun_fact
                     ;;
                 4)
@@ -567,10 +580,19 @@ function gui() {
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
-                        disable_boot_script && local output="Fun Facts! Splashscreens script DISABLED at boot." || local output="ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
+                        if disable_boot_script; then
+                            set_config "boot_script" "false" >/dev/null
+                            local output="Fun Facts! Splashscreens script DISABLED at boot."
+                         else   
+                            local output="ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
+                        fi
                     else
-                        check_config
-                        enable_boot_script && local output="Fun Facts! Splashscreens script ENABLED at boot." || local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
+                        if enable_boot_script; then
+                            set_config "boot_script" "true" >/dev/null
+                            local output="Fun Facts! Splashscreens script ENABLED at boot."
+                         else   
+                            local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
+                        fi
                     fi
                     dialog \
                         --backtitle "$SCRIPT_TITLE" \
@@ -687,7 +709,7 @@ function get_options() {
                     git pull
                 fi
                 ;;
-#H -v, --version                            Check script version.
+#H -v, --version                                Show script version.
             -v|--version)
                 echo "$SCRIPT_VERSION"
                 ;;
@@ -717,20 +739,30 @@ function main() {
 
     mkdir -p "$RP_DIR/splashscreens"
 
+    check_config >/dev/null
+        
     get_options "$@"
 
     if [[ "$CREATE_SPLASH_FLAG" -eq 1 ]]; then
-        check_config
         create_fun_fact
     fi
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
-        check_config
-        enable_boot_script || echo "ERROR: failed to enable Fun Facts! script at boot." >&2
+        if enable_boot_script; then
+            set_config "boot_script" "true" >/dev/null
+            echo "Fun Facts! Splashscreens script ENABLED at boot."
+        else
+            echo "ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot." >&2
+        fi
     fi
 
     if [[ "$DISABLE_BOOT_FLAG" -eq 1 ]]; then
-        disable_boot_script || echo "ERROR: failed to disable Fun Facts! script at boot." >&2
+        if disable_boot_script; then
+            set_config "boot_script" "false" >/dev/null
+            echo "Fun Facts! Splashscreens script DISABLED at boot."
+        else
+            echo "ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot." >&2
+        fi
     fi
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
