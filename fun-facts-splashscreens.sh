@@ -633,7 +633,7 @@ function gui() {
                             --msgbox "Can't update the script when using it from RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
                     else
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
-                            git pull
+                            git pull && chown -R "$user":"$user" .
                         else
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
@@ -726,7 +726,7 @@ function get_options() {
             -u|--update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
-                    git pull
+                    git pull && chown -R "$user":"$user" .
                 fi
                 ;;
 #H -v, --version                                Show script version.
