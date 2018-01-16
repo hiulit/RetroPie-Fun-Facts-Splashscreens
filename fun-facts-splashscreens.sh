@@ -235,9 +235,6 @@ function create_fun_fact() {
     local color="$(get_config "text_color")"
     local font="$(get_font)"
 
-    [[ -f "$splash" ]] || splash="$DEFAULT_SPLASH"
-    [[ -n "$color" ]] || color="$DEFAULT_COLOR"
-
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
