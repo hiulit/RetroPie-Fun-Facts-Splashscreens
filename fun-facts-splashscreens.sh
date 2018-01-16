@@ -18,7 +18,7 @@
 user="$SUDO_USER"
 [[ -z "$user" ]] && user="$(id -un)"
 
-home="$(find /home -type d -name RetroPie -print -quit 2>/dev/null)"
+home="$(find /home -type d -name RetroPie -print -quit 2> /dev/null)"
 home="${home%/RetroPie}"
 
 readonly RP_DIR="$home/RetroPie"
@@ -100,7 +100,7 @@ function check_config() {
     
     if [[ ! -f "$SCRIPT_CFG" ]]; then
         echo "Downloading config file ..."
-        curl "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg"
+        curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg" > /dev/null
         echo "Setting permissions to config file ..."
         chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
         echo "Setting permissions to config file ... OK"
@@ -355,8 +355,8 @@ function check_updates() {
     git remote update > /dev/null
     UPSTREAM="$1@{u}"
     LOCAL="$(git rev-parse @)"
-    REMOTE="$(git rev-parse $UPSTREAM)"
-    BASE="$(git merge-base @ $UPSTREAM)"
+    REMOTE="$(git rev-parse $UPSTREAM > /dev/null)"
+    BASE="$(git merge-base @ $UPSTREAM > /dev/null)"
     if [[ "$LOCAL" == "$REMOTE" ]]; then
         updates_status="up-to-date"
         updates_output="up to date"
@@ -609,14 +609,14 @@ function gui() {
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
                         if disable_boot_script; then
-                            set_config "boot_script" "false" >/dev/null
+                            set_config "boot_script" "false" > /dev/null
                             local output="Fun Facts! Splashscreens script DISABLED at boot."
                          else
                             local output="ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
                         fi
                     else
                         if enable_boot_script; then
-                            set_config "boot_script" "true" >/dev/null
+                            set_config "boot_script" "true" > /dev/null
                             local output="Fun Facts! Splashscreens script ENABLED at boot."
                          else
                             local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
@@ -759,7 +759,7 @@ function main() {
 
     mkdir -p "$RP_DIR/splashscreens"
 
-    check_config >/dev/null
+    check_config > /dev/null
 
     get_options "$@"
 
@@ -769,7 +769,7 @@ function main() {
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
         if enable_boot_script; then
-            set_config "boot_script" "true" >/dev/null
+            set_config "boot_script" "true" > /dev/null
             echo "Fun Facts! Splashscreens script ENABLED at boot."
         else
             echo "ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot." >&2
@@ -778,7 +778,7 @@ function main() {
 
     if [[ "$DISABLE_BOOT_FLAG" -eq 1 ]]; then
         if disable_boot_script; then
-            set_config "boot_script" "false" >/dev/null
+            set_config "boot_script" "false" > /dev/null
             echo "Fun Facts! Splashscreens script DISABLED at boot."
         else
             echo "ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot." >&2
