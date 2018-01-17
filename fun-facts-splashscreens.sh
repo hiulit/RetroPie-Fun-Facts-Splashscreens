@@ -33,6 +33,7 @@ readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
 readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
+readonly DEPENDENCIES=("imagemagick")
 
 
 # Variables ############################################
@@ -60,11 +61,36 @@ function is_retropie() {
 
 
 function check_dependencies() {
-    if ! which convert > /dev/null; then
-        echo "ERROR: The imagemagick package is not installed!" >&2
-        echo "Please, install it with 'sudo apt-get install imagemagick'." >&2
-        exit 1
-    fi
+    local pkg
+    for pkg in "${DEPENDENCIES[@]}";do
+        if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
+            echo "ERROR: The '$pkg' package is not installed!"
+            echo "Would you like to install it now?"
+            local options
+            options=("Yes" "No")
+            local option
+            select option in "${options[@]}"; do
+                case "$option" in
+                    Yes)
+                        if ! which apt-get > /dev/null; then
+                            echo "ERROR: Couldn't install '$pkg' automatically. Try to install it manually." >&2
+                            exit 1
+                        else
+                            sudo apt-get install "$pkg"
+                            break
+                        fi
+                        ;;
+                    No)
+                        echo "ERROR: Can't launch the script if the '$pkg' package is not installed." >&2
+                        exit 1
+                        ;;
+                    *)
+                        echo "Invalid option. Select a number between 1 and ${#options[@]}."
+                        ;;
+                esac
+            done
+        fi
+    done
 }
 
 
@@ -271,7 +297,7 @@ function create_fun_fact() {
     local splash="$(get_config "splashscreen_path")"
     local color="$(get_config "text_color")"
     local font="$(get_font)"
-
+    
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
@@ -296,6 +322,10 @@ function create_fun_fact() {
         "$RESULT_SPLASH" \
     && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
+
+#~ function add_fun_fact() {
+
+#~ }
 
 
 function validate_splash() {
