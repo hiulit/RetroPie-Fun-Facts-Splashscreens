@@ -166,9 +166,11 @@ function check_config() {
 }
 
 function reset_config() {
+    echo "Resetting config file ..."
     set_config "splashscreen_path" ""
     set_config "text_color" ""
     set_config "boot_script" ""
+    echo "Resetting config file ... OK"
 }
 
 function usage() {
