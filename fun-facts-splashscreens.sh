@@ -297,8 +297,7 @@ function create_fun_fact() {
     local splash="$(get_config "splashscreen_path")"
     local color="$(get_config "text_color")"
     local font="$(get_font)"
-    
-    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    local random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
@@ -323,10 +322,52 @@ function create_fun_fact() {
     && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
 
-#~ function add_fun_fact() {
+function add_fun_fact() {
+    sed -i -e "\$a $1" "$FUN_FACTS_TXT"
+}
 
-#~ }
+function select_fun_facts() {
+    local fun_facts=()
+    local options=()
+    local start="$1"
+    local items="$2"
+    
+    clear
+    
+    while IFS= read -r line; do
+        #~ fun_facts+=("${line//$'\n\r'}")
+        fun_facts+=("${line}")
+    done < "$FUN_FACTS_TXT"
+    options=("${fun_facts[@]:$start:$items}" "Next")
+    (( "$start" >= "$items" )) && options=("${fun_facts[@]:$start:$items}" "Previous" "Next")
+    echo "Select a Fun Fact!"
+    echo "------------------"
+    select option in "${options[@]}"; do
+        case "$option" in
+            "$option" )
+                if [[ "$option" == "Next" ]]; then
+                    start=$((start + items))
+                    select_fun_facts "$start" "$items"
+                elif  [[ "$option" == "Previous" ]]; then
+                    start=$((start - items))
+                    select_fun_facts "$start" "$items"
+                else
+                    if [[ -z "$option" ]]; then
+                        echo "Invalid option. Select a number between 1 and ${#options[@]}."
+                    else
+                        echo "You chose: $option"
+                        exit 1
+                    fi
+                fi
+                ;;
+        esac
+    done
+}   
 
+function remove_fun_fact() {
+    select_fun_facts 0 5
+    #~ sed -i -e "/hola/d" "$FUN_FACTS_TXT"
+}
 
 function validate_splash() {
     [[ -z "$1" ]] && return 0
@@ -704,8 +745,8 @@ function get_options() {
 
     while [[ -n "$1" ]]; do
         case "$1" in
-#H -h, --help                                   Print the help message and exit.
-            -h|--help)
+#H --help                                   Print the help message and exit.
+            --help)
                 echo
                 echo "$SCRIPT_TITLE"
                 echo "$SCRIPT_DESCRIPTION"
@@ -718,8 +759,8 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-#H -s, --splash-path [path/to/splashscreen]     Set which splashscreen to use.
-            -s|--splash-path)
+#H --splash-path [path/to/splashscreen]     Set which splashscreen to use.
+            --splash-path)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_splash "$1"
@@ -729,8 +770,8 @@ function get_options() {
                     set_config "splashscreen_path" "$SPLASH_PATH"
                 fi
                 ;;
-#H -t, --text-color [color]                     Set which text color to use.
-            -t|--text-color)
+#H --text-color [color]                     Set which text color to use.
+            --text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_color "$1"
@@ -740,15 +781,28 @@ function get_options() {
                     set_config "text_color" "$TEXT_COLOR"
                 fi
                 ;;
-#H -c, --create-fun-fact                        Create a new Fun Facts! splashscreen.
-            -c|--create-fun-fact)
+#H --add-fun-fact                           Add a new Fun Fact!.
+            --add-fun-fact)
+                check_argument "$1" "$2" || exit 1
+                shift
+                add_fun_fact "$1"
+                ;;
+#H --remove-fun-fact                        Remove a Fun Fact!.
+            --remove-fun-fact)
+                #~ check_argument "$1" "$2" || exit 1
+                #~ shift
+                #~ remove_fun_fact "$1"
+                remove_fun_fact
+                ;;
+#H --create-fun-fact                        Create a new Fun Facts! splashscreen.
+            --create-fun-fact)
                 CREATE_SPLASH_FLAG=1
                 ;;
-#H -a, --apply-splash                           Apply Fun Facts! splashscreen.
-            -a|--apply-splash)
+#H --apply-splash                           Apply Fun Facts! splashscreen.
+            --apply-splash)
                 if [[ ! -f "$RESULT_SPLASH" ]]; then
                     echo >&2
-                    echo "ERROR: create a Fun Facts! splashscreen before applying it." >&2
+                    echo "ERROR: Create a Fun Facts! splashscreen before applying it." >&2
                     echo >&2
                     echo "Try 'sudo $0 --help' for more info." >&2
                     echo >&2
@@ -757,35 +811,39 @@ function get_options() {
                     apply_splash
                 fi
                 ;;
-#H -e, --enable-boot                            Enable script to be launch at boot.
-            -e|--enable-boot)
+#H --enable-boot                            Enable script to be launch at boot.
+            --enable-boot)
                 ENABLE_BOOT_FLAG=1
                 ;;
-#H -d, --disable-boot                           Disable script to be launch at boot.
-            -d|--disable-boot)
+#H --disable-boot                           Disable script to be launch at boot.
+            --disable-boot)
                 DISABLE_BOOT_FLAG=1
                 ;;
-#H -g, --gui                                    Start GUI.
-            -g|--gui)
+#H --gui                                    Start GUI.
+            --gui)
                 GUI_FLAG=1
                 ;;
-#H -r, --reset-config                           Reset config file.
-            -r|--reset-config)
+#H --reset-config                           Reset config file.
+            --reset-config)
                 RESET_CONFIG_FLAG=1
                 ;;
-#H -u, --update                                 Update script.
-            -u|--update)
+#H --update                                 Update script.
+            --update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
                     git pull && chown -R "$user":"$user" .
                 fi
                 ;;
-#H -v, --version                                Show script version.
-            -v|--version)
+#H --version                                Show script version.
+            --version)
                 echo "$SCRIPT_VERSION"
                 ;;
             *)
-                echo "ERROR: invalid option '$1'" >&2
+                echo >&2
+                echo "ERROR: Invalid option '$1'" >&2
+                echo >&2
+                echo "Try 'sudo $0 --help' for more info." >&2
+                echo >&2
                 exit 2
                 ;;
         esac
