@@ -53,6 +53,7 @@ CONFIG_FLAG=0
 GUI_FLAG=0
 RESET_CONFIG_FLAG=0
 
+
 # Functions ############################################
 
 function is_retropie() {
@@ -113,6 +114,7 @@ function set_config() {
     echo "'$1' set to '$2'."
 }
 
+
 function get_config() {
     local config
     config="$(grep -Po "(?<=^$1 = ).*" "$SCRIPT_CFG")"
@@ -121,25 +123,35 @@ function get_config() {
     echo "$config"
 }
 
+
 function check_config() {
     CONFIG_FLAG=1
 
     if [[ ! -f "$DEFAULT_SPLASH" ]]; then
-        echo "Downloading default splashscreen ..."
+        echo "Downloading Fun Facts! default splashscreen ..."
         curl -s "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "retropie-default.png" > /dev/null
-        echo "Downloading default splashscreen ... OK"
-    echo "Setting permissions to default splashscreen ..."
+        echo "Downloading Fun Facts! default splashscreen ... OK"
+        echo "Setting permissions to Fun Facts! default splashscreen ..."
         chown -R "$user":"$user" "retropie-default.png"
-        echo "Setting permissions to default splashscreen ... OK"
+        echo "Setting permissions to Fun Facts! default splashscreen ... OK"
     fi
 
     if [[ ! -f "$SCRIPT_CFG" ]]; then
-        echo "Downloading config file ..."
+        echo "Downloading Fun Facts! config file ..."
         curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg" > /dev/null
-        echo "Downloading config file ... OK"
-    echo "Setting permissions to config file ..."
+        echo "Downloading Fun Facts! config file ... OK"
+        echo "Setting permissions to Fun Facts! config file ..."
         chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
-        echo "Setting permissions to config file ... OK"
+        echo "Setting permissions to Fun Facts! config file ... OK"
+    fi
+    
+    if [[ ! -f "$FUN_FACTS_TXT" ]]; then
+        echo "Downloading Fun Facts! text file ..."
+        curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "fun-facts.txt" > /dev/null
+        echo "Downloading Fun Facts! text file ... OK"
+        echo "Setting permissions to Fun Facts! text file ..."
+        chown -R "$user":"$user" "fun-facts.txt"
+        echo "Setting permissions to Fun Facts! text file ... OK"
     fi
 
     echo "Checking config file ..."
@@ -191,6 +203,7 @@ function check_config() {
     fi
 }
 
+
 function reset_config() {
     echo "Resetting config file ..."
     set_config "splashscreen_path" ""
@@ -198,6 +211,7 @@ function reset_config() {
     set_config "boot_script" ""
     echo "Resetting config file ... OK"
 }
+
 
 function usage() {
     echo
@@ -322,15 +336,17 @@ function create_fun_fact() {
     && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
 
-function add_fun_fact() {
-    sed -i -e "\$a $1" "$FUN_FACTS_TXT"
-}
 
 function select_fun_facts() {
     local fun_facts=()
-    local options=()
+    local fun_facts_total
+    local options
     local start="$1"
     local items="$2"
+    local next="--> NEXT -->"
+    local prev="<-- PREVIOUS <--"
+    local quit="--> QUIT <--"
+    [[ -z "$breaks" ]] && local breaks=1
     
     clear
     
@@ -338,25 +354,39 @@ function select_fun_facts() {
         #~ fun_facts+=("${line//$'\n\r'}")
         fun_facts+=("${line}")
     done < "$FUN_FACTS_TXT"
-    options=("${fun_facts[@]:$start:$items}" "Next")
-    (( "$start" >= "$items" )) && options=("${fun_facts[@]:$start:$items}" "Previous" "Next")
+    
+    fun_facts_total="${#fun_facts[@]}"
+    
+    options=("${fun_facts[@]:$start:$items}" "$quit")
+    
+    if (( "$fun_facts_total" > (( "$start" + "$items" )) &&  "$start" == 0 )); then
+        options=("${fun_facts[@]:$start:$items}" "$next" "$quit")
+    elif (( "$fun_facts_total" < (( "$start" + "$items" )) &&  "$start" != 0 )); then
+        options=("${fun_facts[@]:$start:$items}" "$prev" "$quit")
+    elif (( "$start" >= "$items" )); then
+        options=("${fun_facts[@]:$start:$items}" "$prev" "$next" "$quit")
+    fi
+    
     echo "Select a Fun Fact!"
     echo "------------------"
     select option in "${options[@]}"; do
         case "$option" in
             "$option" )
-                if [[ "$option" == "Next" ]]; then
+                if [[ "$option" == "$next" ]]; then
+                    ((breaks++))
                     start=$((start + items))
                     select_fun_facts "$start" "$items"
-                elif  [[ "$option" == "Previous" ]]; then
+                elif  [[ "$option" == "$prev" ]]; then
+                    ((breaks++))
                     start=$((start - items))
                     select_fun_facts "$start" "$items"
+                elif [[ "$option" == "$quit" ]]; then
+                    exit
                 else
                     if [[ -z "$option" ]]; then
                         echo "Invalid option. Select a number between 1 and ${#options[@]}."
                     else
-                        echo "You chose: $option"
-                        exit 1
+                        break "$breaks"
                     fi
                 fi
                 ;;
@@ -364,10 +394,46 @@ function select_fun_facts() {
     done
 }   
 
-function remove_fun_fact() {
-    select_fun_facts 0 5
-    #~ sed -i -e "/hola/d" "$FUN_FACTS_TXT"
+
+function add_fun_fact() {
+    echo "Adding Fun Fact! ..." && sleep 0.25
+    while IFS= read -r line; do
+        if [[ "$1" == "$line" ]]; then
+            echo "ERROR: '$1' is already in '$FUN_FACTS_TXT'"  >&2
+            exit 1
+        fi
+    done < "$FUN_FACTS_TXT"
+    echo "$1" >> "$FUN_FACTS_TXT" && echo "Adding Fun Fact! ... OK"
 }
+
+
+function check_remove_fun_fact() {
+    if [[ ! -s "$FUN_FACTS_TXT" ]]; then
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            echo "ERROR: '$FUN_FACTS_TXT' is empty!" 
+            return 1
+        else
+            echo "ERROR: '$FUN_FACTS_TXT' is empty!" >&2
+            exit 1
+        fi
+    else
+        return 0
+    fi
+}
+
+
+function remove_fun_fact() {
+    if [[ -n "$1" ]]; then
+        sed -i "/^$1$/ d" "$FUN_FACTS_TXT"
+    else
+        select_fun_facts 0 10
+        echo "Removing Fun Fact! ... '$option'" && sleep 0.5
+        sed -i "/^$option$/ d" "$FUN_FACTS_TXT" # $option comes from select_fun_facts()
+        echo "Removing Fun Fact! ... OK" && sleep 0.25
+        remove_fun_fact
+    fi
+}
+
 
 function validate_splash() {
     [[ -z "$1" ]] && return 0
@@ -375,9 +441,9 @@ function validate_splash() {
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: Check the 'splashscreen_path' value in '$SCRIPT_CFG'" >&2
+                echo "ERROR: Check the 'splashscreen_path' value in '$SCRIPT_CFG'"
             else
-                echo "ERROR: '$1' file not found!" >&2
+                echo "ERROR: '$1' file not found!"
             fi
             return 1
         else
@@ -401,9 +467,9 @@ function validate_color() {
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: Check the 'text_color' value in '$SCRIPT_CFG'" >&2
+                echo "ERROR: Check the 'text_color' value in '$SCRIPT_CFG'"
             else
-                echo "ERROR: Invalid color '$1'." >&2
+                echo "ERROR: Invalid color '$1'."
             fi
             return 1
         else
@@ -469,14 +535,14 @@ function get_last_commit() {
 
 
 function gui() {
-    local last_commit="$(get_last_commit)"
-
     while true; do
+        check_config > /dev/null
+        #~ local last_commit="$(get_last_commit)"
         cmd=(dialog \
             --backtitle "$SCRIPT_TITLE"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
-            --menu "Version: $SCRIPT_VERSION\nLast commit: $last_commit" 15 60 8)
+            --menu "Version: $SCRIPT_VERSION\nLast commit: $last_commit" 18 60 9)
 
         option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
         [[ -n "$SPLASH_PATH" ]] && option_splash="Set splashscreen path ($SPLASH_PATH)"
@@ -510,10 +576,13 @@ function gui() {
         options=(
             1 "$option_splash"
             2 "$option_color"
-            3 "Create a new Fun Facts! splashscreen"
-            4 "$option_apply_splash"
-            5 "Enable/Disable script at boot ($option_boot)"
-            6 "$option_updates"
+            3 "Add a new Fun Fact!"
+            4 "Remove Fun Facts!"
+            5 "Create a new Fun Facts! splashscreen"
+            6 "$option_apply_splash"
+            7 "Enable/Disable script at boot ($option_boot)"
+            8 "$option_updates"
+            9 "Reset config"
         )
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -526,12 +595,11 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Set splashscreen path" \
                         --cancel-label "Back" \
-                        --inputbox "Enter path to splashscreen... \n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
+                        --inputbox "Enter path to splashscreen.\n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
 
                     result_value="$?"
                     if [[ "$result_value" -eq 0 ]]; then
                         local validation="$(validate_splash "$splash")"
-
                         if [[ -n "$validation" ]]; then
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
@@ -542,7 +610,7 @@ function gui() {
                             else
                                 SPLASH_PATH="$splash"
                             fi
-                            set_config "splashscreen_path" "$SPLASH_PATH"
+                            set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
                                 --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 10 50 2>&1 >/dev/tty
@@ -556,7 +624,7 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Set text color" \
                         --cancel-label "Back" \
-                        --menu "Choose an option" 15 60 8)
+                        --menu "Choose an option" 15 60 9)
 
                     options=(
                         1 "Basic colors"
@@ -624,7 +692,7 @@ function gui() {
                                         else
                                             TEXT_COLOR="$color"
                                         fi
-                                        set_config "text_color" "$TEXT_COLOR"
+                                        set_config "text_color" "$TEXT_COLOR" > /dev/null
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
@@ -668,7 +736,7 @@ function gui() {
                                         else
                                             TEXT_COLOR="$color"
                                         fi
-                                        set_config "text_color" "$TEXT_COLOR"
+                                        set_config "text_color" "$TEXT_COLOR" > /dev/null
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
@@ -681,9 +749,70 @@ function gui() {
                     fi
                     ;;
                 3)
-                    create_fun_fact
+                    new_fun_fact="$(dialog \
+                        --backtitle "$SCRIPT_TITLE" \
+                        --title "Add a new Fun Fact!" \
+                        --cancel-label "Back" \
+                        --inputbox "Enter a new Fun Fact!" 8 60 2>&1 >/dev/tty)"
+
+                    result_value="$?"
+                    if [[ "$result_value" -eq 0 ]]; then
+                        add_fun_fact "$new_fun_fact"
+                    fi
                     ;;
-                4)
+                4)                    
+                    local validation
+                    validation="$(check_remove_fun_fact)"
+                    if [[ -n "$validation" ]]; then
+                        dialog \
+                            --backtitle "$SCRIPT_TITLE" \
+                            --msgbox "$validation" 7 50 2>&1 >/dev/tty
+                    else
+                        local fun_facts=()
+                        local fun_fact
+                        local options=()
+                        local i=1
+                        
+                        while IFS= read -r line; do
+                            #~ fun_facts+=("${line//$'\n\r'}")
+                            fun_facts+=("${line}")
+                        done < "$FUN_FACTS_TXT"
+
+                        for fun_fact in "${fun_facts[@]}"; do
+                            options+=("$i" "$fun_fact")
+                            ((i++))
+                        done
+
+                        cmd=(dialog \
+                            --backtitle "$SCRIPT_TITLE" \
+                            --title "Remove a Fun Fact!" \
+                            --cancel-label "Back" \
+                            --menu "Choose a Fun Fact! to remove" 15 60 "${#fun_facts[@]}")
+
+                        choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                        result_value="$?"
+                        if [[ "$result_value" -eq 0 ]]; then
+                            local fun_fact
+                            fun_fact="${options[$((choice*2-1))]}"
+                            remove_fun_fact "$fun_fact" \
+                            && dialog \
+                                --backtitle "$SCRIPT_TITLE" \
+                                --msgbox "'$fun_fact' succesfully removed!" 7 50 2>&1 >/dev/tty
+                        fi
+                    fi
+                    ;;
+                5)
+                    local validation
+                    validation="$(check_remove_fun_fact)"
+                    if [[ -n "$validation" ]]; then
+                        dialog \
+                            --backtitle "$SCRIPT_TITLE" \
+                            --msgbox "$validation" 7 50 2>&1 >/dev/tty
+                    else
+                        create_fun_fact
+                    fi
+                    ;;
+                6)
                     if [[ ! -f "$RESULT_SPLASH" ]]; then
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
@@ -692,7 +821,7 @@ function gui() {
                         apply_splash
                     fi
                     ;;
-                5)
+                7)
                     check_boot_script
                     return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
@@ -714,7 +843,7 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --msgbox "\n$output\n" 7 55 2>&1 >/dev/tty
                     ;;
-                6)
+                8)
                     if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
@@ -728,6 +857,9 @@ function gui() {
                                 --msgbox "\nFun Facts! Splashscreens is $updates_output!\n" 7 50 2>&1 >/dev/tty
                         fi
                     fi
+                    ;;
+                9)
+                    reset_config
                     ;;
             esac
         else
@@ -789,13 +921,12 @@ function get_options() {
                 ;;
 #H --remove-fun-fact                        Remove a Fun Fact!.
             --remove-fun-fact)
-                #~ check_argument "$1" "$2" || exit 1
-                #~ shift
-                #~ remove_fun_fact "$1"
+                check_remove_fun_fact
                 remove_fun_fact
                 ;;
 #H --create-fun-fact                        Create a new Fun Facts! splashscreen.
             --create-fun-fact)
+                check_remove_fun_fact
                 CREATE_SPLASH_FLAG=1
                 ;;
 #H --apply-splash                           Apply Fun Facts! splashscreen.
