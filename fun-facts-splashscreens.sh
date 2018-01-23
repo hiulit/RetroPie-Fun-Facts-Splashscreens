@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # fun-facts-splashscreens.sh
 #
-# Fun Facts! splashscreens for RetroPie.
+# Fun Facts! Splashscreens for RetroPie.
 # A tool for RetroPie to create splashscreens with random video game related fun facts.
 #
 # Author: hiulit
@@ -31,7 +31,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
 readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
 readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
-readonly SCRIPT_TITLE="Fun Facts! splashscreens for RetroPie"
+readonly SCRIPT_TITLE="Fun Facts! Splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
 readonly DEPENDENCIES=("imagemagick")
 
@@ -43,6 +43,9 @@ readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_COLOR="white"
 readonly DEFAULT_BOOT_SCRIPT="false"
+readonly DIALOG_OK=0
+readonly DIALOG_CANCEL=1
+readonly DIALOG_ESC=255
 
 SPLASH_PATH=
 TEXT_COLOR=
@@ -103,7 +106,6 @@ function check_argument() {
         echo >&2
         echo "Try 'sudo $0 --help' for more info." >&2
         echo >&2
-
         return 1
     fi
 }
@@ -160,9 +162,9 @@ function check_config() {
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
 
-    validate_splash "$SPLASH_PATH"
-    validate_color "$TEXT_COLOR"
-    validate_boot_script "$BOOT_SCRIPT"
+    validate_splash "$SPLASH_PATH" || exit 1
+    validate_color "$TEXT_COLOR" || exit 1
+    validate_boot_script "$BOOT_SCRIPT" || exit 1
 
     echo "Checking config file ... OK"
 
@@ -367,8 +369,8 @@ function select_fun_facts() {
         options=("${fun_facts[@]:$start:$items}" "$prev" "$next" "$quit")
     fi
     
-    echo "Select a Fun Fact!"
-    echo "------------------"
+    echo "Choose a Fun Fact! to remove"
+    echo "----------------------------"
     select option in "${options[@]}"; do
         case "$option" in
             "$option" )
@@ -396,21 +398,26 @@ function select_fun_facts() {
 
 
 function add_fun_fact() {
-    echo "Adding Fun Fact! ..." && sleep 0.25
     while IFS= read -r line; do
         if [[ "$1" == "$line" ]]; then
-            echo "ERROR: '$1' is already in '$FUN_FACTS_TXT'"  >&2
-            exit 1
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                echo "'$1' is already in '$FUN_FACTS_TXT'"
+                return 1
+            else
+                echo "ERROR: '$1' is already in '$FUN_FACTS_TXT'"  >&2
+                exit 1
+            fi
         fi
     done < "$FUN_FACTS_TXT"
-    echo "$1" >> "$FUN_FACTS_TXT" && echo "Adding Fun Fact! ... OK"
+    echo "$1" >> "$FUN_FACTS_TXT"
+    echo "'$1' Fun Fact! added succesfully!"
 }
 
 
-function check_remove_fun_fact() {
+function check_fun_facts_txt() {
     if [[ ! -s "$FUN_FACTS_TXT" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            echo "ERROR: '$FUN_FACTS_TXT' is empty!" 
+            echo "'$FUN_FACTS_TXT' is empty!" 
             return 1
         else
             echo "ERROR: '$FUN_FACTS_TXT' is empty!" >&2
@@ -439,22 +446,15 @@ function validate_splash() {
     [[ -z "$1" ]] && return 0
 
     if [[ ! -f "$1" ]]; then
+        local error_message
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: Check the 'splashscreen_path' value in '$SCRIPT_CFG'"
-            else
-                echo "ERROR: '$1' file not found!"
-            fi
-            return 1
+            error_message="'$1' file not found!"
         else
-            echo >&2
-            echo "ERROR: '$1' file not found!" >&2
-            if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "Check the 'splashscreen_path' value in '$SCRIPT_CFG'" >&2
-            fi
-            echo >&2
-            exit 1
+            error_message="ERROR: '$1' file not found!"
         fi
+        echo "$error_message" #>&2
+        [[ "$CONFIG_FLAG" -eq 1 ]] && echo "Check the 'splashscreen_path' value in '$SCRIPT_CFG'" #>&2
+        return 1
     fi
 }
 
@@ -466,18 +466,11 @@ function validate_color() {
         return 0
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "ERROR: Check the 'text_color' value in '$SCRIPT_CFG'"
-            else
-                echo "ERROR: Invalid color '$1'."
-            fi
+            echo "Invalid color '$1'."
             return 1
         else
-            echo >&2
             echo "ERROR: Invalid color '$1'." >&2
-            if [[ "$CONFIG_FLAG" -eq 1 ]]; then
-                echo "Check the 'text_color' value in '$SCRIPT_CFG'" >&2
-            fi
+            [[ "$CONFIG_FLAG" -eq 1 ]] && echo "Check the 'text_color' value in '$SCRIPT_CFG'" >&2
             echo >&2
             echo "Short list of available colors:" >&2
             echo "-------------------------------" >&2
@@ -485,7 +478,6 @@ function validate_color() {
             echo "pink red orange yellow green silver blue cyan purple brown" >&2
             echo >&2
             echo "TIP: run the 'convert -list color' command to get a full list." >&2
-            echo >&2
             exit 1
         fi
     fi
@@ -495,7 +487,6 @@ function validate_boot_script() {
     [[ -z "$1" ]] && return 0
 
     if [[ "$1" != "false" && "$1" != "true" ]]; then
-        echo >&2
         echo "ERROR: Invalid boolean '$1'" >&2
         echo "Check the 'boot_script' value in '$SCRIPT_CFG'" >&2
         exit 1
@@ -537,18 +528,9 @@ function get_last_commit() {
 function gui() {
     while true; do
         check_config > /dev/null
-        #~ local last_commit="$(get_last_commit)"
-        cmd=(dialog \
-            --backtitle "$SCRIPT_TITLE"
-            --title "Fun Facts! Splashscreens" \
-            --cancel-label "Exit" \
-            --menu "Version: $SCRIPT_VERSION\nLast commit: $last_commit" 18 60 9)
-
-        option_splash="Set splashscreen path (default: $DEFAULT_SPLASH)"
-        [[ -n "$SPLASH_PATH" ]] && option_splash="Set splashscreen path ($SPLASH_PATH)"
-
-        option_color="Set text color (default: $DEFAULT_COLOR)"
-        [[ -n "$TEXT_COLOR" ]] && option_color="Set text color ($TEXT_COLOR)"
+    
+        version="$SCRIPT_VERSION"
+        last_commit="$(get_last_commit)"
 
         check_apply_splash
         return_value="$?"
@@ -574,8 +556,8 @@ function gui() {
         fi
 
         options=(
-            1 "$option_splash"
-            2 "$option_color"
+            1 "Set splashscreen path ($(get_config "splashscreen_path"))"
+            2 "Set text color ($(get_config "text_color"))"
             3 "Add a new Fun Fact!"
             4 "Remove Fun Facts!"
             5 "Create a new Fun Facts! splashscreen"
@@ -584,6 +566,16 @@ function gui() {
             8 "$option_updates"
             9 "Reset config"
         )
+        
+        dialog_height=18
+        dialog_width=60
+        menu_items="${#options[@]}"
+        
+        cmd=(dialog \
+            --backtitle "$SCRIPT_TITLE"
+            --title "Fun Facts! Splashscreens" \
+            --cancel-label "Exit" \
+            --menu "Version: $version\nLast commit: $last_commit" "$dialog_height" "$dialog_width" "$menu_items")
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
 
@@ -591,19 +583,22 @@ function gui() {
             case "$choice" in
                 1)
                     CONFIG_FLAG=0
+                    
                     splash="$(dialog \
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Set splashscreen path" \
                         --cancel-label "Back" \
-                        --inputbox "Enter path to splashscreen.\n\n(If input is left empty, default splashscreen will be used)" 12 60 2>&1 >/dev/tty)"
+                        --inputbox "Enter path to splashscreen.\n\n(If input is left empty, default splashscreen will be used)" \
+                            12 "$dialog_width" 2>&1 >/dev/tty)"
 
                     result_value="$?"
-                    if [[ "$result_value" -eq 0 ]]; then
-                        local validation="$(validate_splash "$splash")"
+                    if [[ "$result_value" == "$DIALOG_OK" ]]; then
+                        validation="$(validate_splash "$splash")"
                         if [[ -n "$validation" ]]; then
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --msgbox "$validation" 10 50 2>&1 >/dev/tty
+                                --title "Error!" \
+                                --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
                         else
                             if [[ -z "$splash" ]]; then
                                 SPLASH_PATH="$DEFAULT_SPLASH"
@@ -613,7 +608,8 @@ function gui() {
                             set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 10 50 2>&1 >/dev/tty
+                                --title "Success!" \
+                                --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 8 "$dialog_width" 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -624,7 +620,7 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Set text color" \
                         --cancel-label "Back" \
-                        --menu "Choose an option" 15 60 9)
+                        --menu "Choose an option" "$dialog_height" "$dialog_width" "$menu_items")
 
                     options=(
                         1 "Basic colors"
@@ -669,11 +665,11 @@ function gui() {
                                     --backtitle "$SCRIPT_TITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
-                                    --menu "Choose a color" 15 60 "${#color_list[@]}")
+                                    --menu "Choose a color" "$dialog_height" "$dialog_width" "${#color_list[@]}")
 
                                 choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                                 result_value="$?"
-                                if [[ "$result_value" -eq 0 ]]; then
+                                if [[ "$result_value" == "$DIALOG_OK" ]]; then
                                     if [[ "$choice" -eq 1 ]]; then
                                         local color=""
                                     else
@@ -685,7 +681,8 @@ function gui() {
                                      if [[ -n "$validation" ]]; then
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
-                                            --msgbox "$validation" 6 40 2>&1 >/dev/tty
+                                            --title "Error!" \
+                                            --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
                                     else
                                         if [[ -z "$color" ]]; then
                                             TEXT_COLOR="$DEFAULT_COLOR"
@@ -695,7 +692,8 @@ function gui() {
                                         set_config "text_color" "$TEXT_COLOR" > /dev/null
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
-                                            --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
+                                            --title "Success!" \
+                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$dialog_width" 2>&1 >/dev/tty
                                     fi
                                 fi
                                 ;;
@@ -721,7 +719,7 @@ function gui() {
 
                                 choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                                 result_value="$?"
-                                if [[ "$result_value" -eq 0 ]]; then
+                                if [[ "$result_value" == "$DIALOG_OK" ]]; then
                                     local color="${options[$((choice*2-1))]}"
 
                                     local validation="$(validate_color $color)"
@@ -729,7 +727,8 @@ function gui() {
                                      if [[ -n "$validation" ]]; then
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
-                                            --msgbox "$validation" 6 40 2>&1 >/dev/tty
+                                            --title "Error!" \
+                                            --msgbox "$validation" 0 0 2>&1 >/dev/tty
                                     else
                                         if [[ -z "$color" ]]; then
                                             TEXT_COLOR="$DEFAULT_COLOR"
@@ -739,13 +738,12 @@ function gui() {
                                         set_config "text_color" "$TEXT_COLOR" > /dev/null
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
-                                            --msgbox "\nText color set to '$TEXT_COLOR'" 7 50 2>&1 >/dev/tty
+                                            --title "Success!" \
+                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$dialog_width" 2>&1 >/dev/tty
                                     fi
                                 fi
                                 ;;
                         esac
-                    else
-                        break
                     fi
                     ;;
                 3)
@@ -753,20 +751,34 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Add a new Fun Fact!" \
                         --cancel-label "Back" \
-                        --inputbox "Enter a new Fun Fact!" 8 60 2>&1 >/dev/tty)"
+                        --inputbox "Enter a new Fun Fact!" 8 "$dialog_width" 2>&1 >/dev/tty)"
 
                     result_value="$?"
-                    if [[ "$result_value" -eq 0 ]]; then
-                        add_fun_fact "$new_fun_fact"
+                    if [[ "$result_value" == "$DIALOG_OK" ]]; then
+                        local validation
+                        validation="$(add_fun_fact "$new_fun_fact")"
+                        return_value="$?"
+                        if [[ "$return_value" -eq 0 ]]; then
+                            dialog_title="Success!"
+                        else
+                            dialog_title="Error!"
+                        fi
+                        if [[ -n "$validation" ]]; then
+                            dialog \
+                                --backtitle "$SCRIPT_TITLE" \
+                                --title "$dialog_title" \
+                                --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
+                        fi
                     fi
                     ;;
                 4)                    
                     local validation
-                    validation="$(check_remove_fun_fact)"
+                    validation="$(check_fun_facts_txt)"
                     if [[ -n "$validation" ]]; then
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
-                            --msgbox "$validation" 7 50 2>&1 >/dev/tty
+                            --title "Error!" \
+                            --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
                     else
                         local fun_facts=()
                         local fun_fact
@@ -787,23 +799,24 @@ function gui() {
                             --backtitle "$SCRIPT_TITLE" \
                             --title "Remove a Fun Fact!" \
                             --cancel-label "Back" \
-                            --menu "Choose a Fun Fact! to remove" 15 60 "${#fun_facts[@]}")
+                            --menu "Choose a Fun Fact! to remove" "$dialog_height" "$dialog_width" "${#fun_facts[@]}")
 
                         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                         result_value="$?"
-                        if [[ "$result_value" -eq 0 ]]; then
+                        if [[ "$result_value" == "$DIALOG_OK" ]]; then
                             local fun_fact
                             fun_fact="${options[$((choice*2-1))]}"
                             remove_fun_fact "$fun_fact" \
                             && dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --msgbox "'$fun_fact' succesfully removed!" 7 50 2>&1 >/dev/tty
+                                --title "Success!" \
+                                --msgbox "'$fun_fact' succesfully removed!" 8 "$dialog_width" 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
                 5)
                     local validation
-                    validation="$(check_remove_fun_fact)"
+                    validation="$(check_fun_facts_txt)"
                     if [[ -n "$validation" ]]; then
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
@@ -895,12 +908,10 @@ function get_options() {
             --splash-path)
                 check_argument "$1" "$2" || exit 1
                 shift
-                validate_splash "$1"
-                return_value="$?"
-                if [[ "$return_value" != 1 ]]; then
-                    SPLASH_PATH="$1"
-                    set_config "splashscreen_path" "$SPLASH_PATH"
-                fi
+                CONFIG_FLAG=0
+                validate_splash "$1" || exit 1
+                SPLASH_PATH="$1"
+                set_config "splashscreen_path" "$SPLASH_PATH"
                 ;;
 #H --text-color [color]                     Set which text color to use.
             --text-color)
@@ -921,12 +932,12 @@ function get_options() {
                 ;;
 #H --remove-fun-fact                        Remove a Fun Fact!.
             --remove-fun-fact)
-                check_remove_fun_fact
+                check_fun_facts_txt
                 remove_fun_fact
                 ;;
 #H --create-fun-fact                        Create a new Fun Facts! splashscreen.
             --create-fun-fact)
-                check_remove_fun_fact
+                check_fun_facts_txt
                 CREATE_SPLASH_FLAG=1
                 ;;
 #H --apply-splash                           Apply Fun Facts! splashscreen.
@@ -996,12 +1007,16 @@ function main() {
         usage
         exit 1
     fi
-
+    
     mkdir -p "$RP_DIR/splashscreens"
-
-    check_config > /dev/null
-
+    
     get_options "$@"
+
+    if [[ "$RESET_CONFIG_FLAG" -eq 1 ]]; then
+        reset_config
+    else
+        check_config > /dev/null
+    fi
 
     if [[ "$CREATE_SPLASH_FLAG" -eq 1 ]]; then
         create_fun_fact
@@ -1027,10 +1042,6 @@ function main() {
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         gui
-    fi
-    
-    if [[ "$RESET_CONFIG_FLAG" -eq 1 ]]; then
-        reset_config
     fi
 }
 
