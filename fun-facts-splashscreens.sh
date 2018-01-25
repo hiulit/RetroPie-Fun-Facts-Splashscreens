@@ -57,6 +57,7 @@ ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
 CONFIG_FLAG=0
 GUI_FLAG=0
+EDIT_CONFIG_FLAG=0
 RESET_CONFIG_FLAG=0
 
 
@@ -211,6 +212,26 @@ function reset_config() {
     set_config "boot_script" ""
 }
 
+function edit_config() {
+    if [[ "$GUI_FLAG" -eq 1 ]]; then
+        config_file="$(dialog \
+                    --backtitle "$SCRIPT_TILE" \
+                    --title "Config file" \
+                    --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
+            
+        result_value="$?"
+        if [[ "$result_value" == "$DIALOG_OK" ]]; then
+            echo "$config_file" > "$SCRIPT_CFG" \
+            && dialog \
+                    --backtitle "$SCRIPT_TITLE" \
+                    --title "Info" \
+                    --msgbox "Config file updated." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+        fi
+    else
+        nano "$SCRIPT_CFG"
+    fi
+}
+
 
 function usage() {
     echo
@@ -266,7 +287,7 @@ function apply_splash() {
             echo "Fun Facts! splashscreen is already applied."
         fi
     else
-        echo "$RESULT_SPLASH" >"$SPLASH_LIST"
+        echo "$RESULT_SPLASH" > "$SPLASH_LIST"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
                 --backtitle "$SCRIPT_TITLE" \
@@ -437,7 +458,7 @@ function remove_fun_fact() {
     if [[ -n "$1" ]]; then
         sed -i "/^$1$/ d" "$FUN_FACTS_TXT"
     else
-        select_fun_facts 0 10
+        select_fun_facts 0 5
         echo "Removing Fun Fact! ... '$option'" && sleep 0.5
         sed -i "/^$option$/ d" "$FUN_FACTS_TXT" # $option comes from select_fun_facts()
         echo "Removing Fun Fact! ... OK" && sleep 0.25
@@ -450,11 +471,10 @@ function validate_splash() {
     [[ -z "$1" ]] && return 0
 
     if [[ ! -f "$1" ]]; then
-        local error_message
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            error_message="'$1' file not found!"
+            local error_message="'$1' file not found!"
         else
-            error_message="ERROR: '$1' file not found!"
+            local error_message="ERROR: '$1' file not found!"
         fi
         echo "$error_message" #>&2
         [[ "$CONFIG_FLAG" -eq 1 ]] && echo "Check the 'splashscreen_path' value in '$SCRIPT_CFG'" #>&2
@@ -531,10 +551,10 @@ function get_last_commit() {
 
 function gui() {
     while true; do
-        check_config > /dev/null
+        check_config #> /dev/null
     
         version="$SCRIPT_VERSION"
-        last_commit="$(get_last_commit)"
+        #~ last_commit="$(get_last_commit)"
 
         check_apply_splash
         return_value="$?"
@@ -567,8 +587,9 @@ function gui() {
             5 "Create a new Fun Facts! splashscreen"
             6 "$option_apply_splash"
             7 "Enable/Disable script at boot ($option_boot)"
-            8 "$option_updates"
-            9 "Reset config"
+            8 "Edit config file"
+            9 "Reset config file"
+            10 "$option_updates"
         )
         
         menu_items="${#options[@]}"
@@ -866,6 +887,12 @@ function gui() {
                         --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     ;;
                 8)
+                    edit_config
+                    ;;
+                9)
+                    reset_config
+                    ;;
+                10)
                     if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
@@ -881,9 +908,6 @@ function gui() {
                                 --msgbox "Fun Facts! Splashscreens is $updates_output!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     fi
-                    ;;
-                9)
-                    reset_config
                     ;;
             esac
         else
@@ -928,6 +952,7 @@ function get_options() {
             --text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
+                CONFIG_FLAG=0
                 validate_color "$1"
                 return_value="$?"
                 if [[ "$return_value" != 1 ]]; then
@@ -941,7 +966,7 @@ function get_options() {
                 shift
                 add_fun_fact "$1"
                 ;;
-#H --remove-fun-fact                        Remove a Fun Fact!.
+#H --remove-fun-fact                        Remove Fun Facts!.
             --remove-fun-fact)
                 check_fun_facts_txt
                 remove_fun_fact
@@ -954,11 +979,8 @@ function get_options() {
 #H --apply-splash                           Apply Fun Facts! splashscreen.
             --apply-splash)
                 if [[ ! -f "$RESULT_SPLASH" ]]; then
-                    echo >&2
                     echo "ERROR: Create a Fun Facts! splashscreen before applying it." >&2
-                    echo >&2
                     echo "Try 'sudo $0 --help' for more info." >&2
-                    echo >&2
                     exit 1
                 else
                     apply_splash
@@ -976,6 +998,10 @@ function get_options() {
             --gui)
                 GUI_FLAG=1
                 ;;
+#H --edit-config                            Edit config file.
+            --edit-config)
+                EDIT_CONFIG_FLAG=1
+                ;;
 #H --reset-config                           Reset config file.
             --reset-config)
                 RESET_CONFIG_FLAG=1
@@ -992,11 +1018,8 @@ function get_options() {
                 echo "$SCRIPT_VERSION"
                 ;;
             *)
-                echo >&2
                 echo "ERROR: Invalid option '$1'" >&2
-                echo >&2
                 echo "Try 'sudo $0 --help' for more info." >&2
-                echo >&2
                 exit 2
                 ;;
         esac
@@ -1025,13 +1048,11 @@ function main() {
 
     if [[ "$RESET_CONFIG_FLAG" -eq 1 ]]; then
         reset_config
-    else
-        check_config > /dev/null
+    elif [[ "$GUI_FLAG" -eq 0 ]]; then 
+        check_config # > /dev/null
     fi
 
-    if [[ "$CREATE_SPLASH_FLAG" -eq 1 ]]; then
-        create_fun_fact
-    fi
+    [[ "$CREATE_SPLASH_FLAG" -eq 1 ]] && create_fun_fact
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
         if enable_boot_script; then
@@ -1051,9 +1072,9 @@ function main() {
         fi
     fi
 
-    if [[ "$GUI_FLAG" -eq 1 ]]; then
-        gui
-    fi
+    [[ "$GUI_FLAG" -eq 1 ]] && gui
+    
+    [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
 }
 
 main "$@"
