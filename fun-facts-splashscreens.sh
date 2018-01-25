@@ -25,6 +25,7 @@ readonly RP_DIR="$home/RetroPie"
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
+readonly DEPENDENCIES=("imagemagick")
 
 readonly SCRIPT_VERSION="1.5.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -33,7 +34,6 @@ readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
 readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! Splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
-readonly DEPENDENCIES=("imagemagick")
 
 
 # Variables ############################################
@@ -46,10 +46,13 @@ readonly DEFAULT_BOOT_SCRIPT="false"
 readonly DIALOG_OK=0
 readonly DIALOG_CANCEL=1
 readonly DIALOG_ESC=255
+readonly DIALOG_HEIGHT=18
+readonly DIALOG_WIDTH=60
 
 SPLASH_PATH=
 TEXT_COLOR=
 BOOT_SCRIPT=
+
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
 CONFIG_FLAG=0
@@ -70,8 +73,7 @@ function check_dependencies() {
         if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
             echo "ERROR: The '$pkg' package is not installed!"
             echo "Would you like to install it now?"
-            local options
-            options=("Yes" "No")
+            local options=("Yes" "No")
             local option
             select option in "${options[@]}"; do
                 case "$option" in
@@ -89,7 +91,7 @@ function check_dependencies() {
                         exit 1
                         ;;
                     *)
-                        echo "Invalid option. Select a number between 1 and ${#options[@]}."
+                        echo "Invalid option. Choose a number between 1 and ${#options[@]}."
                         ;;
                 esac
             done
@@ -101,11 +103,8 @@ function check_dependencies() {
 function check_argument() {
     # XXX: this method doesn't accept arguments starting with '-'.
     if [[ -z "$2" || "$2" =~ ^- ]]; then
-        echo >&2
         echo "ERROR: '$1' is missing an argument." >&2
-        echo >&2
         echo "Try 'sudo $0 --help' for more info." >&2
-        echo >&2
         return 1
     fi
 }
@@ -207,11 +206,9 @@ function check_config() {
 
 
 function reset_config() {
-    echo "Resetting config file ..."
     set_config "splashscreen_path" ""
     set_config "text_color" ""
     set_config "boot_script" ""
-    echo "Resetting config file ... OK"
 }
 
 
@@ -219,7 +216,7 @@ function usage() {
     echo
     echo "USAGE: sudo $0 [OPTIONS]"
     echo
-    echo "Use '--help' to see all the options."
+    echo "Use 'sudo $0 --help' to see all the options."
     echo
 }
 
@@ -251,20 +248,21 @@ function check_boot_script() {
 
 
 function check_apply_splash() {
+    [[ ! -f "$SPLASH_LIST" ]] && touch "$SPLASH_LIST"
     grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
 }
 
 
 function apply_splash() {
     check_apply_splash
-    return_value="$?"
+    local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
                 --backtitle "$SCRIPT_TITLE" \
-                --msgbox "\nFun Facts! splashscreen is already applied.\n" 7 50 2>&1 >/dev/tty
+                --title "Info" \
+                --msgbox "Fun Facts! splashscreen is already applied." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         else
-            echo
             echo "Fun Facts! splashscreen is already applied."
         fi
     else
@@ -272,9 +270,10 @@ function apply_splash() {
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog \
                 --backtitle "$SCRIPT_TITLE" \
-                --msgbox "\nFun Facts! splashscreen set succesfully!\n" 7 50 2>&1 >/dev/tty
+                --title "Success!" \
+                --msgbox "Fun Facts! splashscreen applied succesfully!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         else
-            echo "Fun Facts! splashscreen set succesfully!"
+            echo "Fun Facts! splashscreen applied succesfully!"
         fi
     fi
 }
@@ -286,11 +285,13 @@ function get_current_theme() {
 
 
 function get_font() {
-    local theme="$(get_current_theme)"
+    local theme
+    theme="$(get_current_theme)"
 
     [[ -z "$theme" ]] && theme="carbon"
 
-    local font="$(xmlstarlet sel -t -v \
+    local font
+    font="$(xmlstarlet sel -t -v \
         "/theme/view[contains(@name,'detailed')]/textlist/fontPath" \
         "$ES_THEMES_DIR/$theme/$theme.xml" 2> /dev/null)"
 
@@ -310,17 +311,20 @@ function get_font() {
 
 
 function create_fun_fact() {
-    local splash="$(get_config "splashscreen_path")"
-    local color="$(get_config "text_color")"
-    local font="$(get_font)"
-    local random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    local splash
+    splash="$(get_config "splashscreen_path")"
+    local color
+    color="$(get_config "text_color")"
+    local font
+    font="$(get_font)"
+    local random_fact
+    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$SCRIPT_TITLE" \
-            --infobox "\nCreating Fun Facts! splashscreen ...\n" 5 50 2>&1 >/dev/tty
+            --infobox "Creating Fun Facts! splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
-        echo
         echo "Creating Fun Facts! splashscreen ..."
     fi
 
@@ -335,7 +339,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "\nFun Facts! splashscreen successfully created!\n" 7 50 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "Fun Facts! splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
 
 
@@ -567,15 +571,13 @@ function gui() {
             9 "Reset config"
         )
         
-        dialog_height=18
-        dialog_width=60
         menu_items="${#options[@]}"
         
         cmd=(dialog \
             --backtitle "$SCRIPT_TITLE"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
-            --menu "Version: $version\nLast commit: $last_commit" "$dialog_height" "$dialog_width" "$menu_items")
+            --menu "Version: $version\nLast commit: $last_commit" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
 
@@ -589,7 +591,7 @@ function gui() {
                         --title "Set splashscreen path" \
                         --cancel-label "Back" \
                         --inputbox "Enter path to splashscreen.\n\n(If input is left empty, default splashscreen will be used)" \
-                            12 "$dialog_width" 2>&1 >/dev/tty)"
+                            12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
 
                     result_value="$?"
                     if [[ "$result_value" == "$DIALOG_OK" ]]; then
@@ -598,7 +600,7 @@ function gui() {
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
                                 --title "Error!" \
-                                --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
+                                --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         else
                             if [[ -z "$splash" ]]; then
                                 SPLASH_PATH="$DEFAULT_SPLASH"
@@ -609,7 +611,7 @@ function gui() {
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
                                 --title "Success!" \
-                                --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 8 "$dialog_width" 2>&1 >/dev/tty
+                                --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -620,7 +622,7 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Set text color" \
                         --cancel-label "Back" \
-                        --menu "Choose an option" "$dialog_height" "$dialog_width" "$menu_items")
+                        --menu "Choose an option" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
 
                     options=(
                         1 "Basic colors"
@@ -665,7 +667,7 @@ function gui() {
                                     --backtitle "$SCRIPT_TITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
-                                    --menu "Choose a color" "$dialog_height" "$dialog_width" "${#color_list[@]}")
+                                    --menu "Choose a color" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#color_list[@]}")
 
                                 choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                                 result_value="$?"
@@ -682,7 +684,7 @@ function gui() {
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --title "Error!" \
-                                            --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
+                                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     else
                                         if [[ -z "$color" ]]; then
                                             TEXT_COLOR="$DEFAULT_COLOR"
@@ -693,7 +695,7 @@ function gui() {
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --title "Success!" \
-                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$dialog_width" 2>&1 >/dev/tty
+                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     fi
                                 fi
                                 ;;
@@ -739,7 +741,7 @@ function gui() {
                                         dialog \
                                             --backtitle "$SCRIPT_TITLE" \
                                             --title "Success!" \
-                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$dialog_width" 2>&1 >/dev/tty
+                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     fi
                                 fi
                                 ;;
@@ -751,7 +753,7 @@ function gui() {
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Add a new Fun Fact!" \
                         --cancel-label "Back" \
-                        --inputbox "Enter a new Fun Fact!" 8 "$dialog_width" 2>&1 >/dev/tty)"
+                        --inputbox "Enter a new Fun Fact!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
 
                     result_value="$?"
                     if [[ "$result_value" == "$DIALOG_OK" ]]; then
@@ -767,7 +769,7 @@ function gui() {
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
                                 --title "$dialog_title" \
-                                --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
+                                --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -778,7 +780,7 @@ function gui() {
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
                             --title "Error!" \
-                            --msgbox "$validation" 8 "$dialog_width" 2>&1 >/dev/tty
+                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         local fun_facts=()
                         local fun_fact
@@ -799,7 +801,7 @@ function gui() {
                             --backtitle "$SCRIPT_TITLE" \
                             --title "Remove a Fun Fact!" \
                             --cancel-label "Back" \
-                            --menu "Choose a Fun Fact! to remove" "$dialog_height" "$dialog_width" "${#fun_facts[@]}")
+                            --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
 
                         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                         result_value="$?"
@@ -810,7 +812,7 @@ function gui() {
                             && dialog \
                                 --backtitle "$SCRIPT_TITLE" \
                                 --title "Success!" \
-                                --msgbox "'$fun_fact' succesfully removed!" 8 "$dialog_width" 2>&1 >/dev/tty
+                                --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
@@ -820,7 +822,8 @@ function gui() {
                     if [[ -n "$validation" ]]; then
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
-                            --msgbox "$validation" 7 50 2>&1 >/dev/tty
+                            --title "Error!" \
+                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         create_fun_fact
                     fi
@@ -829,37 +832,44 @@ function gui() {
                     if [[ ! -f "$RESULT_SPLASH" ]]; then
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
-                            --msgbox "ERROR: create a Fun Facts! splashscreen before applying it." 7 50 2>&1 >/dev/tty
+                            --title "Error!"
+                            --msgbox "Create a Fun Facts! splashscreen before applying it." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         apply_splash
                     fi
                     ;;
                 7)
                     check_boot_script
-                    return_value="$?"
+                    local return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
                         if disable_boot_script; then
                             set_config "boot_script" "false" > /dev/null
-                            local output="Fun Facts! Splashscreens script DISABLED at boot."
+                            local output="Script DISABLED at boot."
+                            local dialog_title="Success!"
                          else
-                            local output="ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
+                            local output="Failed to DISABLE script at boot."
+                            local dialog_title="Error!"
                         fi
                     else
                         if enable_boot_script; then
                             set_config "boot_script" "true" > /dev/null
-                            local output="Fun Facts! Splashscreens script ENABLED at boot."
+                            local output="Script ENABLED at boot."
+                            local dialog_title="Success!"
                          else
-                            local output="ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
+                            local output="Failed to ENABLE script at boot."
+                            local dialog_title="Error!"
                         fi
                     fi
                     dialog \
                         --backtitle "$SCRIPT_TITLE" \
-                        --msgbox "\n$output\n" 7 55 2>&1 >/dev/tty
+                        --title "$dialog_title" \
+                        --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     ;;
                 8)
                     if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
+                            --title "Info" \
                             --msgbox "Can't update the script when using it from RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
                     else
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
@@ -867,7 +877,8 @@ function gui() {
                         else
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --msgbox "\nFun Facts! Splashscreens is $updates_output!\n" 7 50 2>&1 >/dev/tty
+                                --title "Info" \
+                                --msgbox "Fun Facts! Splashscreens is $updates_output!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     fi
                     ;;
