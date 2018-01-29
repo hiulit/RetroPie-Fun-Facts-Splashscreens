@@ -5,13 +5,23 @@
 ### Fixed
 
 * Fixed files permissions after updating the script.
+* Fixed `Set text color` dialog, which was crashing after clicking the `Back` button.
+* Fixed GUI error messages going to `>&2`.
 
 ### Added
 
+* Added `--add-fun-fact` option to add new **Fun Facts!**.
+* Added `--remove-fun-fact` option to remove **Fun Facts!**.
+* Added `--edit-config` option to edit the config file.
 * Added `--reset-config` option to reset the config file.
-* Added functionality to enable/disable script at boot in config file.
-* Added functionality to download the config file if it doesn't exist.
-* Added functionality to download the default RetroPie's splashscreen if it doesn't exist.
+* Added `--enable-log` option to enable logging.
+* Added `--disable-log` option to disable logging.
+* Added functionality to download the **Fun Facts! Splashscreens** default splashscreen if it doesn't exist.
+* Added functionality to download the **Fun Facts! Splashscreens** config file if it doesn't exist.
+* Added functionality to download the  **Fun Facts! Splashscreens** text file if it doesn't exist.
+* Added log file `fun-facts-splashcreens.log`.
+* Added functionality to enable/disable logging in the config file.
+* Added functionality to enable/disable script at boot in the config file.
 
 ### Changed
 
@@ -154,8 +164,8 @@ If no options are passed to `--create-fun-fact`, the script takes the splashscre
 
 * Options:
     * `--help`: Print the help message and exit.
-    * `--enable-boot`: Enable script to be launch at boot.
-    * `--disable-boot`: Disable script to be launch at boot.
+    * `--enable-boot`: Enable script at boot.
+    * `--disable-boot`: Disable script at boot.
     * `--create-fun-fact`: Create Fun Fact Splashscreen.
 
 ### Changed
