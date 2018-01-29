@@ -151,7 +151,7 @@ function check_default_files() {
         chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
         echo "Setting permissions to Fun Facts! config file ... OK"
     fi
-    
+
     if [[ ! -f "$FUN_FACTS_TXT" ]]; then
         echo "Downloading Fun Facts! text file ..."
         curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "fun-facts.txt" > /dev/null
@@ -214,7 +214,7 @@ function check_config() {
         echo "'boot_script' not set. Switching to defaults ..."
         set_config "boot_script" "$BOOT_SCRIPT"
     fi
-    
+
     if [[ -z "$LOG" ]]; then
         LOG="$DEFAULT_LOG"
         echo "'log' not set. Switching to defaults ..."
@@ -240,7 +240,7 @@ function edit_config() {
                     --backtitle "$SCRIPT_TILE" \
                     --title "Config file" \
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
-            
+
         result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
             echo "$config_file" > "$SCRIPT_CFG" \
@@ -403,18 +403,18 @@ function select_fun_facts() {
     local prev="<-- PREVIOUS <--"
     local quit="--> QUIT <--"
     [[ -z "$breaks" ]] && local breaks=1
-    
+
     clear
-    
+
     while IFS= read -r line; do
         #~ fun_facts+=("${line//$'\n\r'}")
         fun_facts+=("${line}")
     done < "$FUN_FACTS_TXT"
-    
+
     fun_facts_total="${#fun_facts[@]}"
-    
+
     options=("${fun_facts[@]:$start:$items}" "$quit")
-    
+
     if (( "$fun_facts_total" > (( "$start" + "$items" )) &&  "$start" == 0 )); then
         options=("${fun_facts[@]:$start:$items}" "$next" "$quit")
     elif (( "$fun_facts_total" < (( "$start" + "$items" )) &&  "$start" != 0 )); then
@@ -422,7 +422,7 @@ function select_fun_facts() {
     elif (( "$start" >= "$items" )); then
         options=("${fun_facts[@]:$start:$items}" "$prev" "$next" "$quit")
     fi
-    
+
     echo "Choose a Fun Fact! to remove"
     echo "----------------------------"
     select option in "${options[@]}"; do
@@ -448,13 +448,13 @@ function select_fun_facts() {
                 ;;
         esac
     done
-}   
+}
 
 
 function check_fun_facts_txt() {
     if [[ ! -s "$FUN_FACTS_TXT" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!" 
+            log "Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!"
             return 1
         else
             log "ERROR: Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!"
@@ -497,7 +497,7 @@ function remove_fun_fact() {
 
 function validate_splash() {
     [[ -z "$1" ]] && return 0
-    
+
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             local error_message="Can't set/get splashscreen path. '$1' file not found!"
@@ -581,7 +581,7 @@ function gui() {
     #~ log "-- Start GUI --" > /dev/null
     while true; do
         check_config #> /dev/null
-    
+
         version="$SCRIPT_VERSION"
         #~ last_commit="$(get_last_commit)"
 
@@ -620,9 +620,9 @@ function gui() {
             9 "Reset config file"
             10 "$option_updates"
         )
-        
+
         menu_items="${#options[@]}"
-        
+
         cmd=(dialog \
             --backtitle "$SCRIPT_TITLE"
             --title "Fun Facts! Splashscreens" \
@@ -635,7 +635,7 @@ function gui() {
             case "$choice" in
                 1)
                     CONFIG_FLAG=0
-                    
+
                     splash="$(dialog \
                         --backtitle "$SCRIPT_TITLE" \
                         --title "Set splashscreen path" \
@@ -837,7 +837,7 @@ function gui() {
                             local fun_fact
                             local options=()
                             local i=1
-                            
+
                             while IFS= read -r line; do
                                 #~ fun_facts+=("${line//$'\n\r'}")
                                 fun_facts+=("${line}")
@@ -855,7 +855,7 @@ function gui() {
                                 --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
 
                             choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                            
+
                             if [[ -n "$choice" ]]; then
                                 local fun_fact
                                 fun_fact="${options[$((choice*2-1))]}"
@@ -1079,17 +1079,17 @@ function main() {
         usage
         exit 1
     fi
-    
+
     check_default_files
-    
+
     #~ mkdir -p "$RP_DIR/splashscreens"
-    
+
     #~ chown -R "$user":"$user" .
-    
+
     get_options "$@"
-    
+
     echo "boot script $BOOT_SCRIPT"
-    
+
     #~ if [[ "$BOOT_SCRIPT" == "false" ]]; then
         #~ disable_boot_script
         #~ echo "disable"
@@ -1097,13 +1097,13 @@ function main() {
         #~ enable_boot_script
         #~ echo "enable"
     #~ fi
-        
+
     [[ "$RESET_CONFIG_FLAG" -eq 1 ]] && reset_config
 
     [[ "$CREATE_SPLASH_FLAG" -eq 1 ]] && create_fun_fact
-    
+
     [[ "$GUI_FLAG" -eq 1 ]] && gui
-    
+
     [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
