@@ -32,16 +32,20 @@ Use '--help' to see all the options.
 ## Options
 
 * `--help`: Print the help message and exit.
-* `--splash-path [OPTIONS]`: Set which splashscreen to use.
-* `--text-color [OPTIONS]`: Set which text color to use.
-* `--create-fun-fact`: Create a new Fun Facts! splashscreen.
-* `--apply-splash`: Apply Fun Facts! splashscreen.
-* `--enable-boot`: Enable script to be launch at boot.
-* `--disable-boot`: Disable script to be launch at boot.
+* `--splash-path [OPTIONS]`: Set the image to use as Fun Facts! splashscreen.
+* `--text-color [OPTIONS]`: Set the text color to use on the Fun Facts! splashscreen.
+* `--add-fun-fact`: Add new **Fun Facts!**.
+* `--remove-fun-fact`: Remove **Fun Facts!**.
+* `--create-fun-fact`: Create a new **Fun Facts!** splashscreen.
+* `--apply-splash`: Apply the **Fun Facts!** splashscreen.
+* `--enable-boot`: Enable script at boot.
+* `--disable-boot`: Disable script at boot.
 * `--gui`: Start GUI.
 * `--reset-config`: Reset config file.
 * `--update`: Update script.
 * `--version`: Show script version.
+* `--enable-log`: Enable logging.
+* `--disable-log`: Disable logging.
 
 If `--splash-path` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `retropie-default.png` and `white`, respectively.
 
@@ -59,35 +63,37 @@ sudo ./fun-facts-splashscreens.sh --help
 
 ### `--splash-path [OPTIONS]`
 
-Set which splashscreen to use.
+Set the image to use as **Fun Facts! Splashscreen**.
 
 #### Options
 
-* `path/to/splashscreen`: Path to the splashscreen to be used.
+Must be an absolute path (e.g /home/pi/my-awesome-splashscreen.png).
+
+* `path/to/splashscreen`: Path of the image to use as **Fun Facts! Splashscreen**.
 
 #### Example
 
 ```
-sudo ./fun-facts-splashscreens.sh --splash-path /home/pi/Downloads/retropie-2014.png
+sudo ./fun-facts-splashscreens.sh --splash-path "/home/pi/my-awesome-splashscreen.png"
 ```
 
 ### `--text-color [OPTIONS]`
 
-Set which text color to use.
+Set the text color to use on the **Fun Facts! Splashscreen**.
 
 #### Options
 
-* `color`: Text color to be used.
+* `color`: Text color of the **Fun Facts! Splashscreen**.
 
 #### Example
 
 ```
-sudo ./fun-facts-splashscreens.sh --text-color black
+sudo ./fun-facts-splashscreens.sh --text-color "black"
 ```
 
 ### `--create-fun-fact`
 
-Create a new Fun Facts! splashscreen.
+Create a new **Fun Facts! Splashscreen**.
 
 The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
 
@@ -99,9 +105,9 @@ sudo ./fun-facts-splashscreens.sh --create-fun-fact
 
 ### `--apply-splash`
 
-Apply Fun Facts! splashscreen.
+Apply the **Fun Facts! Splashscreen**.
 
-This command must be run in order to use the **Fun Facts!** splashscreen.
+This command must be run in order to use the **Fun Facts! Splashscreen**.
 
 #### Example
 
@@ -111,9 +117,7 @@ sudo ./fun-facts-splashscreens.sh --apply-splash
 
 ### `--enable-boot`
 
-Enable script to be launch at boot.
-
-**Backing up `/etc/rc.local` is most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+Enable script at boot.
 
 #### Example
 
@@ -123,9 +127,7 @@ sudo ./fun-facts-splashscreens.sh --enable-boot
 
 ### `--disable-boot`
 
-Disable script to be launch at boot.
-
-**Backing up `/etc/rc.local` is most recommended before using this option. It could erase important stuff. Use it at your own risk.**
+Disable script at boot.
 
 #### Example
 
@@ -137,7 +139,7 @@ sudo ./fun-facts-splashscreens.sh --disable-boot
 
 Start GUI.
 
-It lets you perform all the previous functions, but in a more friendly manner.
+It lets you perform all the functions, but in a more friendly manner.
 
 #### Example
 
@@ -146,29 +148,53 @@ sudo ./fun-facts-splashscreens.sh --gui
 ```
 
 ##### Set splashscreen path (`--splash-path`)
-![Fun Facts Splashscreens GUI - 01](gui-examples/fun-facts-splashscreens-gui-01.jpg)
+![Fun Facts! Splashscreens GUI - 01](gui-examples/fun-facts-splashscreens-gui-01.jpg)
 ##### Enter path to splashscreen
-![Fun Facts Splashscreens GUI - 02](gui-examples/fun-facts-splashscreens-gui-02.jpg)
+![Fun Facts! Splashscreens GUI - 02](gui-examples/fun-facts-splashscreens-gui-02.jpg)
 ##### Set text color (`--text-color`)
-![Fun Facts Splashscreens GUI - 03](gui-examples/fun-facts-splashscreens-gui-03.jpg)
+![Fun Facts! Splashscreens GUI - 03](gui-examples/fun-facts-splashscreens-gui-03.jpg)
 ##### Choose a color
-![Fun Facts Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
-##### Create a new Fun Facts! splashscreen (`--create-fun-fact`)
-![Fun Facts Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
-##### Apply Fun Facts! splashscreen (`--apply-splash`)
-![Fun Facts Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
+![Fun Facts! Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
+##### Add new Fun Facts!
+![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+##### Remove Fun Facts!
+![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+##### Create a new Fun Facts! Splashscreen (`--create-fun-fact`)
+![Fun Facts! Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
+##### Apply the Fun Facts! Splashscreen (`--apply-splash`)
+![Fun Facts! Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
 ##### Enable at boot (`--enable-boot`)
-![Fun Facts Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
+![Fun Facts! Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
 ##### Disable at boot (`--disable-boot`)
-![Fun Facts Splashscreens GUI - 08](gui-examples/fun-facts-splashscreens-gui-08.jpg)
+![Fun Facts! Splashscreens GUI - 08](gui-examples/fun-facts-splashscreens-gui-08.jpg)
+##### Edit config file
+![Fun Facts Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+##### Reset config file
+![Fun Facts Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+##### Enable logging (`--enable-log`)
+![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+##### Disable logging (`--disable-log`)
+![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
 ##### Update script (`--update`)
-![Fun Facts Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
+![Fun Facts! Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
+
+### `--edit-config`
+
+Edit config file.
+
+Opens a simple file editor.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --edit-config
+```
 
 ### `--reset-config`
 
 Reset config file.
 
-Removes all values from the config file. Next time you execute the script, it will populate the config file with defaults.
+Removes all values from the config file. Next time the script is executed, it will populate the config file with defaults.
 
 #### Example
 
@@ -205,6 +231,28 @@ Show script version.
 sudo ./fun-facts-splashscreens.sh --version
 ```
 
+### `--enable-log`
+
+Enable logging.
+
+The log file is `fun-facts-splashscreens.log`.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --enable-log
+```
+
+### `--disable-log`
+
+Disable logging.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --disable-log
+```
+
 ## Config file
 
 When setting the splashscreen path using `--splash-path` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
@@ -231,6 +279,11 @@ text_color = ""
 #
 # Boolean: true/false.
 boot_script = ""
+
+# Enable/disable logging
+#
+# Boolean: true/false.
+log = ""
 ```
 
 You can edit this file directly instead of using `--splash-path` or `--text-color`.

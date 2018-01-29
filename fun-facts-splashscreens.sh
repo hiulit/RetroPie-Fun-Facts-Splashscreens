@@ -975,14 +975,14 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-#H --splash-path [path/to/splashscreen]     Set which splashscreen to use.
+#H --splash-path [path/to/splashscreen]     Set the image to use as Fun Facts! splashscreen.
             --splash-path)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_splash "$1" || exit 1
                 set_config "splashscreen_path" "$1"
                 ;;
-#H --text-color [color]                     Set which text color to use.
+#H --text-color [color]                     Set the text color to use on the Fun Facts! splashscreen.
             --text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
