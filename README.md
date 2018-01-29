@@ -32,12 +32,12 @@ Use '--help' to see all the options.
 ## Options
 
 * `--help`: Print the help message and exit.
-* `--splash-path [OPTIONS]`: Set the image to use as Fun Facts! splashscreen.
-* `--text-color [OPTIONS]`: Set the text color to use on the Fun Facts! splashscreen.
-* `--add-fun-fact`: Add new **Fun Facts!**.
+* `--splash-path [OPTIONS]`: Set the image to use as **Fun Facts! Splashscreen**.
+* `--text-color [OPTIONS]`: Set the text color to use on the **Fun Facts! Splashscreen**.
+* `--add-fun-fact [OPTIONS]`: Add new **Fun Facts!**.
 * `--remove-fun-fact`: Remove **Fun Facts!**.
-* `--create-fun-fact`: Create a new **Fun Facts!** splashscreen.
-* `--apply-splash`: Apply the **Fun Facts!** splashscreen.
+* `--create-fun-fact`: Create a new **Fun Facts! Splashscreen**.
+* `--apply-splash`: Apply the **Fun Facts! Splashscreen**.
 * `--enable-boot`: Enable script at boot.
 * `--disable-boot`: Disable script at boot.
 * `--gui`: Start GUI.
@@ -89,6 +89,30 @@ Set the text color to use on the **Fun Facts! Splashscreen**.
 
 ```
 sudo ./fun-facts-splashscreens.sh --text-color "black"
+```
+
+### `--add-fun-fact [OPTIONS]`
+
+Add new **Fun Facts!**.
+
+#### Options
+
+* `text`: New Fun Fact! text.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --add-fun-fact "You're new and amazing Fun Fact!"
+```
+
+### `--remove-fun-fact`
+
+Remove **Fun Facts!**.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 ```
 
 ### `--create-fun-fact`
