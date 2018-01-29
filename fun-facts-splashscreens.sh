@@ -38,33 +38,55 @@ readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with ra
 
 # Variables ############################################
 
+# Files
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
 readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
+readonly LOG_FILE="$SCRIPT_DIR/fun-facts-splashscreens.log"
+
+# Defaults
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_COLOR="white"
 readonly DEFAULT_BOOT_SCRIPT="false"
+readonly DEFAULT_LOG="false"
+
+# Dialogs
 readonly DIALOG_OK=0
 readonly DIALOG_CANCEL=1
 readonly DIALOG_ESC=255
 readonly DIALOG_HEIGHT=18
 readonly DIALOG_WIDTH=60
 
+# Flags
+ENABLE_BOOT_FLAG=0
+DISABLE_BOOT_FLAG=0
+GUI_FLAG=0
+CONFIG_FLAG=0
+EDIT_CONFIG_FLAG=0
+RESET_CONFIG_FLAG=0
+LOG_FLAG=0
+
 SPLASH_PATH=
 TEXT_COLOR=
 BOOT_SCRIPT=
-
-ENABLE_BOOT_FLAG=0
-DISABLE_BOOT_FLAG=0
-CONFIG_FLAG=0
-GUI_FLAG=0
-EDIT_CONFIG_FLAG=0
-RESET_CONFIG_FLAG=0
+LOG=
 
 
 # Functions ############################################
 
 function is_retropie() {
     [[ -d "$RP_DIR" && -d "$home/.emulationstation" && -d "/opt/retropie" ]]
+}
+
+
+function log() {
+    [[ "LOG_FLAG" -eq 1 ]] && [[ ! -f "$LOG_FILE" ]] && touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
+    if [[ "$GUI_FLAG" -eq 1 ]] ; then
+        [[ "LOG_FLAG" -eq 1 ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]}" >> "$LOG_FILE"
+        echo "$*"
+    else
+        [[ "LOG_FLAG" -eq 1 ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]}" >> "$LOG_FILE"
+        echo "$*" >&2
+    fi
 }
 
 
@@ -80,7 +102,7 @@ function check_dependencies() {
                 case "$option" in
                     Yes)
                         if ! which apt-get > /dev/null; then
-                            echo "ERROR: Couldn't install '$pkg' automatically. Try to install it manually." >&2
+                            log "ERROR: Can't install '$pkg' automatically. Try to install it manually."
                             exit 1
                         else
                             sudo apt-get install "$pkg"
@@ -88,7 +110,7 @@ function check_dependencies() {
                         fi
                         ;;
                     No)
-                        echo "ERROR: Can't launch the script if the '$pkg' package is not installed." >&2
+                        log "ERROR: Can't launch the script if the '$pkg' package is not installed."
                         exit 1
                         ;;
                     *)
@@ -104,31 +126,14 @@ function check_dependencies() {
 function check_argument() {
     # XXX: this method doesn't accept arguments starting with '-'.
     if [[ -z "$2" || "$2" =~ ^- ]]; then
-        echo "ERROR: '$1' is missing an argument." >&2
+        log "ERROR: '$1' is missing an argument."
         echo "Try 'sudo $0 --help' for more info." >&2
         return 1
     fi
 }
 
 
-function set_config() {
-    sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$SCRIPT_CFG"
-    echo "'$1' set to '$2'."
-}
-
-
-function get_config() {
-    local config
-    config="$(grep -Po "(?<=^$1 = ).*" "$SCRIPT_CFG")"
-    config="${config%\"}"
-    config="${config#\"}"
-    echo "$config"
-}
-
-
-function check_config() {
-    CONFIG_FLAG=1
-
+function check_default_files() {
     if [[ ! -f "$DEFAULT_SPLASH" ]]; then
         echo "Downloading Fun Facts! default splashscreen ..."
         curl -s "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "retropie-default.png" > /dev/null
@@ -155,16 +160,38 @@ function check_config() {
         chown -R "$user":"$user" "fun-facts.txt"
         echo "Setting permissions to Fun Facts! text file ... OK"
     fi
+}
+
+
+function set_config() {
+    sed -i "s|^\($1\s*=\s*\).*|\1\"$2\"|" "$SCRIPT_CFG"
+    echo "'$1' set to '$2'."
+}
+
+
+function get_config() {
+    local config
+    config="$(grep -Po "(?<=^$1 = ).*" "$SCRIPT_CFG")"
+    config="${config%\"}"
+    config="${config#\"}"
+    echo "$config"
+}
+
+
+function check_config() {
+    CONFIG_FLAG=1
 
     echo "Checking config file ..."
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
+    LOG="$(get_config "log")"
 
     validate_splash "$SPLASH_PATH" || exit 1
     validate_color "$TEXT_COLOR" || exit 1
-    validate_boot_script "$BOOT_SCRIPT" || exit 1
+    validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
+    validate_true_false "log" "$LOG" || exit 1
 
     echo "Checking config file ... OK"
 
@@ -187,6 +214,12 @@ function check_config() {
         echo "'boot_script' not set. Switching to defaults ..."
         set_config "boot_script" "$BOOT_SCRIPT"
     fi
+    
+    if [[ -z "$LOG" ]]; then
+        LOG="$DEFAULT_LOG"
+        echo "'log' not set. Switching to defaults ..."
+        set_config "log" "$LOG"
+    fi
 
     echo "Setting config file ... OK"
 
@@ -196,21 +229,10 @@ function check_config() {
     echo "'splashscreen_path'   = '$SPLASH_PATH'"
     echo "'text_color'          = '$TEXT_COLOR'"
     echo "'boot_script'         = '$BOOT_SCRIPT'"
+    echo "'log'                 = '$LOG'"
     echo
-
-    if [[ "$BOOT_SCRIPT" == "false" ]]; then
-        disable_boot_script
-    elif [[ "$BOOT_SCRIPT" == "true" ]]; then
-        enable_boot_script
-    fi
 }
 
-
-function reset_config() {
-    set_config "splashscreen_path" ""
-    set_config "text_color" ""
-    set_config "boot_script" ""
-}
 
 function edit_config() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
@@ -233,12 +255,19 @@ function edit_config() {
 }
 
 
+function reset_config() {
+    set_config "splashscreen_path" ""
+    set_config "text_color" ""
+    set_config "boot_script" ""
+    set_config "log" ""
+}
+
+
 function usage() {
     echo
     echo "USAGE: sudo $0 [OPTIONS]"
     echo
     echo "Use 'sudo $0 --help' to see all the options."
-    echo
 }
 
 
@@ -269,7 +298,7 @@ function check_boot_script() {
 
 
 function check_apply_splash() {
-    [[ ! -f "$SPLASH_LIST" ]] && touch "$SPLASH_LIST"
+    [[ ! -f "$SPLASH_LIST" ]] && touch "$SPLASH_LIST" && chown -R "$user":"$user" "$SPLASH_LIST"
     grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
 }
 
@@ -322,7 +351,7 @@ function get_font() {
         # note: the find below returns the full path file name.
         font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
         if [[ -z "$font" ]]; then
-            echo "ERROR: Unable to get the font from the '$theme' theme files." >&2
+            log "ERROR: Unable to get the font from the '$theme' theme files."
             echo "Aborting ..." >&2
             exit 1
         fi
@@ -360,7 +389,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --msgbox "Fun Facts! splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --title "Success!" --msgbox "Fun Facts! splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
 
 
@@ -422,35 +451,34 @@ function select_fun_facts() {
 }   
 
 
-function add_fun_fact() {
-    while IFS= read -r line; do
-        if [[ "$1" == "$line" ]]; then
-            if [[ "$GUI_FLAG" -eq 1 ]]; then
-                echo "'$1' is already in '$FUN_FACTS_TXT'"
-                return 1
-            else
-                echo "ERROR: '$1' is already in '$FUN_FACTS_TXT'"  >&2
-                exit 1
-            fi
-        fi
-    done < "$FUN_FACTS_TXT"
-    echo "$1" >> "$FUN_FACTS_TXT"
-    echo "'$1' Fun Fact! added succesfully!"
-}
-
-
 function check_fun_facts_txt() {
     if [[ ! -s "$FUN_FACTS_TXT" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            echo "'$FUN_FACTS_TXT' is empty!" 
+            log "Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!" 
             return 1
         else
-            echo "ERROR: '$FUN_FACTS_TXT' is empty!" >&2
+            log "ERROR: Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!"
             exit 1
         fi
     else
         return 0
     fi
+}
+
+
+function add_fun_fact() {
+    while IFS= read -r line; do
+        if [[ "$1" == "$line" ]]; then
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                log "'$1' is already in '$FUN_FACTS_TXT'"
+                return 1
+            else
+                log "ERROR: '$1' is already in '$FUN_FACTS_TXT'"
+                exit 1
+            fi
+        fi
+    done < "$FUN_FACTS_TXT"
+    echo "$1" >> "$FUN_FACTS_TXT" && echo "'$1' Fun Fact! added succesfully!"
 }
 
 
@@ -469,15 +497,15 @@ function remove_fun_fact() {
 
 function validate_splash() {
     [[ -z "$1" ]] && return 0
-
+    
     if [[ ! -f "$1" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            local error_message="'$1' file not found!"
+            local error_message="Can't set/get splashscreen path. '$1' file not found!"
         else
-            local error_message="ERROR: '$1' file not found!"
+            local error_message="ERROR: Can't set/get splashscreen path. '$1' file not found!"
         fi
-        echo "$error_message" #>&2
-        [[ "$CONFIG_FLAG" -eq 1 ]] && echo "Check the 'splashscreen_path' value in '$SCRIPT_CFG'" #>&2
+        log "$error_message"
+        [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the 'splashscreen_path' value in '$SCRIPT_CFG'"
         return 1
     fi
 }
@@ -485,16 +513,15 @@ function validate_splash() {
 
 function validate_color() {
     [[ -z "$1" ]] && return 0
-
     if convert -list color | grep -q "^$1\b"; then
         return 0
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            echo "Invalid color '$1'."
-            return 1
+            log "Can't set/get text color. Invalid color '$1'."
+            [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the 'text_color' value in '$SCRIPT_CFG'"
         else
-            echo "ERROR: Invalid color '$1'." >&2
-            [[ "$CONFIG_FLAG" -eq 1 ]] && echo "Check the 'text_color' value in '$SCRIPT_CFG'" >&2
+            log "ERROR: Can't set/get text color. Invalid color '$1'."
+            [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the 'text_color' value in '$SCRIPT_CFG'"
             echo >&2
             echo "Short list of available colors:" >&2
             echo "-------------------------------" >&2
@@ -502,18 +529,19 @@ function validate_color() {
             echo "pink red orange yellow green silver blue cyan purple brown" >&2
             echo >&2
             echo "TIP: run the 'convert -list color' command to get a full list." >&2
-            exit 1
         fi
+        return 1
     fi
 }
 
-function validate_boot_script() {
-    [[ -z "$1" ]] && return 0
-
-    if [[ "$1" != "false" && "$1" != "true" ]]; then
-        echo "ERROR: Invalid boolean '$1'" >&2
-        echo "Check the 'boot_script' value in '$SCRIPT_CFG'" >&2
-        exit 1
+function validate_true_false() {
+    check_argument "$1" "$2" || exit 1
+    [[ -z "$2" ]] && return 0
+    #~ check_argument "$1" "$2" || exit 1
+    if [[ "$2" != "false" && "$2" != "true" ]]; then
+        log "ERROR: Can't enable/disable $1. Invalid boolean '$2'"
+        [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the '$1' value in '$SCRIPT_CFG'"
+        return 1
     fi
 }
 
@@ -550,6 +578,7 @@ function get_last_commit() {
 
 
 function gui() {
+    #~ log "-- Start GUI --" > /dev/null
     while true; do
         check_config #> /dev/null
     
@@ -794,48 +823,52 @@ function gui() {
                         fi
                     fi
                     ;;
-                4)                    
-                    local validation
-                    validation="$(check_fun_facts_txt)"
-                    if [[ -n "$validation" ]]; then
-                        dialog \
-                            --backtitle "$SCRIPT_TITLE" \
-                            --title "Error!" \
-                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        local fun_facts=()
-                        local fun_fact
-                        local options=()
-                        local i=1
-                        
-                        while IFS= read -r line; do
-                            #~ fun_facts+=("${line//$'\n\r'}")
-                            fun_facts+=("${line}")
-                        done < "$FUN_FACTS_TXT"
-
-                        for fun_fact in "${fun_facts[@]}"; do
-                            options+=("$i" "$fun_fact")
-                            ((i++))
-                        done
-
-                        cmd=(dialog \
-                            --backtitle "$SCRIPT_TITLE" \
-                            --title "Remove a Fun Fact!" \
-                            --cancel-label "Back" \
-                            --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
-
-                        choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                        result_value="$?"
-                        if [[ "$result_value" == "$DIALOG_OK" ]]; then
-                            local fun_fact
-                            fun_fact="${options[$((choice*2-1))]}"
-                            remove_fun_fact "$fun_fact" \
-                            && dialog \
+                4)
+                    while true; do
+                        local validation
+                        validation="$(check_fun_facts_txt)"
+                        if [[ -n "$validation" ]]; then
+                            dialog \
                                 --backtitle "$SCRIPT_TITLE" \
-                                --title "Success!" \
-                                --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                                --title "Error!" \
+                                --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        else
+                            local fun_facts=()
+                            local fun_fact
+                            local options=()
+                            local i=1
+                            
+                            while IFS= read -r line; do
+                                #~ fun_facts+=("${line//$'\n\r'}")
+                                fun_facts+=("${line}")
+                            done < "$FUN_FACTS_TXT"
+
+                            for fun_fact in "${fun_facts[@]}"; do
+                                options+=("$i" "$fun_fact")
+                                ((i++))
+                            done
+
+                            cmd=(dialog \
+                                --backtitle "$SCRIPT_TITLE" \
+                                --title "Remove a Fun Fact!" \
+                                --cancel-label "Back" \
+                                --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
+
+                            choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                            
+                            if [[ -n "$choice" ]]; then
+                                local fun_fact
+                                fun_fact="${options[$((choice*2-1))]}"
+                                remove_fun_fact "$fun_fact" \
+                                && dialog \
+                                    --backtitle "$SCRIPT_TITLE" \
+                                    --title "Success!" \
+                                    --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                            else
+                                break
+                            fi
                         fi
-                    fi
+                    done
                     ;;
                 5)
                     local validation
@@ -914,6 +947,7 @@ function gui() {
             break
         fi
     done
+    #~ log "-- End GUI --" > /dev/null
 }
 
 
@@ -929,7 +963,9 @@ function get_options() {
             --help)
                 echo
                 echo "$SCRIPT_TITLE"
+                for ((i=1; i<="${#SCRIPT_TITLE}"; i+=1)); do [[ -n "$dashes" ]] && dashes+="-" || dashes="-"; done && echo "$dashes"
                 echo "$SCRIPT_DESCRIPTION"
+                echo
                 echo
                 echo "USAGE: sudo $0 [OPTIONS]"
                 echo
@@ -943,24 +979,17 @@ function get_options() {
             --splash-path)
                 check_argument "$1" "$2" || exit 1
                 shift
-                CONFIG_FLAG=0
                 validate_splash "$1" || exit 1
-                SPLASH_PATH="$1"
-                set_config "splashscreen_path" "$SPLASH_PATH"
+                set_config "splashscreen_path" "$1"
                 ;;
 #H --text-color [color]                     Set which text color to use.
             --text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
-                CONFIG_FLAG=0
-                validate_color "$1"
-                return_value="$?"
-                if [[ "$return_value" != 1 ]]; then
-                    TEXT_COLOR="$1"
-                    set_config "text_color" "$TEXT_COLOR"
-                fi
+                validate_color "$1" || exit 1
+                set_config "text_color" "$1"
                 ;;
-#H --add-fun-fact                           Add a new Fun Fact!.
+#H --add-fun-fact                           Add new Fun Facts!.
             --add-fun-fact)
                 check_argument "$1" "$2" || exit 1
                 shift
@@ -973,24 +1002,25 @@ function get_options() {
                 ;;
 #H --create-fun-fact                        Create a new Fun Facts! splashscreen.
             --create-fun-fact)
+                check_config #> /dev/null
                 check_fun_facts_txt
                 CREATE_SPLASH_FLAG=1
                 ;;
-#H --apply-splash                           Apply Fun Facts! splashscreen.
+#H --apply-splash                           Apply the Fun Facts! splashscreen.
             --apply-splash)
                 if [[ ! -f "$RESULT_SPLASH" ]]; then
-                    echo "ERROR: Create a Fun Facts! splashscreen before applying it." >&2
+                    log "ERROR: Create a Fun Facts! splashscreen before applying it."
                     echo "Try 'sudo $0 --help' for more info." >&2
                     exit 1
                 else
                     apply_splash
                 fi
                 ;;
-#H --enable-boot                            Enable script to be launch at boot.
+#H --enable-boot                            Enable script at boot.
             --enable-boot)
                 ENABLE_BOOT_FLAG=1
                 ;;
-#H --disable-boot                           Disable script to be launch at boot.
+#H --disable-boot                           Disable script at boot.
             --disable-boot)
                 DISABLE_BOOT_FLAG=1
                 ;;
@@ -1017,6 +1047,14 @@ function get_options() {
             --version)
                 echo "$SCRIPT_VERSION"
                 ;;
+#H --enable-log                             Enable logging.
+            --enable-log)
+                ENABLE_LOG_FLAG=1
+                ;;
+#H --disable-log                            Disable logging.
+            --disable-log)
+                DISABLE_LOG_FLAG=1
+                ;;
             *)
                 echo "ERROR: Invalid option '$1'" >&2
                 echo "Try 'sudo $0 --help' for more info." >&2
@@ -1029,7 +1067,7 @@ function get_options() {
 
 function main() {
     if ! is_retropie; then
-        echo "ERROR: RetroPie is not installed. Aborting ..." >&2
+        log "ERROR: RetroPie is not installed. Aborting ..."
         exit 1
     fi
 
@@ -1037,29 +1075,43 @@ function main() {
 
     # check if sudo is used.
     if [[ "$(id -u)" -ne 0 ]]; then
-        echo "ERROR: Script must be run under sudo." >&2
+        log "ERROR: Script must be run under sudo."
         usage
         exit 1
     fi
     
-    mkdir -p "$RP_DIR/splashscreens"
+    check_default_files
+    
+    #~ mkdir -p "$RP_DIR/splashscreens"
+    
+    #~ chown -R "$user":"$user" .
     
     get_options "$@"
-
-    if [[ "$RESET_CONFIG_FLAG" -eq 1 ]]; then
-        reset_config
-    elif [[ "$GUI_FLAG" -eq 0 ]]; then 
-        check_config # > /dev/null
-    fi
+    
+    echo "boot script $BOOT_SCRIPT"
+    
+    #~ if [[ "$BOOT_SCRIPT" == "false" ]]; then
+        #~ disable_boot_script
+        #~ echo "disable"
+    #~ elif [[ "$BOOT_SCRIPT" == "true" ]]; then
+        #~ enable_boot_script
+        #~ echo "enable"
+    #~ fi
+        
+    [[ "$RESET_CONFIG_FLAG" -eq 1 ]] && reset_config
 
     [[ "$CREATE_SPLASH_FLAG" -eq 1 ]] && create_fun_fact
+    
+    [[ "$GUI_FLAG" -eq 1 ]] && gui
+    
+    [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
         if enable_boot_script; then
             set_config "boot_script" "true" > /dev/null
             echo "Fun Facts! Splashscreens script ENABLED at boot."
         else
-            echo "ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot." >&2
+            log "ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
         fi
     fi
 
@@ -1068,13 +1120,9 @@ function main() {
             set_config "boot_script" "false" > /dev/null
             echo "Fun Facts! Splashscreens script DISABLED at boot."
         else
-            echo "ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot." >&2
+            log "ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
         fi
     fi
-
-    [[ "$GUI_FLAG" -eq 1 ]] && gui
-    
-    [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
 }
 
 main "$@"
