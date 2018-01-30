@@ -59,11 +59,12 @@ readonly DIALOG_WIDTH=60
 # Flags
 ENABLE_BOOT_FLAG=0
 DISABLE_BOOT_FLAG=0
+ENABLE_LOG_FLAG=0
+DISABLE_LOG_FLAG=0
 GUI_FLAG=0
 CONFIG_FLAG=0
 EDIT_CONFIG_FLAG=0
 RESET_CONFIG_FLAG=0
-LOG_FLAG=0
 
 SPLASH_PATH=
 TEXT_COLOR=
@@ -79,12 +80,17 @@ function is_retropie() {
 
 
 function log() {
-    [[ "LOG_FLAG" -eq 1 ]] && [[ ! -f "$LOG_FILE" ]] && touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
+    if [[ "$LOG" == "true" ]]; then
+        if [[ ! -f "$LOG_FILE" ]]; then
+            touch "$LOG_FILE"
+            chown -R "$user":"$user" "$LOG_FILE"
+        fi
+    fi
     if [[ "$GUI_FLAG" -eq 1 ]] ; then
-        [[ "LOG_FLAG" -eq 1 ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]}" >> "$LOG_FILE"
+        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-4))}" >> "$LOG_FILE" # -4 are log ... get_options main main
         echo "$*"
     else
-        [[ "LOG_FLAG" -eq 1 ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]}" >> "$LOG_FILE"
+        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-4))}" >> "$LOG_FILE" # -4 are log ... get_options main main
         echo "$*" >&2
     fi
 }
@@ -181,7 +187,7 @@ function get_config() {
 function check_config() {
     CONFIG_FLAG=1
 
-    echo "Checking config file ..."
+    log "Checking config file ..."
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
@@ -193,44 +199,42 @@ function check_config() {
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
     validate_true_false "log" "$LOG" || exit 1
 
-    echo "Checking config file ... OK"
+    log "Checking config file ... OK"
 
-    echo "Setting config file ..."
+    log "Setting config file ..."
 
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
-        echo "'splashscreen_path' not set. Switching to defaults ..."
+        log "'splashscreen_path' not set. Switching to defaults ..."
         set_config "splashscreen_path" "$SPLASH_PATH"
     fi
 
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
-        echo "'text_color' not set. Switching to defaults ..."
+        log "'text_color' not set. Switching to defaults ..."
         set_config "text_color" "$TEXT_COLOR"
     fi
 
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        echo "'boot_script' not set. Switching to defaults ..."
+        log "'boot_script' not set. Switching to defaults ..."
         set_config "boot_script" "$BOOT_SCRIPT"
     fi
 
     if [[ -z "$LOG" ]]; then
         LOG="$DEFAULT_LOG"
-        echo "'log' not set. Switching to defaults ..."
+        log "'log' not set. Switching to defaults ..."
         set_config "log" "$LOG"
     fi
 
-    echo "Setting config file ... OK"
+    log "Setting config file ... OK"
 
-    echo
-    echo "Config file"
-    echo "-----------"
-    echo "'splashscreen_path'   = '$SPLASH_PATH'"
-    echo "'text_color'          = '$TEXT_COLOR'"
-    echo "'boot_script'         = '$BOOT_SCRIPT'"
-    echo "'log'                 = '$LOG'"
-    echo
+    log "Config file"
+    log "-----------"
+    log "'splashscreen_path'   = '$SPLASH_PATH'"
+    log "'text_color'          = '$TEXT_COLOR'"
+    log "'boot_script'         = '$BOOT_SCRIPT'"
+    log "'log'                 = '$LOG'"
 }
 
 
@@ -256,6 +260,7 @@ function edit_config() {
 
 
 function reset_config() {
+    # TODO: Create a function to select all keys dynamically.
     set_config "splashscreen_path" ""
     set_config "text_color" ""
     set_config "boot_script" ""
@@ -298,32 +303,56 @@ function check_boot_script() {
 
 
 function check_apply_splash() {
-    [[ ! -f "$SPLASH_LIST" ]] && touch "$SPLASH_LIST" && chown -R "$user":"$user" "$SPLASH_LIST"
+    if [[ ! -f "$SPLASH_LIST" ]]; then
+        touch "$SPLASH_LIST"
+        chown -R "$user":"$user" "$SPLASH_LIST"
+    fi
+    if [[ ! -f "$RESULT_SPLASH" ]]; then
+        is_splash_applied && echo "" > "$SPLASH_LIST"
+        local error_message="Create a Fun Facts! splashscreen before applying it."
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            log "$error_message" > /dev/null
+            dialog \
+                --backtitle "$SCRIPT_TITLE" \
+                --title "Error!" \
+                --msgbox "$error_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+            return 1
+        else
+            log "ERROR: $error_message"
+            echo "Try 'sudo $0 --help' for more info." >&2
+            exit 1
+        fi
+    fi
+}
+
+function is_splash_applied() {
     grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
 }
 
 
 function apply_splash() {
-    check_apply_splash
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        if [[ "$GUI_FLAG" -eq 1 ]]; then
-            dialog \
-                --backtitle "$SCRIPT_TITLE" \
-                --title "Info" \
-                --msgbox "Fun Facts! splashscreen is already applied." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-        else
-            echo "Fun Facts! splashscreen is already applied."
-        fi
-    else
-        echo "$RESULT_SPLASH" > "$SPLASH_LIST"
-        if [[ "$GUI_FLAG" -eq 1 ]]; then
-            dialog \
-                --backtitle "$SCRIPT_TITLE" \
-                --title "Success!" \
-                --msgbox "Fun Facts! splashscreen applied succesfully!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-        else
-            echo "Fun Facts! splashscreen applied succesfully!"
+    if check_apply_splash; then
+        if is_splash_applied; then
+            local info_message="Fun Facts! splashscreen is already applied."
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                dialog \
+                    --backtitle "$SCRIPT_TITLE" \
+                    --title "Info" \
+                    --msgbox "$info_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+            else
+                log "$info_message"
+            fi
+       else
+            echo "$RESULT_SPLASH" > "$SPLASH_LIST"
+            local success_message="Fun Facts! splashscreen applied succesfully!"
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                dialog \
+                    --backtitle "$SCRIPT_TITLE" \
+                    --title "Success!" \
+                    --msgbox "$success_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+            else
+                echo "$success_message"
+            fi
         fi
     fi
 }
@@ -535,9 +564,7 @@ function validate_color() {
 }
 
 function validate_true_false() {
-    check_argument "$1" "$2" || exit 1
     [[ -z "$2" ]] && return 0
-    #~ check_argument "$1" "$2" || exit 1
     if [[ "$2" != "false" && "$2" != "true" ]]; then
         log "ERROR: Can't enable/disable $1. Invalid boolean '$2'"
         [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the '$1' value in '$SCRIPT_CFG'"
@@ -578,16 +605,14 @@ function get_last_commit() {
 
 
 function gui() {
-    #~ log "-- Start GUI --" > /dev/null
+    GUI_FLAG=1
     while true; do
         check_config #> /dev/null
 
         version="$SCRIPT_VERSION"
         #~ last_commit="$(get_last_commit)"
 
-        check_apply_splash
-        return_value="$?"
-        if [[ "$return_value" -eq 0 ]]; then
+        if is_splash_applied; then
             option_apply_splash="Apply Fun Facts! splashscreen (already applied)"
         else
             option_apply_splash="Apply Fun Facts! splashscreen"
@@ -883,14 +908,7 @@ function gui() {
                     fi
                     ;;
                 6)
-                    if [[ ! -f "$RESULT_SPLASH" ]]; then
-                        dialog \
-                            --backtitle "$SCRIPT_TITLE" \
-                            --title "Error!"
-                            --msgbox "Create a Fun Facts! splashscreen before applying it." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        apply_splash
-                    fi
+                    apply_splash
                     ;;
                 7)
                     check_boot_script
@@ -947,7 +965,6 @@ function gui() {
             break
         fi
     done
-    #~ log "-- End GUI --" > /dev/null
 }
 
 
@@ -989,7 +1006,7 @@ function get_options() {
                 validate_color "$1" || exit 1
                 set_config "text_color" "$1"
                 ;;
-#H --add-fun-fact                           Add new Fun Facts!.
+#H --add-fun-fact [text]                    Add new Fun Facts!.
             --add-fun-fact)
                 check_argument "$1" "$2" || exit 1
                 shift
@@ -1004,17 +1021,11 @@ function get_options() {
             --create-fun-fact)
                 check_config #> /dev/null
                 check_fun_facts_txt
-                CREATE_SPLASH_FLAG=1
+                create_fun_fact
                 ;;
 #H --apply-splash                           Apply the Fun Facts! splashscreen.
             --apply-splash)
-                if [[ ! -f "$RESULT_SPLASH" ]]; then
-                    log "ERROR: Create a Fun Facts! splashscreen before applying it."
-                    echo "Try 'sudo $0 --help' for more info." >&2
-                    exit 1
-                else
                     apply_splash
-                fi
                 ;;
 #H --enable-boot                            Enable script at boot.
             --enable-boot)
@@ -1026,15 +1037,18 @@ function get_options() {
                 ;;
 #H --gui                                    Start GUI.
             --gui)
-                GUI_FLAG=1
+                #~ GUI_FLAG=1
+                gui
                 ;;
 #H --edit-config                            Edit config file.
             --edit-config)
-                EDIT_CONFIG_FLAG=1
+                #~ EDIT_CONFIG_FLAG=1
+                edit_config
                 ;;
 #H --reset-config                           Reset config file.
             --reset-config)
-                RESET_CONFIG_FLAG=1
+                #~ RESET_CONFIG_FLAG=1
+                reset_config
                 ;;
 #H --update                                 Update script.
             --update)
@@ -1049,11 +1063,11 @@ function get_options() {
                 ;;
 #H --enable-log                             Enable logging.
             --enable-log)
-                ENABLE_LOG_FLAG=1
+                set_config "log" "true"
                 ;;
 #H --disable-log                            Disable logging.
             --disable-log)
-                DISABLE_LOG_FLAG=1
+                set_config "log" "false"
                 ;;
             *)
                 echo "ERROR: Invalid option '$1'" >&2
@@ -1086,9 +1100,9 @@ function main() {
 
     #~ chown -R "$user":"$user" .
 
-    get_options "$@"
+    LOG="$(get_config "log")"
 
-    echo "boot script $BOOT_SCRIPT"
+    get_options "$@"
 
     #~ if [[ "$BOOT_SCRIPT" == "false" ]]; then
         #~ disable_boot_script
@@ -1098,13 +1112,13 @@ function main() {
         #~ echo "enable"
     #~ fi
 
-    [[ "$RESET_CONFIG_FLAG" -eq 1 ]] && reset_config
+    #~ [[ "$RESET_CONFIG_FLAG" -eq 1 ]] && reset_config
 
-    [[ "$CREATE_SPLASH_FLAG" -eq 1 ]] && create_fun_fact
+    #~ [[ "$CREATE_SPLASH_FLAG" -eq 1 ]] && create_fun_fact
 
-    [[ "$GUI_FLAG" -eq 1 ]] && gui
+    #~ [[ "$GUI_FLAG" -eq 1 ]] && gui
 
-    [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
+    #~ [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
 
     if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
         if enable_boot_script; then
