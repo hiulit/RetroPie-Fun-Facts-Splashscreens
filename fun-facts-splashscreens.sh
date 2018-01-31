@@ -82,15 +82,14 @@ function is_retropie() {
 function log() {
     if [[ "$LOG" == "true" ]]; then
         if [[ ! -f "$LOG_FILE" ]]; then
-            touch "$LOG_FILE"
-            chown -R "$user":"$user" "$LOG_FILE"
+            touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
         fi
     fi
     if [[ "$GUI_FLAG" -eq 1 ]] ; then
-        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-4))}" >> "$LOG_FILE" # -4 are log ... get_options main main
+        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))}" >> "$LOG_FILE" # -2 are log ... get_options main main
         echo "$*"
     else
-        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T): (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-4))}" >> "$LOG_FILE" # -4 are log ... get_options main main
+        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))}" >> "$LOG_FILE" # -2 are log ... get_options main main
         echo "$*" >&2
     fi
 }
@@ -141,30 +140,30 @@ function check_argument() {
 
 function check_default_files() {
     if [[ ! -f "$DEFAULT_SPLASH" ]]; then
-        echo "Downloading Fun Facts! default splashscreen ..."
-        curl -s "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "retropie-default.png" > /dev/null
-        echo "Downloading Fun Facts! default splashscreen ... OK"
-        echo "Setting permissions to Fun Facts! default splashscreen ..."
-        chown -R "$user":"$user" "retropie-default.png"
-        echo "Setting permissions to Fun Facts! default splashscreen ... OK"
+        if curl "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASH"; then
+            echo "Default splashscreen downloaded succesfully!"
+            chown -R "$user":"$user" "$DEFAULT_SPLASH"
+        else
+            log "ERROR: Can't download default splashscreen."
+        fi
     fi
 
     if [[ ! -f "$SCRIPT_CFG" ]]; then
-        echo "Downloading Fun Facts! config file ..."
-        curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "fun-facts-splashscreens-settings.cfg" > /dev/null
-        echo "Downloading Fun Facts! config file ... OK"
-        echo "Setting permissions to Fun Facts! config file ..."
-        chown -R "$user":"$user" "fun-facts-splashscreens-settings.cfg"
-        echo "Setting permissions to Fun Facts! config file ... OK"
+        if curl "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "$SCRIPT_CFG"; then
+            echo "Config file downloaded succesfully!"
+            chown -R "$user":"$user" "$SCRIPT_CFG"
+        else
+            log "ERROR: Can't download config file."
+        fi
     fi
 
     if [[ ! -f "$FUN_FACTS_TXT" ]]; then
-        echo "Downloading Fun Facts! text file ..."
-        curl -s "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "fun-facts.txt" > /dev/null
-        echo "Downloading Fun Facts! text file ... OK"
-        echo "Setting permissions to Fun Facts! text file ..."
-        chown -R "$user":"$user" "fun-facts.txt"
-        echo "Setting permissions to Fun Facts! text file ... OK"
+        if curl "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then
+            echo "Fun Facts! text file downloaded succesfully!"            
+            chown -R "$user":"$user" "$FUN_FACTS_TXT"
+        else
+            log "ERROR: Can't download Fun Facts! text file."
+        fi
     fi
 }
 
@@ -187,7 +186,7 @@ function get_config() {
 function check_config() {
     CONFIG_FLAG=1
 
-    log "Checking config file ..."
+    echo "Checking config file ..."
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
@@ -199,52 +198,53 @@ function check_config() {
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
     validate_true_false "log" "$LOG" || exit 1
 
-    log "Checking config file ... OK"
+    echo "Checking config file ... OK"
 
-    log "Setting config file ..."
+    echo "Setting config file ..."
 
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
-        log "'splashscreen_path' not set. Switching to defaults ..."
+        echo "'splashscreen_path' not set. Switching to defaults ..."
         set_config "splashscreen_path" "$SPLASH_PATH"
     fi
 
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
-        log "'text_color' not set. Switching to defaults ..."
+        echo "'text_color' not set. Switching to defaults ..."
         set_config "text_color" "$TEXT_COLOR"
     fi
 
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        log "'boot_script' not set. Switching to defaults ..."
+        echo "'boot_script' not set. Switching to defaults ..."
         set_config "boot_script" "$BOOT_SCRIPT"
     fi
 
     if [[ -z "$LOG" ]]; then
         LOG="$DEFAULT_LOG"
-        log "'log' not set. Switching to defaults ..."
+        echo "'log' not set. Switching to defaults ..."
         set_config "log" "$LOG"
     fi
 
-    log "Setting config file ... OK"
+    echo "Setting config file ... OK"
 
-    log "Config file"
-    log "-----------"
-    log "'splashscreen_path'   = '$SPLASH_PATH'"
-    log "'text_color'          = '$TEXT_COLOR'"
-    log "'boot_script'         = '$BOOT_SCRIPT'"
-    log "'log'                 = '$LOG'"
+    echo "Config file"
+    echo "-----------"
+    echo "'splashscreen_path'   = '$SPLASH_PATH'"
+    echo "'text_color'          = '$TEXT_COLOR'"
+    echo "'boot_script'         = '$BOOT_SCRIPT'"
+    echo "'log'                 = '$LOG'"
 }
 
 
 function edit_config() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
+        local config_file
         config_file="$(dialog \
                     --backtitle "$SCRIPT_TILE" \
                     --title "Config file" \
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
-
+        local result_value
         result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
             echo "$config_file" > "$SCRIPT_CFG" \
@@ -1093,14 +1093,14 @@ function main() {
         usage
         exit 1
     fi
+    
+    LOG="$(get_config "log")"
 
     check_default_files
 
     #~ mkdir -p "$RP_DIR/splashscreens"
 
     #~ chown -R "$user":"$user" .
-
-    LOG="$(get_config "log")"
 
     get_options "$@"
 
