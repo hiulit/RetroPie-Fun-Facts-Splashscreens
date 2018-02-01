@@ -57,19 +57,15 @@ readonly DIALOG_HEIGHT=18
 readonly DIALOG_WIDTH=60
 
 # Flags
-ENABLE_BOOT_FLAG=0
-DISABLE_BOOT_FLAG=0
-ENABLE_LOG_FLAG=0
-DISABLE_LOG_FLAG=0
 GUI_FLAG=0
 CONFIG_FLAG=0
-EDIT_CONFIG_FLAG=0
-RESET_CONFIG_FLAG=0
 
+# Global variables
 SPLASH_PATH=
 TEXT_COLOR=
 BOOT_SCRIPT=
 LOG=
+OPTION=
 
 
 # Functions ############################################
@@ -79,17 +75,36 @@ function is_retropie() {
 }
 
 
-function log() {
+function is_sudo() {
+    if [[ "$(id -u)" -ne 0 ]]; then
+        log "ERROR: Script must be run under sudo."
+        usage
+        exit 1
+    fi
+}
+
+
+function check_log_file(){
     if [[ "$LOG" == "true" ]]; then
         if [[ ! -f "$LOG_FILE" ]]; then
-            touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
+            touch "$LOG_FILE"
+            chown -R "$user":"$user" "$LOG_FILE"
         fi
     fi
+}
+
+
+function log() {
+    check_log_file
     if [[ "$GUI_FLAG" -eq 1 ]] ; then
-        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))}" >> "$LOG_FILE" # -2 are log ... get_options main main
+        if [[ "$LOG" == "true" ]]; then
+            echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        fi
         echo "$*"
     else
-        [[ "$LOG" == "true" ]] && echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))}" >> "$LOG_FILE" # -2 are log ... get_options main main
+        if [[ "$LOG" == "true" ]]; then
+            echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        fi
         echo "$*" >&2
     fi
 }
@@ -99,7 +114,7 @@ function check_dependencies() {
     local pkg
     for pkg in "${DEPENDENCIES[@]}";do
         if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
-            echo "ERROR: The '$pkg' package is not installed!"
+            log "ERROR: The '$pkg' package is not installed!"
             echo "Would you like to install it now?"
             local options=("Yes" "No")
             local option
@@ -129,7 +144,7 @@ function check_dependencies() {
 
 
 function check_argument() {
-    # XXX: this method doesn't accept arguments starting with '-'.
+    # Note: this method doesn't accept arguments starting with '-'.
     if [[ -z "$2" || "$2" =~ ^- ]]; then
         log "ERROR: '$1' is missing an argument."
         echo "Try 'sudo $0 --help' for more info." >&2
@@ -175,18 +190,22 @@ function set_config() {
 
 
 function get_config() {
-    local config
-    config="$(grep -Po "(?<=^$1 = ).*" "$SCRIPT_CFG")"
-    config="${config%\"}"
-    config="${config#\"}"
-    echo "$config"
+    if [[ -f "$SCRIPT_CFG" ]]; then
+        local config
+        config="$(grep -Po "(?<=^$1 = ).*" "$SCRIPT_CFG")"
+        config="${config%\"}"
+        config="${config#\"}"
+        echo "$config"
+    else
+        return 1
+    fi
 }
 
 
 function check_config() {
     CONFIG_FLAG=1
 
-    echo "Checking config file ..."
+    #~ echo "Checking config file ..."
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
@@ -198,9 +217,9 @@ function check_config() {
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
     validate_true_false "log" "$LOG" || exit 1
 
-    echo "Checking config file ... OK"
+    #~ echo "Checking config file ... OK"
 
-    echo "Setting config file ..."
+    #~ echo "Setting config file ..."
 
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
@@ -226,14 +245,14 @@ function check_config() {
         set_config "log" "$LOG"
     fi
 
-    echo "Setting config file ... OK"
+    #~ echo "Setting config file ... OK"
 
-    echo "Config file"
-    echo "-----------"
-    echo "'splashscreen_path'   = '$SPLASH_PATH'"
-    echo "'text_color'          = '$TEXT_COLOR'"
-    echo "'boot_script'         = '$BOOT_SCRIPT'"
-    echo "'log'                 = '$LOG'"
+    #~ echo "Config file"
+    #~ echo "-----------"
+    #~ echo "'splashscreen_path'   = '$SPLASH_PATH'"
+    #~ echo "'text_color'          = '$TEXT_COLOR'"
+    #~ echo "'boot_script'         = '$BOOT_SCRIPT'"
+    #~ echo "'log'                 = '$LOG'"
 }
 
 
@@ -480,13 +499,13 @@ function select_fun_facts() {
 }
 
 
-function check_fun_facts_txt() {
+function is_fun_facts_empty() {
     if [[ ! -s "$FUN_FACTS_TXT" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!"
+            log "'$FUN_FACTS_TXT' is empty!"
             return 1
         else
-            log "ERROR: Can't remove Fun Facts!. '$FUN_FACTS_TXT' is empty!"
+            log "'$FUN_FACTS_TXT' is empty!"
             exit 1
         fi
     else
@@ -512,13 +531,13 @@ function add_fun_fact() {
 
 
 function remove_fun_fact() {
+    is_fun_facts_empty
     if [[ -n "$1" ]]; then
         sed -i "/^$1$/ d" "$FUN_FACTS_TXT"
     else
         select_fun_facts 0 5
-        echo "Removing Fun Fact! ... '$option'" && sleep 0.5
         sed -i "/^$option$/ d" "$FUN_FACTS_TXT" # $option comes from select_fun_facts()
-        echo "Removing Fun Fact! ... OK" && sleep 0.25
+        echo "'$option' removed successfully!" && sleep 0.5
         remove_fun_fact
     fi
 }
@@ -851,7 +870,7 @@ function gui() {
                 4)
                     while true; do
                         local validation
-                        validation="$(check_fun_facts_txt)"
+                        validation="$(is_fun_facts_empty)"
                         if [[ -n "$validation" ]]; then
                             dialog \
                                 --backtitle "$SCRIPT_TITLE" \
@@ -897,7 +916,7 @@ function gui() {
                     ;;
                 5)
                     local validation
-                    validation="$(check_fun_facts_txt)"
+                    validation="$(is_fun_facts_empty)"
                     if [[ -n "$validation" ]]; then
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
@@ -973,7 +992,9 @@ function get_options() {
         usage
         exit 0
     fi
-
+    
+    OPTION="$1"
+    
     while [[ -n "$1" ]]; do
         case "$1" in
 #H --help                                   Print the help message and exit.
@@ -1014,40 +1035,46 @@ function get_options() {
                 ;;
 #H --remove-fun-fact                        Remove Fun Facts!.
             --remove-fun-fact)
-                check_fun_facts_txt
                 remove_fun_fact
                 ;;
 #H --create-fun-fact                        Create a new Fun Facts! splashscreen.
             --create-fun-fact)
                 check_config #> /dev/null
-                check_fun_facts_txt
+                is_fun_facts_empty
                 create_fun_fact
                 ;;
 #H --apply-splash                           Apply the Fun Facts! splashscreen.
             --apply-splash)
-                    apply_splash
+                apply_splash
                 ;;
 #H --enable-boot                            Enable script at boot.
             --enable-boot)
-                ENABLE_BOOT_FLAG=1
+                if enable_boot_script; then
+                    set_config "boot_script" "true" > /dev/null
+                    echo "Script ENABLED at boot."
+                else
+                    log "ERROR: failed to ENABLE script at boot."
+                fi
                 ;;
 #H --disable-boot                           Disable script at boot.
             --disable-boot)
-                DISABLE_BOOT_FLAG=1
+                if disable_boot_script; then
+                    set_config "boot_script" "false" > /dev/null
+                    echo "Script DISABLED at boot."
+                else
+                    log "ERROR: failed to DISABLE script at boot."
+                fi
                 ;;
 #H --gui                                    Start GUI.
             --gui)
-                #~ GUI_FLAG=1
                 gui
                 ;;
 #H --edit-config                            Edit config file.
             --edit-config)
-                #~ EDIT_CONFIG_FLAG=1
                 edit_config
                 ;;
 #H --reset-config                           Reset config file.
             --reset-config)
-                #~ RESET_CONFIG_FLAG=1
                 reset_config
                 ;;
 #H --update                                 Update script.
@@ -1070,7 +1097,7 @@ function get_options() {
                 set_config "log" "false"
                 ;;
             *)
-                echo "ERROR: Invalid option '$1'" >&2
+                log "ERROR: Invalid option '$1'" >&2
                 echo "Try 'sudo $0 --help' for more info." >&2
                 exit 2
                 ;;
@@ -1080,63 +1107,34 @@ function get_options() {
 }
 
 function main() {
+    is_sudo
+        
     if ! is_retropie; then
         log "ERROR: RetroPie is not installed. Aborting ..."
         exit 1
     fi
 
     check_dependencies
-
-    # check if sudo is used.
-    if [[ "$(id -u)" -ne 0 ]]; then
-        log "ERROR: Script must be run under sudo."
-        usage
-        exit 1
+    
+    check_log="$(get_config "log")"
+    if [[ "$check_log" == "" ]]; then
+        LOG="true"
     fi
     
-    LOG="$(get_config "log")"
-
+    check_boot="$(get_config "boot_script")"
+    if [[ "$check_boot" == "false" || "$check_boot" == "" ]]; then
+        disable_boot_script
+    elif [[ "$check_boot" == "true" ]]; then
+        enable_boot_script
+    fi
+    
     check_default_files
 
-    #~ mkdir -p "$RP_DIR/splashscreens"
+    mkdir -p "$RP_DIR/splashscreens"
 
-    #~ chown -R "$user":"$user" .
+    chown -R "$user":"$user" .
 
     get_options "$@"
-
-    #~ if [[ "$BOOT_SCRIPT" == "false" ]]; then
-        #~ disable_boot_script
-        #~ echo "disable"
-    #~ elif [[ "$BOOT_SCRIPT" == "true" ]]; then
-        #~ enable_boot_script
-        #~ echo "enable"
-    #~ fi
-
-    #~ [[ "$RESET_CONFIG_FLAG" -eq 1 ]] && reset_config
-
-    #~ [[ "$CREATE_SPLASH_FLAG" -eq 1 ]] && create_fun_fact
-
-    #~ [[ "$GUI_FLAG" -eq 1 ]] && gui
-
-    #~ [[ "$EDIT_CONFIG_FLAG" -eq 1 ]] && edit_config
-
-    if [[ "$ENABLE_BOOT_FLAG" -eq 1 ]]; then
-        if enable_boot_script; then
-            set_config "boot_script" "true" > /dev/null
-            echo "Fun Facts! Splashscreens script ENABLED at boot."
-        else
-            log "ERROR: failed to ENABLE Fun Facts! Splashscreens script at boot."
-        fi
-    fi
-
-    if [[ "$DISABLE_BOOT_FLAG" -eq 1 ]]; then
-        if disable_boot_script; then
-            set_config "boot_script" "false" > /dev/null
-            echo "Fun Facts! Splashscreens script DISABLED at boot."
-        else
-            log "ERROR: failed to DISABLE Fun Facts! Splashscreens script at boot."
-        fi
-    fi
 }
 
 main "$@"
