@@ -155,8 +155,7 @@ function check_argument() {
 
 function check_default_files() {
     if [[ ! -f "$DEFAULT_SPLASH" ]]; then
-        if curl "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASH"; then
-            echo "Default splashscreen downloaded succesfully!"
+        if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASH"; then
             chown -R "$user":"$user" "$DEFAULT_SPLASH"
         else
             log "ERROR: Can't download default splashscreen."
@@ -164,8 +163,7 @@ function check_default_files() {
     fi
 
     if [[ ! -f "$SCRIPT_CFG" ]]; then
-        if curl "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "$SCRIPT_CFG"; then
-            echo "Config file downloaded succesfully!"
+        if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "$SCRIPT_CFG"; then
             chown -R "$user":"$user" "$SCRIPT_CFG"
         else
             log "ERROR: Can't download config file."
@@ -173,8 +171,7 @@ function check_default_files() {
     fi
 
     if [[ ! -f "$FUN_FACTS_TXT" ]]; then
-        if curl "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then
-            echo "Fun Facts! text file downloaded succesfully!"            
+        if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then       
             chown -R "$user":"$user" "$FUN_FACTS_TXT"
         else
             log "ERROR: Can't download Fun Facts! text file."
