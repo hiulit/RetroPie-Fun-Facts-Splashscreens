@@ -76,11 +76,7 @@ function is_retropie() {
 
 
 function is_sudo() {
-    if [[ "$(id -u)" -ne 0 ]]; then
-        log "ERROR: Script must be run under sudo."
-        usage
-        exit 1
-    fi
+    [[ "$(id -u)" -eq 0 ]]
 }
 
 
@@ -1104,7 +1100,11 @@ function get_options() {
 }
 
 function main() {
-    is_sudo
+    if ! is_sudo; then
+        log "ERROR: Script must be run under sudo."
+        usage
+        exit 1
+    fi
         
     if ! is_retropie; then
         log "ERROR: RetroPie is not installed. Aborting ..."
