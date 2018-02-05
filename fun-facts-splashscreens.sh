@@ -110,7 +110,8 @@ function log() {
 function check_dependencies() {
     local pkg
     for pkg in "${DEPENDENCIES[@]}";do
-        if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
+        if ! dpkg-query -W -f='${Status}' "$pkg" | grep -q "installed"; then
+        #~ if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
             log "ERROR: The '$pkg' package is not installed!"
             echo "Would you like to install it now?"
             local options=("Yes" "No")
