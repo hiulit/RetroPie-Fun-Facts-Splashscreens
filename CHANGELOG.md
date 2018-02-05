@@ -4,7 +4,9 @@
 
 ### Fixed
 
+* Fixed `check_dependencies`.
 * Fixed files permissions after updating the script.
+* Fixed scriptmodule files and help.
 * Fixed `Set text color` dialog, which was crashing after clicking the `Back` button.
 * Fixed GUI error messages going to `>&2`.
 
@@ -22,6 +24,7 @@
 * Added log file `fun-facts-splashcreens.log`.
 * Added functionality to enable/disable logging in the config file.
 * Added functionality to enable/disable script at boot in the config file.
+* Check if the script is used as a scriptmodule.
 
 ### Changed
 
