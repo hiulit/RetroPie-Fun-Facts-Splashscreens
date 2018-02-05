@@ -34,6 +34,7 @@ readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
 readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! Splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
+readonly SCRIPTMODULE_DIR="/opt/retropie/supplementary/fun-facts-splashscreens"
 
 
 # Variables ############################################
@@ -622,7 +623,6 @@ function gui() {
         check_config #> /dev/null
 
         version="$SCRIPT_VERSION"
-        #~ last_commit="$(get_last_commit)"
 
         if is_splash_applied; then
             option_apply_splash="Apply Fun Facts! splashscreen (already applied)"
@@ -638,7 +638,7 @@ function gui() {
             option_boot="disabled"
         fi
 
-        if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
+        if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
             option_updates="Update script"
         else
             check_updates
@@ -659,12 +659,19 @@ function gui() {
         )
 
         menu_items="${#options[@]}"
-
+        
+        if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
+            menu_text="Version: $version"
+        else
+            last_commit="$(get_last_commit)"
+            menu_text="Version: $version\nLast commit: $last_commit"
+        fi
+        
         cmd=(dialog \
             --backtitle "$SCRIPT_TITLE"
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
-            --menu "Version: $version\nLast commit: $last_commit" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+            --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
 
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
 
@@ -956,11 +963,18 @@ function gui() {
                     reset_config
                     ;;
                 10)
-                    if [[ "$SCRIPT_DIR" == "/opt/retropie/supplementary/fun-facts-splashscreens" ]]; then # If script is used as a scriptmodule
+                    if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
+                        local text="Can't update the script when using it from RetroPie-Setup."
+                                text+="\n\nGo to:"
+                                text+="\n -> Manage packages"
+                                text+="\n -> Manage experimental packages"
+                                text+="\n -> fun-facts-splashscreens"
+                                text+="\n -> Update from source"
+                                 
                         dialog \
                             --backtitle "$SCRIPT_TITLE" \
                             --title "Info" \
-                            --msgbox "Can't update the script when using it from RetroPie-Setup.\n\nGo to:\n -> Manage packages\n -> Manage experimental packages\n -> fun-facts-splashscreens\n -> Update from source" 12 50 2>&1 >/dev/tty
+                            --msgbox "$text" 15 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
                             git pull && chown -R "$user":"$user" .
