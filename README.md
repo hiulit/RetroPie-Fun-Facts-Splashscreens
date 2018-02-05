@@ -47,7 +47,14 @@ Use '--help' to see all the options.
 * `--enable-log`: Enable logging.
 * `--disable-log`: Disable logging.
 
-If `--splash-path` or `--text-color` are not set, the script takes the splashscreen and the text color defaults, `retropie-default.png` and `white`, respectively.
+If `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log` are not set, the script takes the defaults:
+
+* `splashscreen_path`: `[SCRIPT_DIR]/retropie-default.png`
+* `text_color`: `white`
+* `boot_script`: `false`
+* `log`: `false`
+
+See the [config file](#config-file).
 
 ## Examples
 
@@ -195,12 +202,12 @@ sudo ./fun-facts-splashscreens.sh --gui
 ![Fun Facts Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
 ##### Reset config file
 ![Fun Facts Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+##### Update script (`--update`)
+![Fun Facts! Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
 ##### Enable logging (`--enable-log`)
 ![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
 ##### Disable logging (`--disable-log`)
 ![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
-##### Update script (`--update`)
-![Fun Facts! Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
 
 ### `--edit-config`
 
@@ -279,7 +286,7 @@ sudo ./fun-facts-splashscreens.sh --disable-log
 
 ## Config file
 
-When setting the splashscreen path using `--splash-path` or setting the text color using `--text-color`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
+When using `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
 
 ```
 # Settings for Fun Facts Splashscreens.
@@ -310,7 +317,7 @@ boot_script = ""
 log = ""
 ```
 
-You can edit this file directly instead of using `--splash-path` or `--text-color`.
+You can edit this file directly instead of using `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`.
 
 ## Add a new Fun Fact!
 
