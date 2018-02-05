@@ -54,7 +54,7 @@ readonly DEFAULT_LOG="false"
 readonly DIALOG_OK=0
 readonly DIALOG_CANCEL=1
 readonly DIALOG_ESC=255
-readonly DIALOG_HEIGHT=18
+readonly DIALOG_HEIGHT=20
 readonly DIALOG_WIDTH=60
 
 # Flags
@@ -645,6 +645,8 @@ function gui() {
             check_updates
             option_updates="Update script ($updates_output)"
         fi
+        
+        check_log="$(get_config "log")"
 
         options=(
             1 "Set splashscreen path ($(get_config "splashscreen_path"))"
@@ -657,6 +659,7 @@ function gui() {
             8 "Edit config file"
             9 "Reset config file"
             10 "$option_updates"
+            11 "Enable/Disable logging ($check_log)"
         )
 
         menu_items="${#options[@]}"
@@ -985,6 +988,13 @@ function gui() {
                                 --title "Info" \
                                 --msgbox "Fun Facts! Splashscreens is $updates_output!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
+                    fi
+                    ;;
+                11)
+                    if [[ "$check_log" == "false" ]]; then
+                        set_config "log" "true"
+                    else
+                        set_config "log" "false"
                     fi
                     ;;
             esac
