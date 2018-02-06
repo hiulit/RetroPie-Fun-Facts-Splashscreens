@@ -274,11 +274,9 @@ function edit_config() {
 
 
 function reset_config() {
-    # TODO: Create a function to select all keys dynamically.
-    set_config "splashscreen_path" ""
-    set_config "text_color" ""
-    set_config "boot_script" ""
-    set_config "log" ""
+    while read line; do 
+        set_config "$line" ""
+    done < <(grep -Po ".*?(?=\ = )" "$SCRIPT_CFG")
 }
 
 
