@@ -9,6 +9,7 @@
 * Fixed scriptmodule files and help.
 * Fixed `Set text color` dialog, which was crashing after clicking the `Back` button.
 * Fixed GUI error messages going to `>&2`.
+* Refactored `reset_config`. Now it gets the config keys dynamically.
 
 ### Added
 
