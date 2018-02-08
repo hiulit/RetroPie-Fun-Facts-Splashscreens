@@ -75,7 +75,7 @@ Set the image to use as **Fun Facts! Splashscreen**.
 
 #### Options
 
-Must be an absolute path (e.g /home/pi/my-awesome-splashscreen.png).
+Must be an absolute path (e.g `/home/pi/my-awesome-splashscreen.png`).
 
 * `path/to/splashscreen`: Path of the image to use as **Fun Facts! Splashscreen**.
 
