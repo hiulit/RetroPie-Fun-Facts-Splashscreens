@@ -213,7 +213,11 @@ sudo ./fun-facts-splashscreens.sh --gui
 
 Edit config file.
 
-Opens a simple file editor.
+Opens a simple text editor.
+
+When using this option from the terminal, it opens the `nano` text editor. To save the changes, press `ctrl + o` and then press `enter`. To exit, press `ctrl + x`.
+
+When using the GUI, use the `tab` key to select `Save` or `Back`.
 
 #### Example
 
