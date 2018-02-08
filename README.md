@@ -123,6 +123,8 @@ Remove **Fun Facts!**.
 sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 ```
 
+![Fun Facts! Splashscreens Terminal - 01](gui-examples/fun-facts-splashscreens-terminal-01.jpg)
+
 ### `--create-fun-fact`
 
 Create a new **Fun Facts! Splashscreen**.
