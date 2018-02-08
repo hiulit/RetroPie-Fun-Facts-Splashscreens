@@ -200,8 +200,6 @@ function get_config() {
 function check_config() {
     CONFIG_FLAG=1
 
-    #~ echo "Checking config file ..."
-
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
@@ -212,42 +210,25 @@ function check_config() {
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
     validate_true_false "log" "$LOG" || exit 1
 
-    #~ echo "Checking config file ... OK"
-
-    #~ echo "Setting config file ..."
-
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
-        echo "'splashscreen_path' not set. Switching to defaults ..."
-        set_config "splashscreen_path" "$SPLASH_PATH"
+        set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
     fi
 
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
-        echo "'text_color' not set. Switching to defaults ..."
-        set_config "text_color" "$TEXT_COLOR"
+        set_config "text_color" "$TEXT_COLOR" > /dev/null
     fi
 
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        echo "'boot_script' not set. Switching to defaults ..."
-        set_config "boot_script" "$BOOT_SCRIPT"
+        set_config "boot_script" "$BOOT_SCRIPT" > /dev/null
     fi
 
     if [[ -z "$LOG" ]]; then
         LOG="$DEFAULT_LOG"
-        echo "'log' not set. Switching to defaults ..."
-        set_config "log" "$LOG"
+        set_config "log" "$LOG" > /dev/null
     fi
-
-    #~ echo "Setting config file ... OK"
-
-    #~ echo "Config file"
-    #~ echo "-----------"
-    #~ echo "'splashscreen_path'   = '$SPLASH_PATH'"
-    #~ echo "'text_color'          = '$TEXT_COLOR'"
-    #~ echo "'boot_script'         = '$BOOT_SCRIPT'"
-    #~ echo "'log'                 = '$LOG'"
 }
 
 
@@ -257,9 +238,10 @@ function edit_config() {
         config_file="$(dialog \
                     --backtitle "$SCRIPT_TILE" \
                     --title "Config file" \
+                    --ok-label "Save" \
+                    --cancel-label "Back" \
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
-        local result_value
-        result_value="$?"
+        local result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
             echo "$config_file" > "$SCRIPT_CFG" \
             && dialog \
@@ -554,6 +536,7 @@ function validate_splash() {
 
 function validate_color() {
     [[ -z "$1" ]] && return 0
+    
     if convert -list color | grep -q "^$1\b"; then
         return 0
     else
