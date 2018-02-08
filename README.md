@@ -105,7 +105,7 @@ Add new **Fun Facts!**.
 
 #### Options
 
-* `text`: New Fun Fact! text.
+* `text`: **Fun Fact!** text.
 
 #### Example
 
