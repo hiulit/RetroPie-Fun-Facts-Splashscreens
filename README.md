@@ -41,6 +41,7 @@ Use '--help' to see all the options.
 * `--enable-boot`: Enable script at boot.
 * `--disable-boot`: Disable script at boot.
 * `--gui`: Start GUI.
+* `--edit-config`: Edit config file.
 * `--reset-config`: Reset config file.
 * `--update`: Update script.
 * `--version`: Show script version.
@@ -49,7 +50,7 @@ Use '--help' to see all the options.
 
 If `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log` are not set, the script takes the defaults:
 
-* `splashscreen_path`: `[SCRIPT_DIR]/retropie-default.png`
+* `splashscreen_path`: `<SCRIPT_DIR>/retropie-default.png`
 * `text_color`: `white`
 * `boot_script`: `false`
 * `log`: `false`
@@ -290,10 +291,10 @@ sudo ./fun-facts-splashscreens.sh --disable-log
 
 ## Config file
 
-When using `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the command line or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
+When using `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the terminal or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
 
 ```
-# Settings for Fun Facts Splashscreens.
+# Fun Facts! Splashscreens Settings.
 
 # Set splashscreen path
 #
