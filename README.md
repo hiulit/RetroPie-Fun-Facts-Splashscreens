@@ -179,36 +179,52 @@ It lets you perform all the functions, but in a more friendly manner.
 sudo ./fun-facts-splashscreens.sh --gui
 ```
 
-##### Set splashscreen path (`--splash-path`)
+**Set splashscreen path (`--splash-path [options]`)**
 ![Fun Facts! Splashscreens GUI - 01](gui-examples/fun-facts-splashscreens-gui-01.jpg)
-##### Enter path to splashscreen
+**Enter splashscreen path**
 ![Fun Facts! Splashscreens GUI - 02](gui-examples/fun-facts-splashscreens-gui-02.jpg)
-##### Set text color (`--text-color`)
+**Set text color (`--text-color [options]`)**
 ![Fun Facts! Splashscreens GUI - 03](gui-examples/fun-facts-splashscreens-gui-03.jpg)
-##### Choose a color
+**Basic colors**
 ![Fun Facts! Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
-##### Add new Fun Facts!
-![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
-##### Remove Fun Facts!
-![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
-##### Create a new Fun Facts! Splashscreen (`--create-fun-fact`)
+**Choose a color**
 ![Fun Facts! Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
-##### Apply the Fun Facts! Splashscreen (`--apply-splash`)
+**Full list of colors**
 ![Fun Facts! Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
-##### Enable at boot (`--enable-boot`)
+**Choose a color**
 ![Fun Facts! Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
-##### Disable at boot (`--disable-boot`)
+**Add a new Fun Fact! (`--add-fun-fact [options]`)**
 ![Fun Facts! Splashscreens GUI - 08](gui-examples/fun-facts-splashscreens-gui-08.jpg)
-##### Edit config file
-![Fun Facts Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
-##### Reset config file
-![Fun Facts Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
-##### Update script (`--update`)
+**Enter a new Fun Fact!**
 ![Fun Facts! Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
-##### Enable logging (`--enable-log`)
-![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
-##### Disable logging (`--disable-log`)
-![Fun Facts! Splashscreens GUI -](gui-examples/fun-facts-splashscreens-gui-.jpg)
+**Remove Fun Facts! (`--remove-fun-fact`)**
+![Fun Facts! Splashscreens GUI - 10](gui-examples/fun-facts-splashscreens-gui-10.jpg)
+**Choose a Fun Fact! to remove**
+![Fun Facts! Splashscreens GUI - 11](gui-examples/fun-facts-splashscreens-gui-11.jpg)
+**Create a new Fun Facts! Splashscreen (`--create-fun-fact`)**
+![Fun Facts! Splashscreens GUI - 12](gui-examples/fun-facts-splashscreens-gui-12.jpg)
+**Apply the Fun Facts! Splashscreen (`--apply-splash`)**
+![Fun Facts! Splashscreens GUI - 13](gui-examples/fun-facts-splashscreens-gui-13.jpg)
+**Apply the Fun Facts! Splashscreen (already applied)**
+![Fun Facts! Splashscreens GUI - 14](gui-examples/fun-facts-splashscreens-gui-14.jpg)
+**Enable script at boot (`--enable-boot`)**
+![Fun Facts! Splashscreens GUI - 15](gui-examples/fun-facts-splashscreens-gui-15.jpg)
+**Disable script at boot (`--disable-boot`)**
+![Fun Facts! Splashscreens GUI - 16](gui-examples/fun-facts-splashscreens-gui-16.jpg)
+**Edit config file (`--edit-config`)**
+![Fun Facts Splashscreens GUI - 17](gui-examples/fun-facts-splashscreens-gui-17.jpg)
+**Text editor**
+![Fun Facts Splashscreens GUI - 18](gui-examples/fun-facts-splashscreens-gui-18.jpg)
+**Reset config file (`--reset-config`)**
+![Fun Facts Splashscreens GUI - 19](gui-examples/fun-facts-splashscreens-gui-19.jpg)
+**Update script (up to date) (`--update`)**
+![Fun Facts! Splashscreens GUI - 20](gui-examples/fun-facts-splashscreens-gui-20.jpg)
+**Update script (there are updates)**
+![Fun Facts! Splashscreens GUI - 21](gui-examples/fun-facts-splashscreens-gui-21.jpg)
+**Enable logging (`--enable-log`)**
+![Fun Facts! Splashscreens GUI - 22](gui-examples/fun-facts-splashscreens-gui-22.jpg)
+**Disable logging (`--disable-log`)**
+![Fun Facts! Splashscreens GUI - 23](gui-examples/fun-facts-splashscreens-gui-23.jpg)
 
 ### `--edit-config`
 
