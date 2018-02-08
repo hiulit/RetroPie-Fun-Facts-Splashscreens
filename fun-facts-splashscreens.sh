@@ -2,7 +2,7 @@
 # fun-facts-splashscreens.sh
 #
 # Fun Facts! Splashscreens for RetroPie.
-# A tool for RetroPie to create splashscreens with random video game related fun facts.
+# A tool for RetroPie to generate splashscreens with random video game related Fun Facts!.
 #
 # Author: hiulit
 # Repository: https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens
@@ -33,7 +33,7 @@ readonly SCRIPT_NAME="$(basename "$0")"
 readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
 readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! Splashscreens for RetroPie"
-readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
+readonly SCRIPT_DESCRIPTION="A tool for RetroPie to generate splashscreens with random video game related Fun Facts!."
 readonly SCRIPTMODULE_DIR="/opt/retropie/supplementary/fun-facts-splashscreens"
 
 
@@ -170,7 +170,7 @@ function check_default_files() {
     fi
 
     if [[ ! -f "$FUN_FACTS_TXT" ]]; then
-        if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then       
+        if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then
             chown -R "$user":"$user" "$FUN_FACTS_TXT"
         else
             log "ERROR: Can't download Fun Facts! text file."
@@ -257,7 +257,7 @@ function edit_config() {
 
 
 function reset_config() {
-    while read line; do 
+    while read line; do
         set_config "$line" ""
     done < <(grep -Po ".*?(?=\ = )" "$SCRIPT_CFG")
 }
@@ -537,7 +537,7 @@ function validate_splash() {
 
 function validate_color() {
     [[ -z "$1" ]] && return 0
-    
+
     if convert -list color | grep -q "^$1\b"; then
         return 0
     else
@@ -627,7 +627,7 @@ function gui() {
             check_updates
             option_updates="Update script ($updates_output)"
         fi
-        
+
         check_log="$(get_config "log")"
 
         options=(
@@ -645,14 +645,14 @@ function gui() {
         )
 
         menu_items="${#options[@]}"
-        
+
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
             menu_text="Version: $version"
         else
             last_commit="$(get_last_commit)"
             menu_text="Version: $version\nLast commit: $last_commit"
         fi
-        
+
         cmd=(dialog \
             --backtitle "$DIALOG_BACKTITLE" \
             --title "Fun Facts! Splashscreens" \
@@ -956,7 +956,7 @@ function gui() {
                                 text+="\n -> Manage experimental packages"
                                 text+="\n -> fun-facts-splashscreens"
                                 text+="\n -> Update from source"
-                                 
+
                         dialog \
                             --backtitle "$DIALOG_BACKTITLE" \
                             --title "Info" \
@@ -992,9 +992,9 @@ function get_options() {
         usage
         exit 0
     fi
-    
+
     OPTION="$1"
-    
+
     while [[ -n "$1" ]]; do
         case "$1" in
 #H --help                                   Print the help message and exit.
@@ -1112,26 +1112,26 @@ function main() {
         usage
         exit 1
     fi
-        
+
     if ! is_retropie; then
         log "ERROR: RetroPie is not installed. Aborting ..."
         exit 1
     fi
 
     check_dependencies
-    
+
     check_log="$(get_config "log")"
     if [[ "$check_log" == "" ]]; then
         LOG="true"
     fi
-    
+
     check_boot="$(get_config "boot_script")"
     if [[ "$check_boot" == "false" || "$check_boot" == "" ]]; then
         disable_boot_script
     elif [[ "$check_boot" == "true" ]]; then
         enable_boot_script
     fi
-    
+
     check_default_files
 
     mkdir -p "$RP_DIR/splashscreens"
