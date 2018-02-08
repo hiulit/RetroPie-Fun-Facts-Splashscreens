@@ -56,6 +56,7 @@ readonly DIALOG_CANCEL=1
 readonly DIALOG_ESC=255
 readonly DIALOG_HEIGHT=20
 readonly DIALOG_WIDTH=60
+readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 
 # Flags
 GUI_FLAG=0
@@ -236,7 +237,7 @@ function edit_config() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         local config_file
         config_file="$(dialog \
-                    --backtitle "$SCRIPT_TILE" \
+                    --backtitle "$DIALOG_BACKTITLE" \
                     --title "Config file" \
                     --ok-label "Save" \
                     --cancel-label "Back" \
@@ -245,7 +246,7 @@ function edit_config() {
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
             echo "$config_file" > "$SCRIPT_CFG" \
             && dialog \
-                    --backtitle "$SCRIPT_TITLE" \
+                    --backtitle "$DIALOG_BACKTITLE" \
                     --title "Info" \
                     --msgbox "Config file updated." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         fi
@@ -307,7 +308,7 @@ function check_apply_splash() {
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             log "$error_message" > /dev/null
             dialog \
-                --backtitle "$SCRIPT_TITLE" \
+                --backtitle "$DIALOG_BACKTITLE" \
                 --title "Error!" \
                 --msgbox "$error_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
             return 1
@@ -330,7 +331,7 @@ function apply_splash() {
             local info_message="Fun Facts! splashscreen is already applied."
             if [[ "$GUI_FLAG" -eq 1 ]]; then
                 dialog \
-                    --backtitle "$SCRIPT_TITLE" \
+                    --backtitle "$DIALOG_BACKTITLE" \
                     --title "Info" \
                     --msgbox "$info_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
             else
@@ -341,7 +342,7 @@ function apply_splash() {
             local success_message="Fun Facts! splashscreen applied succesfully!"
             if [[ "$GUI_FLAG" -eq 1 ]]; then
                 dialog \
-                    --backtitle "$SCRIPT_TITLE" \
+                    --backtitle "$DIALOG_BACKTITLE" \
                     --title "Success!" \
                     --msgbox "$success_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
             else
@@ -395,7 +396,7 @@ function create_fun_fact() {
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
-            --backtitle "$SCRIPT_TITLE" \
+            --backtitle "$DIALOG_BACKTITLE" \
             --infobox "Creating Fun Facts! splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
         echo "Creating Fun Facts! splashscreen ..."
@@ -412,7 +413,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$SCRIPT_TITLE" --title "Success!" --msgbox "Fun Facts! splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$DIALOG_BACKTITLE" --title "Success!" --msgbox "Fun Facts! splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
 }
 
 
@@ -653,7 +654,7 @@ function gui() {
         fi
         
         cmd=(dialog \
-            --backtitle "$SCRIPT_TITLE"
+            --backtitle "$DIALOG_BACKTITLE" \
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
             --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
@@ -666,7 +667,7 @@ function gui() {
                     CONFIG_FLAG=0
 
                     splash="$(dialog \
-                        --backtitle "$SCRIPT_TITLE" \
+                        --backtitle "$DIALOG_BACKTITLE" \
                         --title "Set splashscreen path" \
                         --cancel-label "Back" \
                         --inputbox "Enter path to splashscreen.\n\n(If input is left empty, default splashscreen will be used)" \
@@ -677,7 +678,7 @@ function gui() {
                         validation="$(validate_splash "$splash")"
                         if [[ -n "$validation" ]]; then
                             dialog \
-                                --backtitle "$SCRIPT_TITLE" \
+                                --backtitle "$DIALOG_BACKTITLE" \
                                 --title "Error!" \
                                 --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         else
@@ -688,7 +689,7 @@ function gui() {
                             fi
                             set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
                             dialog \
-                                --backtitle "$SCRIPT_TITLE" \
+                                --backtitle "$DIALOG_BACKTITLE" \
                                 --title "Success!" \
                                 --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
@@ -698,7 +699,7 @@ function gui() {
                     CONFIG_FLAG=0
 
                     cmd=(dialog \
-                        --backtitle "$SCRIPT_TITLE" \
+                        --backtitle "$DIALOG_BACKTITLE" \
                         --title "Set text color" \
                         --cancel-label "Back" \
                         --menu "Choose an option" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
@@ -743,7 +744,7 @@ function gui() {
                                 done
 
                                 cmd=(dialog \
-                                    --backtitle "$SCRIPT_TITLE" \
+                                    --backtitle "$DIALOG_BACKTITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
                                     --menu "Choose a color" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#color_list[@]}")
@@ -761,7 +762,7 @@ function gui() {
 
                                      if [[ -n "$validation" ]]; then
                                         dialog \
-                                            --backtitle "$SCRIPT_TITLE" \
+                                            --backtitle "$DIALOG_BACKTITLE" \
                                             --title "Error!" \
                                             --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     else
@@ -772,7 +773,7 @@ function gui() {
                                         fi
                                         set_config "text_color" "$TEXT_COLOR" > /dev/null
                                         dialog \
-                                            --backtitle "$SCRIPT_TITLE" \
+                                            --backtitle "$DIALOG_BACKTITLE" \
                                             --title "Success!" \
                                             --msgbox "Text color set to '$TEXT_COLOR'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     fi
@@ -793,7 +794,7 @@ function gui() {
                                 done
 
                                 cmd=(dialog \
-                                    --backtitle "$SCRIPT_TITLE" \
+                                    --backtitle "$DIALOG_BACKTITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
                                     --menu "Choose a color" 15 60 "${#color_list[@]}")
@@ -807,7 +808,7 @@ function gui() {
 
                                      if [[ -n "$validation" ]]; then
                                         dialog \
-                                            --backtitle "$SCRIPT_TITLE" \
+                                            --backtitle "$DIALOG_BACKTITLE" \
                                             --title "Error!" \
                                             --msgbox "$validation" 0 0 2>&1 >/dev/tty
                                     else
@@ -818,7 +819,7 @@ function gui() {
                                         fi
                                         set_config "text_color" "$TEXT_COLOR" > /dev/null
                                         dialog \
-                                            --backtitle "$SCRIPT_TITLE" \
+                                            --backtitle "$DIALOG_BACKTITLE" \
                                             --title "Success!" \
                                             --msgbox "Text color set to '$TEXT_COLOR'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     fi
@@ -829,7 +830,7 @@ function gui() {
                     ;;
                 3)
                     new_fun_fact="$(dialog \
-                        --backtitle "$SCRIPT_TITLE" \
+                        --backtitle "$DIALOG_BACKTITLE" \
                         --title "Add a new Fun Fact!" \
                         --cancel-label "Back" \
                         --inputbox "Enter a new Fun Fact!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
@@ -846,7 +847,7 @@ function gui() {
                         fi
                         if [[ -n "$validation" ]]; then
                             dialog \
-                                --backtitle "$SCRIPT_TITLE" \
+                                --backtitle "$DIALOG_BACKTITLE" \
                                 --title "$dialog_title" \
                                 --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
@@ -858,7 +859,7 @@ function gui() {
                         validation="$(is_fun_facts_empty)"
                         if [[ -n "$validation" ]]; then
                             dialog \
-                                --backtitle "$SCRIPT_TITLE" \
+                                --backtitle "$DIALOG_BACKTITLE" \
                                 --title "Error!" \
                                 --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         else
@@ -878,7 +879,7 @@ function gui() {
                             done
 
                             cmd=(dialog \
-                                --backtitle "$SCRIPT_TITLE" \
+                                --backtitle "$DIALOG_BACKTITLE" \
                                 --title "Remove a Fun Fact!" \
                                 --cancel-label "Back" \
                                 --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
@@ -890,7 +891,7 @@ function gui() {
                                 fun_fact="${options[$((choice*2-1))]}"
                                 remove_fun_fact "$fun_fact" \
                                 && dialog \
-                                    --backtitle "$SCRIPT_TITLE" \
+                                    --backtitle "$DIALOG_BACKTITLE" \
                                     --title "Success!" \
                                     --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                             else
@@ -904,7 +905,7 @@ function gui() {
                     validation="$(is_fun_facts_empty)"
                     if [[ -n "$validation" ]]; then
                         dialog \
-                            --backtitle "$SCRIPT_TITLE" \
+                            --backtitle "$DIALOG_BACKTITLE" \
                             --title "Error!" \
                             --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
@@ -937,7 +938,7 @@ function gui() {
                         fi
                     fi
                     dialog \
-                        --backtitle "$SCRIPT_TITLE" \
+                        --backtitle "$DIALOG_BACKTITLE" \
                         --title "$dialog_title" \
                         --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     ;;
@@ -957,7 +958,7 @@ function gui() {
                                 text+="\n -> Update from source"
                                  
                         dialog \
-                            --backtitle "$SCRIPT_TITLE" \
+                            --backtitle "$DIALOG_BACKTITLE" \
                             --title "Info" \
                             --msgbox "$text" 15 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
@@ -965,7 +966,7 @@ function gui() {
                             git pull && chown -R "$user":"$user" .
                         else
                             dialog \
-                                --backtitle "$SCRIPT_TITLE" \
+                                --backtitle "$DIALOG_BACKTITLE" \
                                 --title "Info" \
                                 --msgbox "Fun Facts! Splashscreens is $updates_output!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
