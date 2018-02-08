@@ -304,7 +304,7 @@ function check_apply_splash() {
     fi
     if [[ ! -f "$RESULT_SPLASH" ]]; then
         is_splash_applied && echo "" > "$SPLASH_LIST"
-        local error_message="Create a Fun Facts! splashscreen before applying it."
+        local error_message="Create a Fun Facts! Splashscreen before applying it."
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             log "$error_message" > /dev/null
             dialog \
@@ -328,7 +328,7 @@ function is_splash_applied() {
 function apply_splash() {
     if check_apply_splash; then
         if is_splash_applied; then
-            local info_message="Fun Facts! splashscreen is already applied."
+            local info_message="Fun Facts! Splashscreen is already applied."
             if [[ "$GUI_FLAG" -eq 1 ]]; then
                 dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
@@ -339,7 +339,7 @@ function apply_splash() {
             fi
        else
             echo "$RESULT_SPLASH" > "$SPLASH_LIST"
-            local success_message="Fun Facts! splashscreen applied succesfully!"
+            local success_message="Fun Facts! Splashscreen applied succesfully!"
             if [[ "$GUI_FLAG" -eq 1 ]]; then
                 dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
@@ -397,9 +397,9 @@ function create_fun_fact() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$DIALOG_BACKTITLE" \
-            --infobox "Creating Fun Facts! splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+            --infobox "Creating Fun Facts! Splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
-        echo "Creating Fun Facts! splashscreen ..."
+        echo "Creating Fun Facts! Splashscreen ..."
     fi
 
     convert "$splash" \
@@ -413,7 +413,7 @@ function create_fun_fact() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$DIALOG_BACKTITLE" --title "Success!" --msgbox "Fun Facts! splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! splashscreen successfully created!"
+    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$DIALOG_BACKTITLE" --title "Success!" --msgbox "Fun Facts! Splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! Splashscreen successfully created!"
 }
 
 
@@ -608,9 +608,9 @@ function gui() {
         version="$SCRIPT_VERSION"
 
         if is_splash_applied; then
-            option_apply_splash="Apply Fun Facts! splashscreen (already applied)"
+            option_apply_splash="Apply Fun Facts! Splashscreen (already applied)"
         else
-            option_apply_splash="Apply Fun Facts! splashscreen"
+            option_apply_splash="Apply Fun Facts! Splashscreen"
         fi
 
         check_boot_script
@@ -635,7 +635,7 @@ function gui() {
             2 "Set text color ($(get_config "text_color"))"
             3 "Add a new Fun Fact!"
             4 "Remove Fun Facts!"
-            5 "Create a new Fun Facts! splashscreen"
+            5 "Create a new Fun Facts! Splashscreen"
             6 "$option_apply_splash"
             7 "Enable/Disable script at boot ($option_boot)"
             8 "Edit config file"
@@ -1013,14 +1013,14 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-#H --splash-path [path/to/splashscreen]     Set the image to use as Fun Facts! splashscreen.
+#H --splash-path [path/to/splashscreen]     Set the image to use as Fun Facts! Splashscreen.
             --splash-path)
                 check_argument "$1" "$2" || exit 1
                 shift
                 validate_splash "$1" || exit 1
                 set_config "splashscreen_path" "$1"
                 ;;
-#H --text-color [color]                     Set the text color to use on the Fun Facts! splashscreen.
+#H --text-color [color]                     Set the text color to use on the Fun Facts! Splashscreen.
             --text-color)
                 check_argument "$1" "$2" || exit 1
                 shift
@@ -1037,13 +1037,13 @@ function get_options() {
             --remove-fun-fact)
                 remove_fun_fact
                 ;;
-#H --create-fun-fact                        Create a new Fun Facts! splashscreen.
+#H --create-fun-fact                        Create a new Fun Facts! Splashscreen.
             --create-fun-fact)
                 check_config #> /dev/null
                 is_fun_facts_empty
                 create_fun_fact
                 ;;
-#H --apply-splash                           Apply the Fun Facts! splashscreen.
+#H --apply-splash                           Apply the Fun Facts! Splashscreen.
             --apply-splash)
                 apply_splash
                 ;;
