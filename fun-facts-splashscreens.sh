@@ -429,8 +429,28 @@ function create_fun_fact() {
         -gravity south \
         -geometry +0+25 \
         -composite \
-        "$RESULT_SPLASH" \
-    && [[ "$GUI_FLAG" -eq 1 ]] && dialog --backtitle "$DIALOG_BACKTITLE" --title "Success!" --msgbox "Fun Facts! Splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty || echo "Fun Facts! Splashscreen successfully created!"
+        "$RESULT_SPLASH"
+    
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            dialog \
+                --backtitle "$DIALOG_BACKTITLE" \
+                --title "Success!" \
+                --msgbox "Fun Facts! Splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+        else
+            echo "Fun Facts! Splashscreen successfully created!"
+        fi
+    else
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            dialog \
+                --backtitle "$DIALOG_BACKTITLE" \
+                --title "Error!" \
+                --msgbox "Fun Facts! Splashscreen failed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+        else
+            echo "Fun Facts! Splashscreen failed!"
+        fi
+    fi
 }
 
 
