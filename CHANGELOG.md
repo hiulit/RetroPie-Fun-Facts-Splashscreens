@@ -18,6 +18,7 @@
 * Added `--reset-config` option to reset the config file.
 * Added `--enable-log` option to enable logging.
 * Added `--disable-log` option to disable logging.
+* Added `--restore-defaults` option to restore default files (splashscreen, config file and **Fun Facts!**).
 * Added functionality to download the **Fun Facts! Splashscreens** default splashscreen if it doesn't exist.
 * Added functionality to download the **Fun Facts! Splashscreens** config file if it doesn't exist.
 * Added functionality to download the  **Fun Facts! Splashscreens** text file if it doesn't exist.
