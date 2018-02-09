@@ -2,7 +2,7 @@
 # fun-facts-splashscreens.sh
 #
 # Fun Facts! Splashscreens for RetroPie.
-# A tool for RetroPie to generate splashscreens with random video game related Fun Facts!.
+# A tool for RetroPie to create splashscreens with random video game related fun facts.
 #
 # Author: hiulit
 # Repository: https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens
@@ -27,13 +27,13 @@ readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
 readonly DEPENDENCIES=("imagemagick")
 
-readonly SCRIPT_VERSION="1.5.0"
+readonly SCRIPT_VERSION="2.0.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
 readonly SCRIPT_FULL="$SCRIPT_DIR/$SCRIPT_NAME"
 readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! Splashscreens for RetroPie"
-readonly SCRIPT_DESCRIPTION="A tool for RetroPie to generate splashscreens with random video game related Fun Facts!."
+readonly SCRIPT_DESCRIPTION="A tool for RetroPie to create splashscreens with random video game related fun facts."
 readonly SCRIPTMODULE_DIR="/opt/retropie/supplementary/fun-facts-splashscreens"
 
 
@@ -170,7 +170,7 @@ function check_default_files() {
     fi
 
     if [[ ! -f "$FUN_FACTS_TXT" ]]; then
-        if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then
+        if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then       
             chown -R "$user":"$user" "$FUN_FACTS_TXT"
         else
             log "ERROR: Can't download Fun Facts! text file."
@@ -257,7 +257,7 @@ function edit_config() {
 
 
 function reset_config() {
-    while read line; do
+    while read line; do 
         set_config "$line" ""
     done < <(grep -Po ".*?(?=\ = )" "$SCRIPT_CFG")
 }
@@ -537,7 +537,7 @@ function validate_splash() {
 
 function validate_color() {
     [[ -z "$1" ]] && return 0
-
+    
     if convert -list color | grep -q "^$1\b"; then
         return 0
     else
@@ -627,8 +627,13 @@ function gui() {
             check_updates
             option_updates="Update script ($updates_output)"
         fi
-
+        
         check_log="$(get_config "log")"
+        if [[ "$check_log" == "false" || "$check_log" == "" ]]; then
+            option_log="disabled"
+        elif [[ "$check_log" == "true" ]]; then
+            option_log="enabled"
+        fi
 
         options=(
             1 "Set splashscreen path ($(get_config "splashscreen_path"))"
@@ -641,18 +646,18 @@ function gui() {
             8 "Edit config file"
             9 "Reset config file"
             10 "$option_updates"
-            11 "Enable/Disable logging ($check_log)"
+            11 "Enable/Disable logging ($option_log)"
         )
 
         menu_items="${#options[@]}"
-
+        
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
             menu_text="Version: $version"
         else
             last_commit="$(get_last_commit)"
             menu_text="Version: $version\nLast commit: $last_commit"
         fi
-
+        
         cmd=(dialog \
             --backtitle "$DIALOG_BACKTITLE" \
             --title "Fun Facts! Splashscreens" \
@@ -670,7 +675,7 @@ function gui() {
                         --backtitle "$DIALOG_BACKTITLE" \
                         --title "Set splashscreen path" \
                         --cancel-label "Back" \
-                        --inputbox "Enter path to splashscreen.\n\n(If input is left empty, default splashscreen will be used)" \
+                        --inputbox "Enter splashscreen path.\n\n(If input is left empty, default splashscreen will be used)" \
                             12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
 
                     result_value="$?"
@@ -797,7 +802,7 @@ function gui() {
                                     --backtitle "$DIALOG_BACKTITLE" \
                                     --title "Set text color" \
                                     --cancel-label "Back" \
-                                    --menu "Choose a color" 15 60 "${#color_list[@]}")
+                                    --menu "Choose a color" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#color_list[@]}")
 
                                 choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                                 result_value="$?"
@@ -810,7 +815,7 @@ function gui() {
                                         dialog \
                                             --backtitle "$DIALOG_BACKTITLE" \
                                             --title "Error!" \
-                                            --msgbox "$validation" 0 0 2>&1 >/dev/tty
+                                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                                     else
                                         if [[ -z "$color" ]]; then
                                             TEXT_COLOR="$DEFAULT_COLOR"
@@ -837,19 +842,26 @@ function gui() {
 
                     result_value="$?"
                     if [[ "$result_value" == "$DIALOG_OK" ]]; then
-                        local validation
-                        validation="$(add_fun_fact "$new_fun_fact")"
-                        return_value="$?"
-                        if [[ "$return_value" -eq 0 ]]; then
-                            dialog_title="Success!"
-                        else
-                            dialog_title="Error!"
-                        fi
-                        if [[ -n "$validation" ]]; then
+                        if [[ -z "$new_fun_fact" ]]; then
                             dialog \
                                 --backtitle "$DIALOG_BACKTITLE" \
-                                --title "$dialog_title" \
-                                --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                                --title "Error!" \
+                                --msgbox "You must enter a Fun Fact!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        else
+                            local validation
+                            validation="$(add_fun_fact "$new_fun_fact")"
+                            return_value="$?"
+                            if [[ "$return_value" -eq 0 ]]; then
+                                dialog_title="Success!"
+                            else
+                                dialog_title="Error!"
+                            fi
+                            if [[ -n "$validation" ]]; then
+                                dialog \
+                                    --backtitle "$DIALOG_BACKTITLE" \
+                                    --title "$dialog_title" \
+                                    --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                            fi
                         fi
                     fi
                     ;;
@@ -889,11 +901,18 @@ function gui() {
                             if [[ -n "$choice" ]]; then
                                 local fun_fact
                                 fun_fact="${options[$((choice*2-1))]}"
-                                remove_fun_fact "$fun_fact" \
-                                && dialog \
-                                    --backtitle "$DIALOG_BACKTITLE" \
-                                    --title "Success!" \
-                                    --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                                if [[ -z "$fun_fact" ]]; then
+                                    dialog \
+                                        --backtitle "$DIALOG_BACKTITLE" \
+                                        --title "Error!" \
+                                        --msgbox "Can't remove a ghost Fun Fact!.\nTry removing it manually from '$FUN_FACTS_TXT'." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                                else
+                                    remove_fun_fact "$fun_fact" \
+                                    && dialog \
+                                        --backtitle "$DIALOG_BACKTITLE" \
+                                        --title "Success!" \
+                                        --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                                fi
                             else
                                 break
                             fi
@@ -921,26 +940,26 @@ function gui() {
                     if [[ "$return_value" -eq 0 ]]; then
                         if disable_boot_script; then
                             set_config "boot_script" "false" > /dev/null
-                            local output="Script DISABLED at boot."
-                            local dialog_title="Success!"
                          else
                             local output="Failed to DISABLE script at boot."
                             local dialog_title="Error!"
+                            dialog \
+                                --backtitle "$DIALOG_BACKTITLE" \
+                                --title "$dialog_title" \
+                                --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     else
                         if enable_boot_script; then
                             set_config "boot_script" "true" > /dev/null
-                            local output="Script ENABLED at boot."
-                            local dialog_title="Success!"
                          else
-                            local output="Failed to ENABLE script at boot."
+                            local output="Failed to DISABLE script at boot."
                             local dialog_title="Error!"
+                            dialog \
+                                --backtitle "$DIALOG_BACKTITLE" \
+                                --title "$dialog_title" \
+                                --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         fi
                     fi
-                    dialog \
-                        --backtitle "$DIALOG_BACKTITLE" \
-                        --title "$dialog_title" \
-                        --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     ;;
                 8)
                     edit_config
@@ -956,7 +975,7 @@ function gui() {
                                 text+="\n -> Manage experimental packages"
                                 text+="\n -> fun-facts-splashscreens"
                                 text+="\n -> Update from source"
-
+                                 
                         dialog \
                             --backtitle "$DIALOG_BACKTITLE" \
                             --title "Info" \
@@ -974,9 +993,9 @@ function gui() {
                     ;;
                 11)
                     if [[ "$check_log" == "false" ]]; then
-                        set_config "log" "true"
+                        set_config "log" "true" > /dev/null
                     else
-                        set_config "log" "false"
+                        set_config "log" "false" >  /dev/null
                     fi
                     ;;
             esac
@@ -992,9 +1011,9 @@ function get_options() {
         usage
         exit 0
     fi
-
+    
     OPTION="$1"
-
+    
     while [[ -n "$1" ]]; do
         case "$1" in
 #H --help                                   Print the help message and exit.
@@ -1112,26 +1131,26 @@ function main() {
         usage
         exit 1
     fi
-
+        
     if ! is_retropie; then
         log "ERROR: RetroPie is not installed. Aborting ..."
         exit 1
     fi
 
     check_dependencies
-
+    
     check_log="$(get_config "log")"
     if [[ "$check_log" == "" ]]; then
         LOG="true"
     fi
-
+    
     check_boot="$(get_config "boot_script")"
     if [[ "$check_boot" == "false" || "$check_boot" == "" ]]; then
         disable_boot_script
     elif [[ "$check_boot" == "true" ]]; then
         enable_boot_script
     fi
-
+    
     check_default_files
 
     mkdir -p "$RP_DIR/splashscreens"
