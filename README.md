@@ -47,10 +47,11 @@ Use '--help' to see all the options.
 * `--version`: Show script version.
 * `--enable-log`: Enable logging.
 * `--disable-log`: Disable logging.
+* `--restore-defaults`: Restore default files.
 
 If `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log` are not set, the script takes the defaults:
 
-* `splashscreen_path`: `<SCRIPT_DIR>/retropie-default.png`
+* `splashscreen_path`: `./retropie-default.png`
 * `text_color`: `white`
 * `boot_script`: `false`
 * `log`: `false`
@@ -227,6 +228,8 @@ sudo ./fun-facts-splashscreens.sh --gui
 ![Fun Facts! Splashscreens GUI - 22](gui-examples/fun-facts-splashscreens-gui-22.jpg)
 #### Disable logging (`--disable-log`)
 ![Fun Facts! Splashscreens GUI - 23](gui-examples/fun-facts-splashscreens-gui-23.jpg)
+#### Restore default files (`--restore-defaults`)
+![Fun Facts! Splashscreens GUI - 24](gui-examples/fun-facts-splashscreens-gui-24.jpg)
 
 ### `--edit-config`
 
@@ -305,6 +308,20 @@ Disable logging.
 
 ```
 sudo ./fun-facts-splashscreens.sh --disable-log
+```
+
+#### `--restore-defaults`
+
+Restore default files.
+
+* `./retropie-default.png` (default splashscreen)
+* `./fun-facts-splashscreens-settings.cfg` (default config file)
+* `./fun-facts.txt` (default **Fun Facts!**)
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --restore-defaults
 ```
 
 ## Config file
