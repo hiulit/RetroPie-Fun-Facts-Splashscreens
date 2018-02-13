@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Up to date
+
+## v2.0.0 (February 12th 2018)
+
 ### Fixed
 
 * Fixed `check_dependencies`.
