@@ -22,6 +22,7 @@ home="$(find /home -type d -name RetroPie -print -quit 2> /dev/null)"
 home="${home%/RetroPie}"
 
 readonly RP_DIR="$home/RetroPie"
+readonly RP_CONFIG_DIR="/opt/retropie/configs"
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
@@ -402,6 +403,21 @@ function get_font() {
 
 
 function create_fun_fact() {
+    if [[ -z "$1" ]]; then
+        local result_splash="$RESULT_SPLASH"
+    else
+        local system="$1"
+        if [[ "$system" == "all" ]]; then
+            local system_dir
+            for system_dir in "$RP_CONFIG_DIR/"*; do
+                system_dir="$(basename "$system_dir")"
+                [[ "$system_dir" != "all" ]] && create_fun_fact "$system_dir"
+            done
+            exit
+        else
+            local result_splash="$RP_CONFIG_DIR/$system/launching.png"
+        fi
+    fi
     local splash
     splash="$(get_config "splashscreen_path")"
     local color
@@ -416,7 +432,11 @@ function create_fun_fact() {
             --backtitle "$DIALOG_BACKTITLE" \
             --infobox "Creating Fun Facts! Splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
-        echo "Creating Fun Facts! Splashscreen ..."
+        if [[ -z "$1" ]]; then
+            echo "Creating Fun Facts! Splashscreen ..."
+        else
+            echo "Creating Fun Facts! Splashscreen for '$1' ..."
+        fi
     fi
 
     convert "$splash" \
@@ -429,7 +449,7 @@ function create_fun_fact() {
         -gravity south \
         -geometry +0+25 \
         -composite \
-        "$RESULT_SPLASH"
+        "$result_splash"
     
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
@@ -439,7 +459,11 @@ function create_fun_fact() {
                 --title "Success!" \
                 --msgbox "Fun Facts! Splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         else
-            echo "Fun Facts! Splashscreen successfully created!"
+            if [[ -z "$1" ]]; then
+                echo "Fun Facts! Splashscreen successfully created!"
+            else
+                echo "Fun Facts! Splashscreen for '$1' successfully created!"
+            fi
         fi
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
@@ -448,7 +472,11 @@ function create_fun_fact() {
                 --title "Error!" \
                 --msgbox "Fun Facts! Splashscreen failed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         else
-            echo "Fun Facts! Splashscreen failed!"
+            if [[ -z "$1" ]]; then
+                echo "Fun Facts! Splashscreen failed!"
+            else
+                echo "Fun Facts! Splashscreen for '$1' failed!"
+            fi
         fi
     fi
 }
@@ -1117,7 +1145,12 @@ function get_options() {
             --create-fun-fact)
                 check_config #> /dev/null
                 is_fun_facts_empty
-                create_fun_fact
+                if [[ -z "$2" ]]; then
+                    create_fun_fact
+                else
+                    shift
+                    create_fun_fact "$1"
+                fi
                 ;;
 #H --apply-splash                           Apply the Fun Facts! Splashscreen.
             --apply-splash)
