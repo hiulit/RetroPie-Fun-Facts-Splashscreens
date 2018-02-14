@@ -48,6 +48,7 @@ readonly LOG_FILE="$SCRIPT_DIR/fun-facts-splashscreens.log"
 # Defaults
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_COLOR="white"
+readonly DEFAULT_BG_COLOR="black"
 readonly DEFAULT_BOOT_SCRIPT="false"
 readonly DEFAULT_LOG="false"
 
@@ -66,6 +67,7 @@ CONFIG_FLAG=0
 # Global variables
 SPLASH_PATH=
 TEXT_COLOR=
+BG_COLOR=
 BOOT_SCRIPT=
 LOG=
 OPTION=
@@ -221,11 +223,13 @@ function check_config() {
 
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
+    BG_COLOR="$(get_config "bg_color")"
     BOOT_SCRIPT="$(get_config "boot_script")"
     LOG="$(get_config "log")"
 
     validate_splash "$SPLASH_PATH" || exit 1
     validate_color "$TEXT_COLOR" || exit 1
+    validate_color "$BG_COLOR" || exit 1
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
     validate_true_false "log" "$LOG" || exit 1
 
@@ -237,6 +241,11 @@ function check_config() {
     if [[ -z "$TEXT_COLOR" ]]; then
         TEXT_COLOR="$DEFAULT_COLOR"
         set_config "text_color" "$TEXT_COLOR" > /dev/null
+    fi
+    
+    if [[ -z "$BG_COLOR" ]]; then
+        BG_COLOR="$DEFAULT_BG_COLOR"
+        set_config "bg_color" "$BG_COLOR" > /dev/null
     fi
 
     if [[ -z "$BOOT_SCRIPT" ]]; then
