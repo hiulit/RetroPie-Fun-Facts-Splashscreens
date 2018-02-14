@@ -34,6 +34,7 @@ Use '--help' to see all the options.
 * `--help`: Print the help message and exit.
 * `--splash-path [OPTIONS]`: Set the image to use as **Fun Facts! Splashscreen**.
 * `--text-color [OPTIONS]`: Set the text color to use on the **Fun Facts! Splashscreen**.
+* `--bg-color [OPTIONS]`: Set the background color to use on the **Fun Facts! Splashscreen**.
 * `--add-fun-fact [OPTIONS]`: Add new **Fun Facts!**.
 * `--remove-fun-fact`: Remove **Fun Facts!**.
 * `--create-fun-fact`: Create a new **Fun Facts! Splashscreen**.
@@ -49,7 +50,7 @@ Use '--help' to see all the options.
 * `--disable-log`: Disable logging.
 * `--restore-defaults`: Restore default files.
 
-If `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log` are not set, the script takes the defaults:
+If `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log` are not set, the script takes the defaults:
 
 * `splashscreen_path`: `./retropie-default.png`
 * `text_color`: `white`
@@ -97,7 +98,21 @@ Set the text color to use on the **Fun Facts! Splashscreen**.
 #### Example
 
 ```
-sudo ./fun-facts-splashscreens.sh --text-color "black"
+sudo ./fun-facts-splashscreens.sh --text-color "white"
+```
+
+### `--bg-color [OPTIONS]`
+
+Set the background color to use on the **Fun Facts! Splashscreen**.
+
+#### Options
+
+* `color`: Background color of the **Fun Facts! Splashscreen**.
+
+#### Example
+
+```
+sudo ./fun-facts-splashscreens.sh --bg-color "black"
 ```
 
 ### `--add-fun-fact [OPTIONS]`
@@ -326,7 +341,7 @@ sudo ./fun-facts-splashscreens.sh --restore-defaults
 
 ## Config file
 
-When using `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the terminal or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
+When using `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the terminal or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
 
 ```
 # Fun Facts! Splashscreens Settings.
@@ -346,6 +361,9 @@ splashscreen_path = ""
 # TIP: run the 'convert -list color' command to get a full list.
 text_color = ""
 
+# Set background color
+bg_color = ""
+
 # Enable/disable script at boot
 #
 # Boolean: true/false.
@@ -357,7 +375,7 @@ boot_script = ""
 log = ""
 ```
 
-You can edit this file directly instead of using `--splash-path`, `--text-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`.
+You can edit this file directly instead of using `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`.
 
 ## Add a new Fun Fact!
 
