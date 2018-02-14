@@ -1140,6 +1140,13 @@ function get_options() {
                 validate_color "$1" || exit 1
                 set_config "text_color" "$1"
                 ;;
+#H --bg-color [color]                       Set the background color to use on the Fun Facts! Splashscreen.
+            --bg-color)
+                check_argument "$1" "$2" || exit 1
+                shift
+                validate_color "$1" || exit 1
+                set_config "bg_color" "$1"
+                ;;
 #H --add-fun-fact [text]                    Add new Fun Facts!.
             --add-fun-fact)
                 check_argument "$1" "$2" || exit 1
