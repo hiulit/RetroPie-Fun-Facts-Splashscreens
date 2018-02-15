@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-* Up to date
+### Fixed
+
+* Refixed `check_dependencies`.
+
+### Added
+
+* New dependency `librsvg2-bin`.
 
 ## v2.0.0 (February 12th 2018)
 
