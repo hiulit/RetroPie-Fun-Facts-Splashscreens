@@ -26,7 +26,7 @@ readonly RP_CONFIG_DIR="/opt/retropie/configs"
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
-readonly DEPENDENCIES=("imagemagick")
+readonly DEPENDENCIES=("imagemagick" "librsvg2-bin")
 
 readonly SCRIPT_VERSION="2.0.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -114,7 +114,7 @@ function log() {
 function check_dependencies() {
     local pkg
     for pkg in "${DEPENDENCIES[@]}";do
-        if ! dpkg-query -W -f='${Status}' "$pkg" | grep -qwo "installed"; then
+        if ! dpkg-query -W -f='${Status}' "$pkg" | awk '{print $3}' | grep -q "^installed$"; then
         #~ if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
             log "ERROR: The '$pkg' package is not installed!"
             echo "Would you like to install it now?"
@@ -411,8 +411,33 @@ function get_font() {
 }
 
 
+function get_screen_resolution_x() {
+    xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $3}'
+}
+
+
+function get_screen_resolution_y() {
+    xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $4}'
+}
+
+
 function create_fun_fact() {
+    local splash
+    splash="$(get_config "splashscreen_path")"
+    local text_color
+    text_color="$(get_config "text_color")"
+    local bg_color
+    bg_color="$(get_config "bg_color")"
+    local font
+    font="$(get_font)"
+    local theme
+    theme="$(get_current_theme)"
+    local random_fact
+    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    
+    : '
     if [[ -z "$1" ]]; then
+        bg_color="none"
         local result_splash="$RESULT_SPLASH"
     else
         local system="$1"
@@ -425,16 +450,106 @@ function create_fun_fact() {
             exit
         else
             local result_splash="$RP_CONFIG_DIR/$system/launching.png"
+            local splash_w=480
+            local splash_h=270
+            local screen_w
+            screen_w="$(get_screen_resolution_x)"
+            local screen_h
+            screen_h="$(get_screen_resolution_y)"
+            local system_image_h
+            #~ system_image_h="$(identify -format "%h" "$ES_THEMES_DIR/$theme/$system/console.png")"
+            local system_image_w
+            #~ system_image_w="$(identify -format "%w" "$ES_THEMES_DIR/$theme/$system/console.png")"
+            
+            TMP_DIR="$home/tmp"
+            mkdir -p "$TMP_DIR"
+            
+            # TODO: If box art exists -> logo UP, boxart CENTER, fun fact BOTTOM, button text BOTTOM BOTTOM :P
+            # else -> logo CENTER, fun fact BOTTOM, button text BOTTOM BOTTOM :P
+            
+            function IM_add_background() {
+                convert -size "$screen_w"x"$screen_h" xc:"$bg_color" \
+                    "$TMP_DIR/launching.png"
+            }
+            function IM_convert_svg_to_png() {
+                convert -background none \
+                    -gravity center \
+                    -resize "$(((screen_w*60/100)))"x"$(((screen_h*20/100)))" \
+                    "$ES_THEMES_DIR/$theme/$system/art/system.svg" "$TMP_DIR/$system.png"
+            }
+            function IM_add_logo() {
+                IM_convert_svg_to_png
+                convert "$TMP_DIR/launching.png" \
+                    "$TMP_DIR/$system.png" \
+                    -gravity north \
+                    -geometry +0+"$(((screen_h*5/100)))" \
+                    -composite \
+                    "$TMP_DIR/launching.png"
+            }
+            function IM_add_boxart() {
+                # TODO: Check if boxart exists
+                convert "$TMP_DIR/launching.png" \
+                    \( "/home/pi/RetroPie/roms/megadrive/images/Earthworm Jim-image.jpg" -resize x"$(((screen_h*35/100)))" \) \
+                    -gravity center \
+                    -geometry +0-+"$(((screen_h*(5/2)/100)))" \
+                    -composite \
+                    "$TMP_DIR/launching.png"
+            }
+            function IM_add_fun_fact() {
+                convert "$TMP_DIR/launching.png" \
+                    -size "$(((screen_w*75/100)))"x"$(((screen_h*15/100)))" \
+                    -background none \
+                    -fill "$text_color" \
+                    -interline-spacing 2 \
+                    -font "$font" \
+                    caption:"$random_fact" \
+                    -gravity south \
+                    -geometry +0+"$(((screen_h*15/100)))" \
+                    -composite \
+                    "$TMP_DIR/launching.png"
+            }
+            function IM_add_press_button_text() {
+                convert "$TMP_DIR/launching.png" \
+                    -size "$(((screen_w*60/100)))"x"$(((screen_h*5/100)))" \
+                    -background none \
+                    -fill "$text_color" \
+                    -interline-spacing 2 \
+                    -font "$font" \
+                    caption:"PRESS A BUTTON TO CONFIGURE LAUNCH OPTIONS" \
+                    -gravity south \
+                    -geometry +0+"$(((screen_h*5/100)))" \
+                    -composite \
+                    "$TMP_DIR/launching.png"
+            }
+            IM_add_background
+            IM_add_logo
+            IM_add_boxart
+            IM_add_fun_fact
+            IM_add_press_button_text
+            #~ mv "$TMP_DIR/launching.png" "$RP_CONFIG_DIR/$system/launching.png"
+            #~ rm "$TMP_DIR"
+            chown -R "$user":"$user" "$TMP_DIR"
+            exit
+            
+            convert -size "$splash_w"x"$splash_h" xc:"$bg_color" \
+                "$ES_THEMES_DIR/$theme/$system/console.png" -geometry +0+0 -gravity center -composite \
+                "$ES_THEMES_DIR/$theme/$system/logo.png" -geometry +0-"$system_image_h" -gravity center -composite \
+                "$result_splash" \
+            && convert "$result_splash" \
+                -size "$(((splash_w*60/100)))"x"$(((splash_h*20/100)))" \
+                -background none \
+                -fill "$text_color" \
+                -interline-spacing 2 \
+                -font "$font" \
+                caption:"$random_fact" \
+                -gravity south \
+                -geometry +0+"$(((splash_h*5/100)))" \
+                -composite \
+                "$result_splash"
+            exit
         fi
     fi
-    local splash
-    splash="$(get_config "splashscreen_path")"
-    local color
-    color="$(get_config "text_color")"
-    local font
-    font="$(get_font)"
-    local random_fact
-    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    '
 
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
@@ -451,14 +566,14 @@ function create_fun_fact() {
     convert "$splash" \
         -size 1000x100 \
         -background none \
-        -fill "$color" \
+        -fill "$text_color" \
         -interline-spacing 2 \
         -font "$font" \
         caption:"$random_fact" \
         -gravity south \
         -geometry +0+25 \
         -composite \
-        "$result_splash"
+        "$RESULT_SPLASH"
     
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
