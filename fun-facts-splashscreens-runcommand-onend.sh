@@ -4,7 +4,8 @@
 readonly RP_CONFIG_DIR="/opt/retropie/configs"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 readonly SYSTEM="$1"
+readonly MANUAL_SET_THEME="$2"
 
 [[ -f "$RP_CONFIG_DIR/$SYSTEM/launching.png"  ]] && rm "$RP_CONFIG_DIR/$SYSTEM/launching.png"
 
-"$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" #> /dev/null
+"$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" --set-theme "$MANUAL_SET_THEME" #> /dev/null
