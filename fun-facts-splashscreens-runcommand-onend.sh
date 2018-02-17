@@ -8,4 +8,4 @@ readonly MANUAL_SET_THEME="$2"
 
 [[ -f "$RP_CONFIG_DIR/$SYSTEM/launching.png"  ]] && rm "$RP_CONFIG_DIR/$SYSTEM/launching.png"
 
-"$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$MANUAL_SET_THEME" #> /dev/null
+"$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" --set-theme "$MANUAL_SET_THEME" #> /dev/null
