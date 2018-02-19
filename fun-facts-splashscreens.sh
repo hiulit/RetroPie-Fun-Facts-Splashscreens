@@ -23,10 +23,12 @@ home="${home%/RetroPie}"
 
 readonly RP_DIR="$home/RetroPie"
 readonly RP_CONFIG_DIR="/opt/retropie/configs"
+readonly RP_ROMS_DIR="$RP_DIR/roms"
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
 readonly DEPENDENCIES=("imagemagick" "librsvg2-bin")
+readonly TMP_DIR="$home/tmp"
 
 readonly SCRIPT_VERSION="2.0.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -420,147 +422,182 @@ function get_screen_resolution_y() {
     xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $4}'
 }
 
+function get_system_logo() {
+    local logo
+    logo="$(xmlstarlet sel -t -v \
+        "/theme/view[contains(@name,'detailed') or contains(@name,'system')]/image[@name='logo']/path" \
+        "$ES_THEMES_DIR/$theme/$system/theme.xml" 2> /dev/null | head -1)"
+    logo="$ES_THEMES_DIR/$theme/$system/$logo"
+    echo "$logo"
+}
 
-function create_fun_fact() {
-    local splash
-    splash="$(get_config "splashscreen_path")"
-    local text_color
-    text_color="$(get_config "text_color")"
-    local bg_color
-    bg_color="$(get_config "bg_color")"
-    local font
-    font="$(get_font)"
-    local theme
-    theme="$(get_current_theme)"
-    local random_fact
-    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
-    
-    : '
-    if [[ -z "$1" ]]; then
-        bg_color="none"
-        local result_splash="$RESULT_SPLASH"
+function get_boxart() {
+    local rom_path="$1"
+    [[ -z "$rom_path" ]]  && return 1
+    [[ ! -f "$rom_path" ]] && return 1
+    rom_path="$(basename "$rom_path")"
+    local boxart
+    boxart="$(xmlstarlet sel -t -v \
+        "/gameList/game[path=\"./$rom_path\"]/image" \
+        "$RP_ROMS_DIR/$system/gamelist.xml" 2> /dev/null | head -1)"
+    boxart="$RP_ROMS_DIR/$system/$boxart"
+    echo "$boxart"
+}
+
+
+function IM_add_background() {
+    convert -size "$screen_w"x"$screen_h" xc:"$bg_color" \
+        "$TMP_DIR/launching.png"
+        
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        echo "Background ... added!"
     else
-        local system="$1"
-        if [[ "$system" == "all" ]]; then
-            local system_dir
-            for system_dir in "$RP_CONFIG_DIR/"*; do
-                system_dir="$(basename "$system_dir")"
-                [[ "$system_dir" != "all" ]] && create_fun_fact "$system_dir"
-            done
-            exit
-        else
-            local result_splash="$RP_CONFIG_DIR/$system/launching.png"
-            local splash_w=480
-            local splash_h=270
-            local screen_w
-            screen_w="$(get_screen_resolution_x)"
-            local screen_h
-            screen_h="$(get_screen_resolution_y)"
-            local system_image_h
-            #~ system_image_h="$(identify -format "%h" "$ES_THEMES_DIR/$theme/$system/console.png")"
-            local system_image_w
-            #~ system_image_w="$(identify -format "%w" "$ES_THEMES_DIR/$theme/$system/console.png")"
-            
-            TMP_DIR="$home/tmp"
-            mkdir -p "$TMP_DIR"
-            
-            # TODO: If box art exists -> logo UP, boxart CENTER, fun fact BOTTOM, button text BOTTOM BOTTOM :P
-            # else -> logo CENTER, fun fact BOTTOM, button text BOTTOM BOTTOM :P
-            
-            function IM_add_background() {
-                convert -size "$screen_w"x"$screen_h" xc:"$bg_color" \
-                    "$TMP_DIR/launching.png"
-            }
-            function IM_convert_svg_to_png() {
-                convert -background none \
-                    -gravity center \
-                    -resize "$(((screen_w*60/100)))"x"$(((screen_h*20/100)))" \
-                    "$ES_THEMES_DIR/$theme/$system/art/system.svg" "$TMP_DIR/$system.png"
-            }
-            function IM_add_logo() {
-                IM_convert_svg_to_png
-                convert "$TMP_DIR/launching.png" \
-                    "$TMP_DIR/$system.png" \
-                    -gravity north \
-                    -geometry +0+"$(((screen_h*5/100)))" \
-                    -composite \
-                    "$TMP_DIR/launching.png"
-            }
-            function IM_add_boxart() {
-                # TODO: Check if boxart exists
-                convert "$TMP_DIR/launching.png" \
-                    \( "/home/pi/RetroPie/roms/megadrive/images/Earthworm Jim-image.jpg" -resize x"$(((screen_h*35/100)))" \) \
-                    -gravity center \
-                    -geometry +0-+"$(((screen_h*(5/2)/100)))" \
-                    -composite \
-                    "$TMP_DIR/launching.png"
-            }
-            function IM_add_fun_fact() {
-                convert "$TMP_DIR/launching.png" \
-                    -size "$(((screen_w*75/100)))"x"$(((screen_h*15/100)))" \
-                    -background none \
-                    -fill "$text_color" \
-                    -interline-spacing 2 \
-                    -font "$font" \
-                    caption:"$random_fact" \
-                    -gravity south \
-                    -geometry +0+"$(((screen_h*15/100)))" \
-                    -composite \
-                    "$TMP_DIR/launching.png"
-            }
-            function IM_add_press_button_text() {
-                convert "$TMP_DIR/launching.png" \
-                    -size "$(((screen_w*60/100)))"x"$(((screen_h*5/100)))" \
-                    -background none \
-                    -fill "$text_color" \
-                    -interline-spacing 2 \
-                    -font "$font" \
-                    caption:"PRESS A BUTTON TO CONFIGURE LAUNCH OPTIONS" \
-                    -gravity south \
-                    -geometry +0+"$(((screen_h*5/100)))" \
-                    -composite \
-                    "$TMP_DIR/launching.png"
-            }
-            IM_add_background
-            IM_add_logo
-            IM_add_boxart
-            IM_add_fun_fact
-            IM_add_press_button_text
-            #~ mv "$TMP_DIR/launching.png" "$RP_CONFIG_DIR/$system/launching.png"
-            #~ rm "$TMP_DIR"
-            chown -R "$user":"$user" "$TMP_DIR"
-            exit
-            
-            convert -size "$splash_w"x"$splash_h" xc:"$bg_color" \
-                "$ES_THEMES_DIR/$theme/$system/console.png" -geometry +0+0 -gravity center -composite \
-                "$ES_THEMES_DIR/$theme/$system/logo.png" -geometry +0-"$system_image_h" -gravity center -composite \
-                "$result_splash" \
-            && convert "$result_splash" \
-                -size "$(((splash_w*60/100)))"x"$(((splash_h*20/100)))" \
-                -background none \
-                -fill "$text_color" \
-                -interline-spacing 2 \
-                -font "$font" \
-                caption:"$random_fact" \
-                -gravity south \
-                -geometry +0+"$(((splash_h*5/100)))" \
-                -composite \
-                "$result_splash"
-            exit
-        fi
+        echo "Background failed!"
     fi
-    '
+}
 
+
+function IM_convert_svg_to_png() {
+    local logo
+    logo="$(get_system_logo)"
+    local location="$1"
+    if [[ "$location" == "up" ]]; then
+        local size_y="$(((screen_h*10/100)))"
+    elif [[ "$location" == "center" ]]; then
+        local size_y="$(((screen_h*25/100)))"
+    else
+        log "Location not valid!"
+        exit 1
+    fi
+    convert -background none \
+        -gravity center \
+        -resize "$(((screen_w*60/100)))"x"$size_y" \
+        "$logo" "$TMP_DIR/$system.png"
+        
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        echo "SVG converted to PNG successfully!"
+    else
+        echo "SVG to PNG conversion failed!"
+    fi
+}
+
+
+function IM_add_logo() {
+    local logo
+    logo="$(get_system_logo)"
+    local location="$1"
+    if file --mime-type "$logo" | grep -q "svg"; then
+        echo "mime type is SVG"
+        IM_convert_svg_to_png "$location"
+    elif file --mime-type "$logo" | grep -q "png" || file --mime-type "$logo" | grep -q "jpeg"; then
+        echo "mime type is PNG or JPEG"
+        cp "$logo" "$TMP_DIR/$system.png"
+    else
+        file --mime-type "$logo" 
+        log "File type not recognised."
+        exit 1
+    fi
+    if [[ "$location" == "up" ]]; then
+        local gravity="north"
+        local offset_y="$(((screen_h*5/100)))"
+    elif [[ "$location" == "center" ]]; then
+        local gravity="center"
+        local image_h
+        image_h="$(identify -format "%h" "$logo")"
+        local offset_y="-$image_h"
+    else
+        log "Location not valid!"
+        exit 1
+    fi
+    convert "$TMP_DIR/launching.png" \
+        "$TMP_DIR/$system.png" \
+        -gravity "$gravity" \
+        -geometry +0+"$offset_y" \
+        -composite \
+        "$TMP_DIR/launching.png"
+
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        echo "Logo ... added!"
+    else
+        echo "Logo failed!"
+    fi
+}
+
+
+function IM_add_boxart() {
+    local rom_path="$1"
+    local boxart
+    boxart="$(get_boxart "$rom_path")"
+    convert "$TMP_DIR/launching.png" \
+        \( "$boxart" -resize x"$(((screen_h*45/100)))" \) \
+        -gravity center \
+        -geometry +0-"$(((screen_h*(10-(5/2))/100)))" \
+        -composite \
+        "$TMP_DIR/launching.png"
+        
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        echo "Boxart ... added!"
+    else
+        echo "Boxart failed!"
+    fi
+}
+
+
+function IM_add_fun_fact() {
+    convert "$TMP_DIR/launching.png" \
+        -size "$(((screen_w*75/100)))"x"$(((screen_h*15/100)))" \
+        -background none \
+        -fill "$text_color" \
+        -interline-spacing 2 \
+        -font "$font" \
+        caption:"$random_fact" \
+        -gravity south \
+        -geometry +0+"$(((screen_h*15/100)))" \
+        -composite \
+        "$TMP_DIR/launching.png"
+
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        echo "Fun Fact! ... added!"
+    else
+        echo "Fun Fact! failed!"
+    fi
+}
+
+
+function IM_add_press_button_text() {
+    convert "$TMP_DIR/launching.png" \
+        -size "$(((screen_w*60/100)))"x"$(((screen_h*5/100)))" \
+        -background none \
+        -fill "$text_color" \
+        -interline-spacing 2 \
+        -font "$font" \
+        caption:"PRESS A BUTTON TO CONFIGURE LAUNCH OPTIONS" \
+        -gravity south \
+        -geometry +0+"$(((screen_h*5/100)))" \
+        -composite \
+        "$TMP_DIR/launching.png"
+    
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        echo "Press button ... added!"
+    else
+        echo "Press button failed!"
+    fi
+}
+
+
+function create_fun_fact_boot() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$DIALOG_BACKTITLE" \
             --infobox "Creating Fun Facts! Splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
-        if [[ -z "$1" ]]; then
-            echo "Creating Fun Facts! Splashscreen ..."
-        else
-            echo "Creating Fun Facts! Splashscreen for '$1' ..."
-        fi
+        echo "Creating Fun Facts! Splashscreen ..."
     fi
 
     convert "$splash" \
@@ -583,25 +620,86 @@ function create_fun_fact() {
                 --title "Success!" \
                 --msgbox "Fun Facts! Splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         else
-            if [[ -z "$1" ]]; then
-                echo "Fun Facts! Splashscreen successfully created!"
-            else
-                echo "Fun Facts! Splashscreen for '$1' successfully created!"
-            fi
+            echo "Fun Facts! Splashscreen successfully created!"
         fi
     else
+        local error_message="Fun Facts! Splashscreen failed!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
+            log "$error_message" > /dev/null
             dialog \
                 --backtitle "$DIALOG_BACKTITLE" \
                 --title "Error!" \
-                --msgbox "Fun Facts! Splashscreen failed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                --msgbox "$error_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
         else
-            if [[ -z "$1" ]]; then
-                echo "Fun Facts! Splashscreen failed!"
-            else
-                echo "Fun Facts! Splashscreen for '$1' failed!"
-            fi
+            log "$error_message"
         fi
+    fi
+}
+
+
+function create_fun_fact_launching() {
+    local system="$1"
+    #~ local rom_path="/home/pi/RetroPie/roms/$system/Super Mario World.zip" # TO BE REMOVED!!!
+    if [[ "$system" == "all" ]]; then
+        local system_dir
+        for system_dir in "$RP_CONFIG_DIR/"*; do
+            system_dir="$(basename "$system_dir")"
+            [[ "$system_dir" != "all" ]] && create_fun_fact_launching "$system_dir"
+        done
+        exit
+    else
+        if [[ -z "$2" ]]; then
+            local result_splash="$RP_CONFIG_DIR/$system/launching.png"
+        else
+            local rom_path="$2"
+            local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-launching.png"
+        fi
+        #~ local splash_w=480
+        #~ local splash_h=270
+        local screen_w
+        screen_w="$(get_screen_resolution_x)"
+        local screen_h
+        screen_h="$(get_screen_resolution_y)"
+
+        mkdir -p "$TMP_DIR"
+        
+        IM_add_background
+        if get_boxart "$rom_path" > /dev/null; then
+            IM_add_logo "up"
+            IM_add_boxart "$rom_path"
+        else
+            IM_add_logo "center"
+        fi
+        IM_add_fun_fact
+        IM_add_press_button_text
+        
+        [[ -f "$result_splash" ]] && rm "$result_splash"
+        mv "$TMP_DIR/launching.png" "$result_splash"
+        chown -R "$user":"$user" "$TMP_DIR"
+        chown -R "$user":"$user" "$result_splash"
+        rm  -r "$TMP_DIR"
+    fi
+}
+
+
+function create_fun_fact() {
+    local splash
+    splash="$(get_config "splashscreen_path")"
+    local text_color
+    text_color="$(get_config "text_color")"
+    local bg_color
+    bg_color="$(get_config "bg_color")"
+    local font
+    font="$(get_font)"
+    local theme
+    theme="$(get_current_theme)"
+    local random_fact
+    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    
+    if [[ -z "$1" ]]; then
+        create_fun_fact_boot
+    else
+        create_fun_fact_launching "$@"
     fi
 }
 
@@ -1280,7 +1378,8 @@ function get_options() {
                     create_fun_fact
                 else
                     shift
-                    create_fun_fact "$1"
+                    create_fun_fact "$@"
+                    shift
                 fi
                 ;;
 #H --apply-splash                           Apply the Fun Facts! Splashscreen.
