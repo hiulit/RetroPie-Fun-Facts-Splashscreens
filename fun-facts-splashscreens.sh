@@ -89,6 +89,11 @@ function is_sudo() {
 }
 
 
+function is_arm() {
+    uname -m | grep -q "arm"
+}
+
+
 function check_log_file(){
     if [[ "$LOG" == "true" ]]; then
         if [[ ! -f "$LOG_FILE" ]]; then
@@ -452,12 +457,21 @@ function get_font() {
 
 
 function get_screen_resolution_x() {
-    xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $3}'
+    if is_arm; then
+        #~ fbaset -s | grep -Eo "^[^x]*"
+        fbaset -s | cut -dx -f1
+    else
+        xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $3}'
+    fi
 }
 
 
 function get_screen_resolution_y() {
-    xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $4}'
+    if is_arm; then
+        fbaset -s | cut -dx -f2
+    else
+        xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $4}'
+    fi
 }
 
 function get_system_logo() {
