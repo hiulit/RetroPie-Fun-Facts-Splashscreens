@@ -38,6 +38,7 @@ readonly SCRIPT_CFG="$SCRIPT_DIR/fun-facts-splashscreens-settings.cfg"
 readonly SCRIPT_TITLE="Fun Facts! Splashscreens for RetroPie"
 readonly SCRIPT_DESCRIPTION="A tool for RetroPie to generate splashscreens with random video game related Fun Facts!."
 readonly SCRIPTMODULE_DIR="/opt/retropie/supplementary/fun-facts-splashscreens"
+readonly SCRIPT_RUNCOMMAND_ONEND="$SCRIPT_DIR/fun-facts-splashscreens-runcommand-onend.sh"
 
 
 # Variables ############################################
@@ -46,6 +47,7 @@ readonly SCRIPTMODULE_DIR="/opt/retropie/supplementary/fun-facts-splashscreens"
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
 readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
 readonly LOG_FILE="$SCRIPT_DIR/fun-facts-splashscreens.log"
+readonly RUNCOMMAND_ONEND="$RP_CONFIG_DIR/all/runcommand-onend.sh"
 
 # Defaults
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
@@ -304,6 +306,8 @@ function enable_boot_script() {
     local command="\"$SCRIPT_FULL\" --create-fun-fact \&"
     disable_boot_script # deleting any previous config (do nothing if there isn't).
     sed -i "s|^exit 0$|${command}\\nexit 0|" "$RCLOCAL"
+    local return_value="$?"
+    [[ "$return_value" -eq 0 ]] || return 1
     assure_safe_exit_boot_script
     check_boot_script
 }
@@ -311,6 +315,8 @@ function enable_boot_script() {
 
 function disable_boot_script() {
     sed -i "/$(basename "$0")/d" "$RCLOCAL"
+    local return_value="$?"
+    [[ "$return_value" -eq 0 ]] || return 1
     assure_safe_exit_boot_script
     ! check_boot_script
 }
@@ -323,6 +329,38 @@ function assure_safe_exit_boot_script() {
 
 function check_boot_script() {
     grep -q "$SCRIPT_DIR" "$RCLOCAL"
+}
+
+
+function enable_runcommand_onend() {
+    if [[ ! -f "$RUNCOMMAND_ONEND" ]]; then
+        touch "$RUNCOMMAND_ONEND"
+        cat > "$RUNCOMMAND_ONEND" << _EOF_
+#!/usr/bin/env bash
+# $(basename "$RUNCOMMAND_ONEND")
+
+_EOF_
+        chown -R "$user":"$user" "$RUNCOMMAND_ONEND"
+    fi
+    local command="\"$SCRIPT_RUNCOMMAND_ONEND\" \"\$1\" \"\$2\" \"\$3\" \"\$4\""
+    disable_runcommand_onend # deleting any previous config (do nothing if there isn't).
+    sed -i "\$a$command" "$RUNCOMMAND_ONEND"
+    local return_value="$?"
+    [[ "$return_value" -eq 0 ]] || return 1
+    check_runcommand_onend
+}
+
+
+function disable_runcommand_onend() {
+    sed -i "/[^# ]$(basename "$SCRIPT_RUNCOMMAND_ONEND")/d" "$RUNCOMMAND_ONEND"
+    local return_value="$?"
+    [[ "$return_value" -eq 0 ]] || return 1
+    ! check_runcommand_onend
+}
+
+
+function check_runcommand_onend() {
+    grep -q "$SCRIPT_RUNCOMMAND_ONEND" "$RUNCOMMAND_ONEND"
 }
 
 
@@ -1402,6 +1440,24 @@ function get_options() {
                     echo "Script DISABLED at boot."
                 else
                     log "ERROR: failed to DISABLE script at boot."
+                fi
+                ;;
+#H --enable-runcommand-onend                Enable runcommand-onend.
+            --enable-runcommand-onend)
+                if enable_runcommand_onend; then
+                    set_config "runcommand_onend" "true" > /dev/null
+                    echo "runcommand-onend ENABLED."
+                else
+                    log "ERROR: failed to ENABLE runcommand-onend."
+                fi
+                ;;
+#H --disable-runcommand-onend               Disable runcommand-onend.
+            --disable-runcommand-onend)
+                if disable_runcommand_onend; then
+                    set_config "runcommand_onend" "false" > /dev/null
+                    echo "runcommand-onend DISABLED."
+                else
+                    log "ERROR: failed to DISABLE runcommand-onend."
                 fi
                 ;;
 #H --gui                                    Start GUI.
