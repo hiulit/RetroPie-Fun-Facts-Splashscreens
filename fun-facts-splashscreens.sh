@@ -458,8 +458,8 @@ function get_font() {
 
 function get_screen_resolution_x() {
     if is_arm; then
-        #~ fbaset -s | grep -Eo "^[^x]*"
-        fbaset -s | cut -dx -f1
+        local screen_resolution="$(fbset -s | grep -o -P '(?<=").*(?=")')"
+        echo "$screen_resolution" | cut -dx -f1
     else
         xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $3}'
     fi
@@ -468,7 +468,8 @@ function get_screen_resolution_x() {
 
 function get_screen_resolution_y() {
     if is_arm; then
-        fbaset -s | cut -dx -f2
+        local screen_resolution="$(fbset -s | grep -o -P '(?<=").*(?=")')"
+        echo "$screen_resolution" | cut -dx -f2
     else
         xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $4}'
     fi
