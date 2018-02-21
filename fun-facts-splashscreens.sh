@@ -337,7 +337,7 @@ function check_boot_script() {
 }
 
 
-function enable_runcommand_onend() {
+function enable_launching_images() {
     if [[ ! -f "$RUNCOMMAND_ONEND" ]]; then
         touch "$RUNCOMMAND_ONEND"
         cat > "$RUNCOMMAND_ONEND" << _EOF_
@@ -348,7 +348,7 @@ _EOF_
         chown -R "$user":"$user" "$RUNCOMMAND_ONEND"
     fi
     local command="\"$SCRIPT_RUNCOMMAND_ONEND\" \"\$1\" \"\$2\" \"\$3\" \"\$4\""
-    disable_runcommand_onend # deleting any previous config (do nothing if there isn't).
+    disable_launching_images # deleting any previous config (do nothing if there isn't).
     sed -i "\$a$command" "$RUNCOMMAND_ONEND"
     local return_value="$?"
     [[ "$return_value" -eq 0 ]] || return 1
@@ -356,7 +356,7 @@ _EOF_
 }
 
 
-function disable_runcommand_onend() {
+function disable_launching_images() {
     sed -i "/[^# ]$(basename "$SCRIPT_RUNCOMMAND_ONEND")/d" "$RUNCOMMAND_ONEND"
     local return_value="$?"
     [[ "$return_value" -eq 0 ]] || return 1
@@ -1458,22 +1458,22 @@ function get_options() {
                     log "ERROR: failed to DISABLE script at boot."
                 fi
                 ;;
-#H --enable-runcommand-onend                Enable runcommand-onend.
-            --enable-runcommand-onend)
-                if enable_runcommand_onend; then
-                    set_config "runcommand_onend" "true" > /dev/null
-                    echo "runcommand-onend ENABLED."
+#H --enable-launching-images                Enable launching images.
+            --enable-launching-images)
+                if enable_launching_images; then
+                    set_config "launching_images" "true" > /dev/null
+                    echo "Launching images ENABLED."
                 else
-                    log "ERROR: failed to ENABLE runcommand-onend."
+                    log "ERROR: failed to ENABLE launching images."
                 fi
                 ;;
-#H --disable-runcommand-onend               Disable runcommand-onend.
-            --disable-runcommand-onend)
-                if disable_runcommand_onend; then
-                    set_config "runcommand_onend" "false" > /dev/null
-                    echo "runcommand-onend DISABLED."
+#H --disable-launching-images               Disable launching images.
+            --disable-launching-images)
+                if disable_launching_images; then
+                    set_config "launching_images" "false" > /dev/null
+                    echo "Launching images DISABLED."
                 else
-                    log "ERROR: failed to DISABLE runcommand-onend."
+                    log "ERROR: failed to DISABLE launching images."
                 fi
                 ;;
 #H --gui                                    Start GUI.
