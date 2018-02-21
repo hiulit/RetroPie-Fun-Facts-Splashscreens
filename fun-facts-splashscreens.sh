@@ -10,7 +10,8 @@
 #
 # Requirements:
 # - Retropie 4.x.x
-# - Imagemagick package
+# - imagemagick
+# - librsvg2-bin
 
 
 # Globals #############################################
@@ -254,7 +255,7 @@ function check_config() {
         TEXT_COLOR="$DEFAULT_COLOR"
         set_config "text_color" "$TEXT_COLOR" > /dev/null
     fi
-    
+
     if [[ -z "$BG_COLOR" ]]; then
         BG_COLOR="$DEFAULT_BG_COLOR"
         set_config "bg_color" "$BG_COLOR" > /dev/null
@@ -504,7 +505,7 @@ function get_boxart() {
 function IM_add_background() {
     convert -size "$screen_w"x"$screen_h" xc:"$bg_color" \
         "$TMP_DIR/launching.png"
-        
+
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         echo "Background ... added!"
@@ -530,7 +531,7 @@ function IM_convert_svg_to_png() {
         -gravity center \
         -resize "$(((screen_w*60/100)))"x"$size_y" \
         "$logo" "$TMP_DIR/$system.png"
-        
+
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         echo "SVG converted to PNG successfully!"
@@ -551,7 +552,7 @@ function IM_add_logo() {
         echo "mime type is PNG or JPEG"
         cp "$logo" "$TMP_DIR/$system.png"
     else
-        file --mime-type "$logo" 
+        file --mime-type "$logo"
         log "File type not recognised."
         exit 1
     fi
@@ -593,7 +594,7 @@ function IM_add_boxart() {
         -geometry +0-"$(((screen_h*(10-(5/2))/100)))" \
         -composite \
         "$TMP_DIR/launching.png"
-        
+
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         echo "Boxart ... added!"
@@ -637,7 +638,7 @@ function IM_add_press_button_text() {
         -geometry +0+"$(((screen_h*5/100)))" \
         -composite \
         "$TMP_DIR/launching.png"
-    
+
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         echo "Press button ... added!"
@@ -667,7 +668,7 @@ function create_fun_fact_boot() {
         -geometry +0+25 \
         -composite \
         "$RESULT_SPLASH"
-    
+
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
@@ -719,7 +720,7 @@ function create_fun_fact_launching() {
         screen_h="$(get_screen_resolution_y)"
 
         mkdir -p "$TMP_DIR"
-        
+
         IM_add_background
         if get_boxart "$rom_path" > /dev/null; then
             IM_add_logo "up"
@@ -729,7 +730,7 @@ function create_fun_fact_launching() {
         fi
         IM_add_fun_fact
         IM_add_press_button_text
-        
+
         [[ -f "$result_splash" ]] && rm "$result_splash"
         mv "$TMP_DIR/launching.png" "$result_splash"
         chown -R "$user":"$user" "$TMP_DIR"
@@ -752,7 +753,7 @@ function create_fun_fact() {
     theme="$(get_current_theme)"
     local random_fact
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
-    
+
     if [[ -z "$1" ]]; then
         create_fun_fact_boot
     else
