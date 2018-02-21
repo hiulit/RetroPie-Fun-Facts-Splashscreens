@@ -8,4 +8,4 @@ readonly ROM_PATH="$3"
 
 [[ -f "$RP_CONFIG_DIR/$SYSTEM/launching.png"  ]] && rm "$RP_CONFIG_DIR/$SYSTEM/launching.png"
 
-"$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$ROM_PATH" #> /dev/null
+sudo "$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$ROM_PATH" #> /dev/null
