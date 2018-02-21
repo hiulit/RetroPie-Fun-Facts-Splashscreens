@@ -89,8 +89,11 @@ function is_sudo() {
 }
 
 
-function is_arm() {
-    uname -m | grep -q "arm"
+function get_system_platform() {
+    . "$home/RetroPie-Setup/scriptmodules/helpers.sh"
+    . "$home/RetroPie-Setup/scriptmodules/system.sh"
+    get_platform
+    echo "$__platform"
 }
 
 
@@ -457,7 +460,7 @@ function get_font() {
 
 
 function get_screen_resolution_x() {
-    if is_arm; then
+    if [[ "$(get_system_platform)" != "x86" ]]; then
         local screen_resolution="$(fbset -s | grep -o -P '(?<=").*(?=")')"
         echo "$screen_resolution" | cut -dx -f1
     else
@@ -467,7 +470,7 @@ function get_screen_resolution_x() {
 
 
 function get_screen_resolution_y() {
-    if is_arm; then
+    if [[ "$(get_system_platform)" != "x86" ]]; then
         local screen_resolution="$(fbset -s | grep -o -P '(?<=").*(?=")')"
         echo "$screen_resolution" | cut -dx -f2
     else
