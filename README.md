@@ -325,7 +325,7 @@ Disable logging.
 sudo ./fun-facts-splashscreens.sh --disable-log
 ```
 
-#### `--restore-defaults`
+### `--restore-defaults`
 
 Restore default files.
 
