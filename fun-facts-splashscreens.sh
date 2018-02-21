@@ -705,6 +705,7 @@ function create_fun_fact_launching() {
             local result_splash="$RP_CONFIG_DIR/$system/launching.png"
         else
             local rom_path="$2"
+            [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
             local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-launching.png"
         fi
         #~ local splash_w=480
