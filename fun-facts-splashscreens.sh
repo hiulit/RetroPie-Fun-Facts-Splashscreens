@@ -90,14 +90,6 @@ function is_sudo() {
 }
 
 
-function get_system_platform() {
-    . "$home/RetroPie-Setup/scriptmodules/helpers.sh"
-    . "$home/RetroPie-Setup/scriptmodules/system.sh"
-    get_platform
-    echo "$__platform"
-}
-
-
 function check_log_file(){
     if [[ "$LOG" == "true" ]]; then
         if [[ ! -f "$LOG_FILE" ]]; then
@@ -460,25 +452,6 @@ function get_font() {
 }
 
 
-function get_screen_resolution_x() {
-    if [[ "$(get_system_platform)" != "x86" ]]; then
-        local screen_resolution="$(fbset -s | grep -o -P '(?<=").*(?=")')"
-        echo "$screen_resolution" | cut -dx -f1
-    else
-        xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $3}'
-    fi
-}
-
-
-function get_screen_resolution_y() {
-    if [[ "$(get_system_platform)" != "x86" ]]; then
-        local screen_resolution="$(fbset -s | grep -o -P '(?<=").*(?=")')"
-        echo "$screen_resolution" | cut -dx -f2
-    else
-        xdpyinfo | awk -F '[ x]+' '/dimensions:/{print $4}'
-    fi
-}
-
 function get_system_logo() {
     local logo
     logo="$(xmlstarlet sel -t -v \
@@ -752,12 +725,8 @@ function create_fun_fact_launching() {
             echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
         fi
 
-        local screen_w
-        #screen_w="$(get_screen_resolution_x)"
-        screen_w=1024
-        local screen_h
-        #screen_h="$(get_screen_resolution_y)"
-        screen_h=576
+        local screen_w=1024
+        local screen_h=576
         local logo
         logo="$(get_system_logo)"
 
