@@ -397,7 +397,11 @@ function check_apply_splash() {
 }
 
 function is_splash_applied() {
-    grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
+    if [[ -f "$SPLASH_LIST" ]]; then
+        grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
+    else
+        return 1
+    fi
 }
 
 
@@ -985,9 +989,7 @@ function gui() {
             option_apply_splash="Apply Fun Facts! Splashscreen"
         fi
 
-        check_boot_script
-        return_value="$?"
-        if [[ "$return_value" -eq 0 ]]; then
+        if check_boot_script; then
             option_boot="enabled"
         else
             option_boot="disabled"
