@@ -54,6 +54,7 @@ readonly RUNCOMMAND_ONEND="$RP_CONFIG_DIR/all/runcommand-onend.sh"
 readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_COLOR="white"
 readonly DEFAULT_BG_COLOR="black"
+readonly DEFAULT_PRESS_BUTTON_TEXT="Press a button to configure launch options"
 readonly DEFAULT_BOOT_SCRIPT="false"
 readonly DEFAULT_LOG="false"
 
@@ -73,6 +74,7 @@ CONFIG_FLAG=0
 SPLASH_PATH=
 TEXT_COLOR=
 BG_COLOR=
+PRESS_BUTTON_TEXT=
 BOOT_SCRIPT=
 LOG=
 OPTION=
@@ -229,6 +231,7 @@ function check_config() {
     SPLASH_PATH="$(get_config "splashscreen_path")"
     TEXT_COLOR="$(get_config "text_color")"
     BG_COLOR="$(get_config "bg_color")"
+    PRESS_BUTTON_TEXT="$(get_config "press_button_text")"
     BOOT_SCRIPT="$(get_config "boot_script")"
     LOG="$(get_config "log")"
 
@@ -252,7 +255,12 @@ function check_config() {
         BG_COLOR="$DEFAULT_BG_COLOR"
         set_config "bg_color" "$BG_COLOR" > /dev/null
     fi
-
+    
+    if [[ -z "$PRESS_BUTTON_TEXT" ]]; then
+        PRESS_BUTTON_TEXT="$DEFAULT_PRESS_BUTTON_TEXT"
+        set_config "press_button_text" "$PRESS_BUTTON_TEXT" > /dev/null
+    fi
+    
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
         set_config "boot_script" "$BOOT_SCRIPT" > /dev/null
@@ -440,7 +448,7 @@ function get_font() {
     if [[ -n "$font" ]]; then
         font="$ES_THEMES_DIR/$theme/$font"
     else
-        # note: the find below returns the full path file name.
+        # Note: the find function below returns the full path file name.
         font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
         if [[ -z "$font" ]]; then
             log "ERROR: Unable to get the font from the '$theme' theme files."
@@ -639,7 +647,7 @@ function IM_add_press_button_text() {
         -fill "$text_color" \
         -interline-spacing 2 \
         -font "$font" \
-        caption:"PRESS A BUTTON TO CONFIGURE LAUNCH OPTIONS" \
+        caption:"${press_button_text^^}" \
         -gravity south \
         -geometry +0+"$(((screen_h*5/100)))" \
         -composite \
@@ -758,6 +766,8 @@ function create_fun_fact() {
     text_color="$(get_config "text_color")"
     local bg_color
     bg_color="$(get_config "bg_color")"
+    local press_button_text
+    press_button_text="$(get_config "press_button_text")"
     local font
     font="$(get_font)"
     local theme
