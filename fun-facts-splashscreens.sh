@@ -710,7 +710,6 @@ function create_fun_fact_boot() {
 
 function create_fun_fact_launching() {
     local system="$1"
-    #~ local rom_path="/home/pi/RetroPie/roms/$system/Super Mario World.zip" # TO BE REMOVED!!!
     if [[ "$system" == "all" ]]; then
         local system_dir
         for system_dir in "$RP_CONFIG_DIR/"*; do
@@ -729,8 +728,15 @@ function create_fun_fact_launching() {
         else
             local rom_path="$2"
             [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
-            local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-launching.png"
-            echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
+            if [[ ! -f "$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-image.jpg" ]]; then
+                log "ERROR: '$(basename "${rom_path%.*}")' doesn't have a scraped image!" >&2
+                rom_path=""
+                local result_splash="$RP_CONFIG_DIR/$system/launching.png"
+                echo "Creating launching image for '$system' ..."            
+            else
+                local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-launching.png"
+                echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
+            fi
         fi
 
         local screen_w=1024
