@@ -93,11 +93,9 @@ function is_sudo() {
 
 
 function check_log_file(){
-    if [[ "$LOG" == "true" ]]; then
-        if [[ ! -f "$LOG_FILE" ]]; then
-            touch "$LOG_FILE"
-            chown -R "$user":"$user" "$LOG_FILE"
-        fi
+    if [[ ! -f "$LOG_FILE" ]]; then
+        touch "$LOG_FILE"
+        chown -R "$user":"$user" "$LOG_FILE"
     fi
 }
 
@@ -105,14 +103,10 @@ function check_log_file(){
 function log() {
     check_log_file
     if [[ "$GUI_FLAG" -eq 1 ]] ; then
-        if [[ "$LOG" == "true" ]]; then
-            echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
-        fi
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
         echo "$*"
     else
-        if [[ "$LOG" == "true" ]]; then
-            echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
-        fi
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
         echo "$*" >&2
     fi
 }
@@ -233,13 +227,11 @@ function check_config() {
     BG_COLOR="$(get_config "bg_color")"
     PRESS_BUTTON_TEXT="$(get_config "press_button_text")"
     BOOT_SCRIPT="$(get_config "boot_script")"
-    LOG="$(get_config "log")"
 
     validate_splash "$SPLASH_PATH" || exit 1
     validate_color "$TEXT_COLOR" || exit 1
     validate_color "$BG_COLOR" || exit 1
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
-    validate_true_false "log" "$LOG" || exit 1
 
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASH"
@@ -264,11 +256,6 @@ function check_config() {
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
         set_config "boot_script" "$BOOT_SCRIPT" > /dev/null
-    fi
-
-    if [[ -z "$LOG" ]]; then
-        LOG="$DEFAULT_LOG"
-        set_config "log" "$LOG" > /dev/null
     fi
 }
 
@@ -733,7 +720,7 @@ function create_fun_fact_launching() {
             local rom_path="$2"
             [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
             if [[ ! -f "$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-image.jpg" ]]; then
-                log "ERROR: '$(basename "${rom_path%.*}")' doesn't have a scraped image!" >&2
+                log "ERROR: '$(basename "${rom_path%.*}")' doesn't have a scraped image!"
                 rom_path=""
                 local result_splash="$RP_CONFIG_DIR/$system/launching.png"
                 echo "Creating launching image for '$system' ..."            
@@ -1002,13 +989,6 @@ function gui() {
             option_updates="Update script ($updates_output)"
         fi
 
-        check_log="$(get_config "log")"
-        if [[ "$check_log" == "false" || "$check_log" == "" ]]; then
-            option_log="disabled"
-        elif [[ "$check_log" == "true" ]]; then
-            option_log="enabled"
-        fi
-
         options=(
             1 "Set splashscreen path ($(get_config "splashscreen_path"))"
             2 "Set text color ($(get_config "text_color"))"
@@ -1020,8 +1000,7 @@ function gui() {
             8 "Edit config file"
             9 "Reset config file"
             10 "$option_updates"
-            11 "Enable/Disable logging ($option_log)"
-            12 "Restore default files"
+            11 "Restore default files"
         )
 
         menu_items="${#options[@]}"
@@ -1367,13 +1346,6 @@ function gui() {
                     fi
                     ;;
                 11)
-                    if [[ "$check_log" == "false" ]]; then
-                        set_config "log" "true" > /dev/null
-                    else
-                        set_config "log" "false" >  /dev/null
-                    fi
-                    ;;
-                12)
                     local validation
                     validation="$(restore_default_files)"
                     if [[ -n "$validation" ]]; then
@@ -1532,21 +1504,13 @@ function get_options() {
             --version)
                 echo "$SCRIPT_VERSION"
                 ;;
-#H --enable-log                             Enable logging.
-            --enable-log)
-                set_config "log" "true"
-                ;;
-#H --disable-log                            Disable logging.
-            --disable-log)
-                set_config "log" "false"
-                ;;
 #H --restore-defaults                       Restore default files.
             --restore-defaults)
                 restore_default_files
                 ;;
             *)
-                log "ERROR: Invalid option '$1'" >&2
-                echo "Try 'sudo $0 --help' for more info." >&2
+                log "ERROR: Invalid option '$1'."
+                log "Try 'sudo $0 --help' for more info."
                 exit 2
                 ;;
         esac
@@ -1567,11 +1531,6 @@ function main() {
     fi
 
     check_dependencies
-
-    check_log="$(get_config "log")"
-    if [[ "$check_log" == "" ]]; then
-        LOG="true"
-    fi
 
     check_boot="$(get_config "boot_script")"
     if [[ "$check_boot" == "false" || "$check_boot" == "" ]]; then
