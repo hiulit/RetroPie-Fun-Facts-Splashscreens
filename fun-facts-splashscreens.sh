@@ -94,8 +94,7 @@ function is_sudo() {
 
 function check_log_file(){
     if [[ ! -f "$LOG_FILE" ]]; then
-        touch "$LOG_FILE"
-        chown -R "$user":"$user" "$LOG_FILE"
+        touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
     fi
 }
 
@@ -116,7 +115,6 @@ function check_dependencies() {
     local pkg
     for pkg in "${DEPENDENCIES[@]}";do
         if ! dpkg-query -W -f='${Status}' "$pkg" | awk '{print $3}' | grep -q "^installed$"; then
-        #~ if ! dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" > /dev/null; then
             log "ERROR: The '$pkg' package is not installed!"
             echo "Would you like to install it now?"
             local options=("Yes" "No")
@@ -330,13 +328,12 @@ function check_boot_script() {
 
 function enable_launching_images() {
     if [[ ! -f "$RUNCOMMAND_ONEND" ]]; then
-        touch "$RUNCOMMAND_ONEND"
+        touch "$RUNCOMMAND_ONEND" && chown -R "$user":"$user" "$RUNCOMMAND_ONEND"
         cat > "$RUNCOMMAND_ONEND" << _EOF_
 #!/usr/bin/env bash
 # $(basename "$RUNCOMMAND_ONEND")
 
 _EOF_
-        chown -R "$user":"$user" "$RUNCOMMAND_ONEND"
     fi
     local command="\"$SCRIPT_RUNCOMMAND_ONEND\" \"\$1\" \"\$2\" \"\$3\" \"\$4\""
     disable_launching_images # deleting any previous config (do nothing if there isn't).
@@ -357,66 +354,6 @@ function disable_launching_images() {
 
 function check_runcommand_onend() {
     grep -q "$SCRIPT_RUNCOMMAND_ONEND" "$RUNCOMMAND_ONEND"
-}
-
-
-function check_apply_splash() {
-    if [[ ! -f "$SPLASH_LIST" ]]; then
-        touch "$SPLASH_LIST"
-        chown -R "$user":"$user" "$SPLASH_LIST"
-    fi
-    if [[ ! -f "$RESULT_SPLASH" ]]; then
-        is_splash_applied && echo "" > "$SPLASH_LIST"
-        local error_message="Create a Fun Facts! Splashscreen before applying it."
-        if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "$error_message" > /dev/null
-            dialog \
-                --backtitle "$DIALOG_BACKTITLE" \
-                --title "Error!" \
-                --msgbox "$error_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-            return 1
-        else
-            log "ERROR: $error_message"
-            echo "Try 'sudo $0 --help' for more info." >&2
-            exit 1
-        fi
-    fi
-}
-
-function is_splash_applied() {
-    if [[ -f "$SPLASH_LIST" ]]; then
-        grep -q "$RESULT_SPLASH" "$SPLASH_LIST"
-    else
-        return 1
-    fi
-}
-
-
-function apply_splash() {
-    if check_apply_splash; then
-        if is_splash_applied; then
-            local info_message="Fun Facts! Splashscreen is already applied."
-            if [[ "$GUI_FLAG" -eq 1 ]]; then
-                dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Info" \
-                    --msgbox "$info_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-            else
-                log "$info_message"
-            fi
-       else
-            echo "$RESULT_SPLASH" > "$SPLASH_LIST"
-            local success_message="Fun Facts! Splashscreen applied succesfully!"
-            if [[ "$GUI_FLAG" -eq 1 ]]; then
-                dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Success!" \
-                    --msgbox "$success_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-            else
-                echo "$success_message"
-            fi
-        fi
-    fi
 }
 
 
@@ -695,6 +632,7 @@ function create_fun_fact_boot() {
         else
             log "$error_message"
         fi
+        return 1
     fi
 }
 
@@ -735,7 +673,7 @@ function create_fun_fact_launching() {
         local logo
         logo="$(get_system_logo)"
 
-        mkdir -p "$TMP_DIR"
+        mkdir -p "$TMP_DIR" && chown -R "$user":"$user" "$TMP_DIR"
 
         IM_add_background
         IM_add_logo
@@ -748,10 +686,7 @@ function create_fun_fact_launching() {
         IM_add_press_button_text
 
         [[ -f "$result_splash" ]] && rm "$result_splash"
-        mv "$TMP_DIR/launching.png" "$result_splash"
-        chown -R "$user":"$user" "$TMP_DIR"
-        chown -R "$user":"$user" "$result_splash"
-        rm  -r "$TMP_DIR"
+        mv "$TMP_DIR/launching.png" "$result_splash" && chown -R "$user":"$user" "$result_splash" && rm -r "$TMP_DIR"
     fi
 }
 
@@ -774,6 +709,16 @@ function create_fun_fact() {
 
     if [[ -z "$1" ]]; then
         create_fun_fact_boot
+        local return_value
+        return_value="$?"
+        if [[ "$return_value" -eq 0 ]]; then
+            if [[ -f "$RESULT_SPLASH" ]]; then
+                if [[ ! -f "$SPLASH_LIST" ]]; then
+                    touch "$SPLASH_LIST" && chown -R "$user":"$user" "$SPLASH_LIST"
+                fi
+                echo "$RESULT_SPLASH" > "$SPLASH_LIST"
+            fi
+        fi
     else
         create_fun_fact_launching "$@"
     fi
@@ -970,12 +915,6 @@ function gui() {
 
         version="$SCRIPT_VERSION"
 
-        if is_splash_applied; then
-            option_apply_splash="Apply Fun Facts! Splashscreen (already applied)"
-        else
-            option_apply_splash="Apply Fun Facts! Splashscreen"
-        fi
-
         if check_boot_script; then
             option_boot="enabled"
         else
@@ -995,12 +934,11 @@ function gui() {
             3 "Add a new Fun Fact!"
             4 "Remove Fun Facts!"
             5 "Create a new Fun Facts! Splashscreen"
-            6 "$option_apply_splash"
-            7 "Enable/Disable script at boot ($option_boot)"
-            8 "Edit config file"
-            9 "Reset config file"
-            10 "$option_updates"
-            11 "Restore default files"
+            6 "Enable/Disable script at boot ($option_boot)"
+            7 "Edit config file"
+            8 "Reset config file"
+            9 "$option_updates"
+            10 "Restore default files"
         )
 
         menu_items="${#options[@]}"
@@ -1286,9 +1224,6 @@ function gui() {
                     fi
                     ;;
                 6)
-                    apply_splash
-                    ;;
-                7)
                     check_boot_script
                     local return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
@@ -1315,13 +1250,13 @@ function gui() {
                         fi
                     fi
                     ;;
-                8)
+                7)
                     edit_config
                     ;;
-                9)
+                8)
                     reset_config
                     ;;
-                10)
+                9)
                     if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
                         local text="Can't update the script when using it from RetroPie-Setup."
                                 text+="\n\nGo to:"
@@ -1345,7 +1280,7 @@ function gui() {
                         fi
                     fi
                     ;;
-                11)
+                10)
                     local validation
                     validation="$(restore_default_files)"
                     if [[ -n "$validation" ]]; then
@@ -1440,10 +1375,6 @@ function get_options() {
                     create_fun_fact "$@"
                     shift
                 fi
-                ;;
-#H --apply-splash                           Apply the Fun Facts! Splashscreen.
-            --apply-splash)
-                apply_splash
                 ;;
 #H --enable-boot                            Enable script at boot.
             --enable-boot)
@@ -1541,7 +1472,7 @@ function main() {
 
     check_default_files
 
-    mkdir -p "$RP_DIR/splashscreens"
+    mkdir -p "$RP_DIR/splashscreens" && chown -R "$user":"$user" "$RP_DIR/splashscreens"
 
     chown -R "$user":"$user" .
 
