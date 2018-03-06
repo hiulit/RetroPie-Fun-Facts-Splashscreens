@@ -493,8 +493,8 @@ function get_console() {
     local console
     console="$(xmlstarlet sel -t -v \
         "/theme/view[contains(@name,'detailed') or contains(@name,'system')]/image[@name='console_overlay']/path" \
-        "$ES_THEMES_DIR/pixel/megadrive/theme.xml" 2> /dev/null | head -1)"
-    console="$ES_THEMES_DIR/pixel/megadrive/$console"
+        "$ES_THEMES_DIR/$theme/$system/theme.xml" 2> /dev/null | head -1)"
+    console="$ES_THEMES_DIR/$theme/$system/$console"
     echo "$console"
 }
 
@@ -742,6 +742,7 @@ function create_fun_fact_launching() {
         done
     else
         if [[ -z "$2" ]]; then
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
             local result_splash="$RP_CONFIG_DIR/$system/launching.png"
             echo "Creating launching image for '$system' ..."
         else
@@ -752,9 +753,11 @@ function create_fun_fact_launching() {
         fi
 
         local screen_w
-        screen_w="$(get_screen_resolution_x)"
+        #screen_w="$(get_screen_resolution_x)"
+        screen_w=1024
         local screen_h
-        screen_h="$(get_screen_resolution_y)"
+        #screen_h="$(get_screen_resolution_y)"
+        screen_h=576
         local logo
         logo="$(get_system_logo)"
 
