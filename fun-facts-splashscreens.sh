@@ -912,34 +912,33 @@ function get_last_commit() {
 function dialog_choose_path() {
     property="$1"
     property_var="${property^^}_PATH"
+    property_text="${property//_/ }"
     image_path="$(dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Set image path" \
+                    --title "Set $property_text path" \
                     --cancel-label "Back" \
-                    --inputbox "Enter image path (must be an absolute path).\n\nEnter 'default' to set the default   image.\nLeave the input empty to unset the image." \
+                    --inputbox "Enter $property_text path (must be an absolute path).\n\nEnter 'default' to set the default image.\nLeave the input empty to unset the image." \
                     12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
     result_value="$?"
     if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
         if [[ -z "$image_path" ]]; then
             dialog_title="Success!"
-            dialog_text="Unset splashscreen path successfully!"
+            dialog_text="$property_text path unset."
             set_config "${property}_path" "" > /dev/null
         elif [[ "$image_path" == "default" ]]; then
             declare "$property_var"="$DEFAULT_SPLASH"
             set_config "${property}_path" "${!property_var}" > /dev/null
             dialog_title="Success!"
-            dialog_text="Splashscreen path set to '${!property_var}'."
-            SPLASH_BG_IMAGE_FLAG=1
+            dialog_text="${property_text^} path set to '${!property_var}'."
         else
             if [[ ! -f "$image_path" ]]; then
                 dialog_title="Error!"
-                dialog_text="File '$image_path' doesn't exist!"
+                dialog_text="'$image_path' file doesn't exist!"
             else
                 declare "$property_var"="$image_path"
                 set_config "${property}_path" "${!property_var}" > /dev/null
                 dialog_title="Success!"
-                dialog_text="Splashscreen path set to '${!property_var}'."
-                SPLASH_BG_IMAGE_FLAG=1
+                dialog_text="${property_text^} path set to '${!property_var}'."
             fi
         fi
         dialog \
@@ -950,8 +949,9 @@ function dialog_choose_path() {
 }
 
 function dialog_choose_color() {
-    property="$1" # Can be "background", "fun_fact_text" or "press_button_text"
+    property="$1"
     property_var="${property^^}_COLOR"
+    property_text="${property//_/ }"
     options=(
         1 "Basic colors"
         2 "Full list of colors"
@@ -960,7 +960,7 @@ function dialog_choose_color() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Set $property color" \
+        --title "Set $property_text color" \
         --cancel-label "Back" \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -980,7 +980,7 @@ function dialog_choose_color() {
                 menu_text="Choose a color."
                 cmd=(dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Set $property color" \
+                    --title "Set $property_text color" \
                     --cancel-label "Back" \
                     --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
                 choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -1003,7 +1003,7 @@ function dialog_choose_color() {
                         dialog \
                             --backtitle "$DIALOG_BACKTITLE" \
                             --title "Success!" \
-                            --msgbox "${property^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                            --msgbox "${property_text^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     fi
                 fi
                 ;;
@@ -1022,7 +1022,7 @@ function dialog_choose_color() {
                 menu_text="Choose a color."
                 cmd=(dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Set $property color" \
+                    --title "Set $property_text color" \
                     --cancel-label "Back" \
                     --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
                 choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -1045,9 +1045,64 @@ function dialog_choose_color() {
                         dialog \
                             --backtitle "$DIALOG_BACKTITLE" \
                             --title "Success!" \
-                            --msgbox "${property^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                            --msgbox "${property_text^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     fi
                 fi
+                ;;
+        esac
+    fi
+}
+
+
+function dialog_choose_background() {
+    property="$1"
+    property_text="${property//_/ }"
+    options=(
+        1 "Image ($(get_config "${property}_background_path"))"
+        2 "Solid color ($(get_config "${property}_background_color"))"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option.\n\nIf both options are set, 'Image' takes precedence over 'Solid color'."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "${property_text^} background settings" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                dialog_choose_path "${property}_background"
+                ;;
+            2)
+                dialog_choose_color "${property}_background"
+                ;;
+        esac
+    fi
+}
+
+dialog_choose_splashscreen_settings() {
+    property="$1"
+    property_text="${property//_/ }"
+    options=(
+        1 "Background"
+        2 "Text color"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "${property_text^} splashcreen settings" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                dialog_choose_path "${property}_background"
+                ;;
+            2)
+                dialog_choose_color "${property}_text"
                 ;;
         esac
     fi
@@ -1088,7 +1143,7 @@ function gui() {
         #~ )
         
         options=(
-            1 "Splashscreen settings"
+            1 "Splashscreens settings"
             2 "Fun Facts! settings"
             3 "Create Fun Facts! Splashscreen"
             4 "Automate scripts"
@@ -1113,218 +1168,30 @@ function gui() {
             case "$choice" in
                 1)
                     options=(
-                        1 "Background"
-                        2 "Text color"
+                        1 "Boot splashscreen"
+                        2 "Launching images"
                     )
                     menu_items="$(((${#options[@]} / 2)))"
                     menu_text="Choose an option."
                     cmd=(dialog \
                         --backtitle "$DIALOG_BACKTITLE" \
-                        --title "Splashscreen settings" \
+                        --title "Splashscreens settings" \
                         --cancel-label "Back" \
                         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
                     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
                     if [[ -n "$choice" ]]; then
                         case "$choice" in
                             1)
-                                options=(
-                                    1 "Image ($(get_config "splashscreen_path"))"
-                                    2 "Solid color ($(get_config "background_color"))"
-                                )
-                                menu_items="$(((${#options[@]} / 2)))"
-                                menu_text="Choose an option.\n\nIf both options are set, 'Image' takes precedence over 'Solid color'."
-                                cmd=(dialog \
-                                    --backtitle "$DIALOG_BACKTITLE" \
-                                    --title "Background settings" \
-                                    --cancel-label "Back" \
-                                    --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-                                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                                if [[ -n "$choice" ]]; then
-                                    case "$choice" in
-                                        1)
-                                            dialog_choose_path "boot_background"
-                                            ;;
-                                        2)
-                                            dialog_choose_color "boot_text"
-                                            ;;
-                                    esac
-                                fi
+                                dialog_choose_splashscreen_settings "boot_splashscreen"
                                 ;;
                             2)
-                                ;;
-                            3)
-                                ;;
-                            4)
-                                ;;
-                            5)
-                                ;;
+                               dialog_choose_splashscreen_settings "launching_images"
+                               ;;
                         esac
                     fi
                     ;;
-                #~ 1)
-                    #~ CONFIG_FLAG=0
-
-                    #~ splash="$(dialog \
-                        #~ --backtitle "$DIALOG_BACKTITLE" \
-                        #~ --title "Set splashscreen path" \
-                        #~ --cancel-label "Back" \
-                        #~ --inputbox "Enter splashscreen path.\n\n(If input is left empty, default splashscreen will be used)" \
-                            #~ 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
-
-                    #~ result_value="$?"
-                    #~ if [[ "$result_value" == "$DIALOG_OK" ]]; then
-                        #~ validation="$(validate_splash "$splash")"
-                        #~ if [[ -n "$validation" ]]; then
-                            #~ dialog \
-                                #~ --backtitle "$DIALOG_BACKTITLE" \
-                                #~ --title "Error!" \
-                                #~ --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        #~ else
-                            #~ if [[ -z "$splash" ]]; then
-                                #~ SPLASH_PATH="$DEFAULT_SPLASH"
-                            #~ else
-                                #~ SPLASH_PATH="$splash"
-                            #~ fi
-                            #~ set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
-                            #~ dialog \
-                                #~ --backtitle "$DIALOG_BACKTITLE" \
-                                #~ --title "Success!" \
-                                #~ --msgbox "'splashscreen_path' set to '$SPLASH_PATH'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        #~ fi
-                    #~ fi
-                    #~ ;;
                 2)
-                    CONFIG_FLAG=0
-
-                    cmd=(dialog \
-                        --backtitle "$DIALOG_BACKTITLE" \
-                        --title "Set text color" \
-                        --cancel-label "Back" \
-                        --menu "Choose an option." "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-
-                    options=(
-                        1 "Basic colors"
-                        2 "Full list of colors"
-                    )
-
-                    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-
-                    if [[ -n "$choice" ]]; then
-                        case "$choice" in
-                            1)
-                                local i=1
-                                local color_list=(
-                                    "white (default)"
-                                    "black"
-                                    "gray"
-                                    "gray10"
-                                    "gray25"
-                                    "gray50"
-                                    "gray75"
-                                    "gray90"
-                                    "pink"
-                                    "red"
-                                    "orange"
-                                    "yellow"
-                                    "green"
-                                    "silver"
-                                    "blue"
-                                    "cyan"
-                                    "purple"
-                                    "brown"
-                                )
-
-                                options=()
-
-                                for color in "${color_list[@]}"; do
-                                    options+=("$i" "$color")
-                                    ((i++))
-                                done
-
-                                cmd=(dialog \
-                                    --backtitle "$DIALOG_BACKTITLE" \
-                                    --title "Set text color" \
-                                    --cancel-label "Back" \
-                                    --menu "Choose a color" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#color_list[@]}")
-
-                                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                                result_value="$?"
-                                if [[ "$result_value" == "$DIALOG_OK" ]]; then
-                                    if [[ "$choice" -eq 1 ]]; then
-                                        local color=""
-                                    else
-                                        local color="${options[$((choice*2-1))]}"
-                                    fi
-
-                                    local validation="$(validate_color "$color")"
-
-                                     if [[ -n "$validation" ]]; then
-                                        dialog \
-                                            --backtitle "$DIALOG_BACKTITLE" \
-                                            --title "Error!" \
-                                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                                    else
-                                        if [[ -z "$color" ]]; then
-                                            TEXT_COLOR="$DEFAULT_COLOR"
-                                        else
-                                            TEXT_COLOR="$color"
-                                        fi
-                                        set_config "text_color" "$TEXT_COLOR" > /dev/null
-                                        dialog \
-                                            --backtitle "$DIALOG_BACKTITLE" \
-                                            --title "Success!" \
-                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                                    fi
-                                fi
-                                ;;
-                            2)
-                                local i=1
-                                local color_list=()
-                                options=()
-
-                                while IFS= read -r line; do
-                                    color_list+=("$line")
-                                done < <(convert -list color | grep "srgb" | grep -Eo "^[^ ]+")
-
-                                for color in "${color_list[@]}"; do
-                                    options+=("$i" "$color")
-                                    ((i++))
-                                done
-
-                                cmd=(dialog \
-                                    --backtitle "$DIALOG_BACKTITLE" \
-                                    --title "Set text color" \
-                                    --cancel-label "Back" \
-                                    --menu "Choose a color" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#color_list[@]}")
-
-                                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                                result_value="$?"
-                                if [[ "$result_value" == "$DIALOG_OK" ]]; then
-                                    local color="${options[$((choice*2-1))]}"
-
-                                    local validation="$(validate_color $color)"
-
-                                     if [[ -n "$validation" ]]; then
-                                        dialog \
-                                            --backtitle "$DIALOG_BACKTITLE" \
-                                            --title "Error!" \
-                                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                                    else
-                                        if [[ -z "$color" ]]; then
-                                            TEXT_COLOR="$DEFAULT_COLOR"
-                                        else
-                                            TEXT_COLOR="$color"
-                                        fi
-                                        set_config "text_color" "$TEXT_COLOR" > /dev/null
-                                        dialog \
-                                            --backtitle "$DIALOG_BACKTITLE" \
-                                            --title "Success!" \
-                                            --msgbox "Text color set to '$TEXT_COLOR'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                                    fi
-                                fi
-                                ;;
-                        esac
-                    fi
+                    
                     ;;
                 3)
                     new_fun_fact="$(dialog \
