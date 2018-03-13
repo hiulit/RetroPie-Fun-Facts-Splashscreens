@@ -13,6 +13,9 @@
 # - imagemagick
 # - librsvg2-bin
 
+# External resources ######################################
+
+source "./utils/dialogs.sh"
 
 # Globals #############################################
 
@@ -51,30 +54,21 @@ readonly LOG_FILE="$SCRIPT_DIR/fun-facts-splashscreens.log"
 readonly RUNCOMMAND_ONEND="$RP_CONFIG_DIR/all/runcommand-onend.sh"
 
 # Defaults
+readonly DEFAULT_SPLASHSCREEN_BACKGROUND="$SCRIPT_DIR/retropie-default.png"
 
 ## Boot splashscreen
-readonly DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH="$SCRIPT_DIR/retropie-default.png"
 readonly DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR="white"
 readonly DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR="black"
 
 ## Launching images
-readonly LAUNCHING_IMAGES_BACKGROUND_PATH=""
-readonly LAUNCHING_IMAGES_BACKGROUND_COLOR="black"
-readonly LAUNCHING_IMAGES_TEXT_COLOR="white"
-readonly LAUNCHING_IMAGES_PRESS_BUTTON_TEXT="Press a button to configure launch options"
-readonly LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="white"
+readonly DEFAULT_LAUNCHING_IMAGES_BACKGROUND_COLOR="black"
+readonly DEFAULT_LAUNCHING_IMAGES_TEXT_COLOR="white"
+readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT="Press a button to configure launch options"
+readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="white"
 
 ## Automate scripts
 readonly DEFAULT_BOOT_SCRIPT="false"
 readonly DEFAULT_LOG="false"
-
-# Dialogs
-readonly DIALOG_OK=0
-readonly DIALOG_CANCEL=1
-readonly DIALOG_ESC=255
-readonly DIALOG_HEIGHT=20
-readonly DIALOG_WIDTH=60
-readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 
 # Flags
 GUI_FLAG=0
@@ -165,8 +159,8 @@ function check_argument() {
 
 
 function download_default_boot_splashscreen_background() {
-    if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"; then
-        chown -R "$user":"$user" "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"
+    if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASHSCREEN_BACKGROUND"; then
+        chown -R "$user":"$user" "$DEFAULT_SPLASHSCREEN_BACKGROUND"
     else
         log "ERROR: Can't download default splashscreen."
         return 1
@@ -202,7 +196,7 @@ function restore_default_files() {
 
 
 function check_default_files() {
-    [[ ! -f "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH" ]] && download_default_boot_splashscreen_background
+    [[ ! -f "$DEFAULT_SPLASHSCREEN_BACKGROUND" ]] && download_default_boot_splashscreen_background
     [[ ! -f "$SCRIPT_CFG" ]] && download_config_file
     [[ ! -f "$FUN_FACTS_TXT" ]] && download_fun_facts
 }
@@ -249,7 +243,7 @@ function check_config() {
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
 
     if [[ -z "$SPLASH_PATH" ]]; then
-        SPLASH_PATH="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"
+        SPLASH_PATH="$DEFAULT_SPLASHSCREEN_BACKGROUND"
         set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
     fi
 
@@ -917,249 +911,6 @@ function get_last_commit() {
     echo "$(git -C "$SCRIPT_DIR" log -1 --pretty=format:"%cr (%h)")"
 }
 
-function dialog_choose_path() {
-    local property="$1"
-    log "$property" > /dev/null
-    local property_var="${property^^}_PATH"
-    local property_text="${property//_/ }"
-    file_type="image"
-    file_path="$(dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Set $property_text path" \
-                    --cancel-label "Back" \
-                    --inputbox "Enter $property_text path (must be an absolute path).\n\nEnter 'default' to set the default $file_type.\nLeave the input empty to unset the $file_type." \
-                    12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
-    result_value="$?"
-    if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
-        if [[ -z "$file_path" ]]; then
-            dialog_title="Success!"
-            dialog_text="$property_text path unset."
-            set_config "${property}_path" "" > /dev/null
-        elif [[ "$file_path" == "default" ]]; then
-            declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"
-            dialog_title="Success!"
-            dialog_text="${property_text^} path set to '${!property_var}'."
-            set_config "${property}_path" "${!property_var}" > /dev/null
-        else
-            if [[ ! -f "$file_path" ]]; then
-                dialog_title="Error!"
-                dialog_text="'$file_path' file doesn't exist!"
-            else
-                declare "$property_var"="$file_path"
-                dialog_title="Success!"
-                dialog_text="${property_text^} path set to '${!property_var}'."
-                set_config "${property}_path" "${!property_var}" > /dev/null
-            fi
-        fi
-        dialog \
-            --backtitle "$DIALOG_BACKTITLE" \
-            --title "$dialog_title" \
-            --msgbox "$dialog_text"  8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-    elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
-        dialog_choose_background "$property"
-    fi
-}
-
-function dialog_choose_color() {
-    local property="$1"
-    log "$property" > /dev/null
-    local property_var="${property^^}_COLOR"
-    local property_text="${property//_/ }"
-    options=(
-        1 "Basic colors"
-        2 "Full list of colors"
-    )
-    menu_items="$(((${#options[@]} / 2)))"
-    menu_text="Choose an option."
-    cmd=(dialog \
-        --backtitle "$DIALOG_BACKTITLE" \
-        --title "Set $property_text color" \
-        --cancel-label "Back" \
-        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-    if [[ -n "$choice" ]]; then
-        case "$choice" in
-            1)
-                i=1
-                color_list=(
-                    "white" "black" "gray" "gray10" "gray25" "gray50" "gray75" "gray90" "pink" "red" "orange" "yellow" "green" "silver" "blue" "cyan" "purple" "brown"
-                )
-                options=()
-                for color in "${color_list[@]}"; do
-                    options+=("$i" "$color")
-                    ((i++))
-                done
-                menu_items="$(((${#options[@]} / 2)))"
-                menu_text="Choose a color."
-                cmd=(dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Set $property_text color" \
-                    --cancel-label "Back" \
-                    --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                result_value="$?"
-                if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
-                    color="${options[$((choice*2-1))]}"
-                    validation="$(validate_color "$color")"
-                    if [[ -n "$validation" ]]; then
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Error!" \
-                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        if [[ -z "$color" ]]; then
-                            declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR" # This case will never exist!!!!
-                        else
-                            declare "$property_var"="$color"
-                        fi
-                        set_config "${property}_color" "${!property_var}" > /dev/null
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Success!" \
-                            --msgbox "${property_text^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    fi
-                elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
-                    dialog_choose_color "$property"
-                fi
-                ;;
-            2)
-                i=1
-                color_list=()
-                options=()
-                while IFS= read -r line; do
-                    color_list+=("$line")
-                done < <(convert -list color | grep "srgb" | grep -Eo "^[^ ]+")
-                for color in "${color_list[@]}"; do
-                    options+=("$i" "$color")
-                    ((i++))
-                done
-                menu_items="$(((${#options[@]} / 2)))"
-                menu_text="Choose a color."
-                cmd=(dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Set $property_text color" \
-                    --cancel-label "Back" \
-                    --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-                choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                result_value="$?"
-                if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
-                    color="${options[$((choice*2-1))]}"
-                    validation="$(validate_color $color)"
-                    if [[ -n "$validation" ]]; then
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Error!" \
-                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        if [[ -z "$color" ]]; then
-                            declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
-                        else
-                            declare "$property_var"="$color"
-                        fi
-                        set_config "${property}_color" "${!property_var}" > /dev/null
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Success!" \
-                            --msgbox "${property_text^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    fi
-                elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
-                    dialog_choose_color "$property"
-                fi
-                ;;
-        esac
-    else
-        dialog_choose_splashscreen_settings "$property"
-    fi
-}
-
-
-function dialog_choose_background() {
-    local property="$1"
-    log "$property" > /dev/null
-    local property_text="${property//_/ }"
-    options=(
-        1 "Image ($(get_config "${property}_path"))"
-        2 "Solid color ($(get_config "${property}_color"))"
-    )
-    menu_items="$(((${#options[@]} / 2)))"
-    menu_text="Choose an option.\n\nIf both options are set, 'Image' takes precedence over 'Solid color'."
-    cmd=(dialog \
-        --backtitle "$DIALOG_BACKTITLE" \
-        --title "${property_text^} settings" \
-        --cancel-label "Back" \
-        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-    if [[ -n "$choice" ]]; then
-        case "$choice" in
-            1)
-                dialog_choose_path "$property"
-                ;;
-            2)
-                dialog_choose_color "$property"
-                ;;
-        esac
-    else
-        dialog_choose_splashscreen_settings "${property%_*}"
-    fi
-}
-
-dialog_choose_splashscreen_settings() {
-    local property="$1"
-    log "$property" > /dev/null
-    local property_text="${property//_/ }"
-    options=(
-        1 "Background"
-        2 "Text color"
-    )
-    menu_items="$(((${#options[@]} / 2)))"
-    menu_text="Choose an option."
-    cmd=(dialog \
-        --backtitle "$DIALOG_BACKTITLE" \
-        --title "${property_text^} settings" \
-        --cancel-label "Back" \
-        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-    if [[ -n "$choice" ]]; then
-        case "$choice" in
-            1)
-                dialog_choose_background "${property}_background"
-                ;;
-            2)
-                dialog_choose_color "${property}_text"
-                ;;
-        esac
-    else
-        dialog_splashscreen_settings
-    fi
-}
-
-dialog_splashscreen_settings() {
-    options=(
-        1 "Boot splashscreen"
-        2 "Launching images"
-    )
-    menu_items="$(((${#options[@]} / 2)))"
-    menu_text="Choose an option."
-    cmd=(dialog \
-        --backtitle "$DIALOG_BACKTITLE" \
-        --title "Splashscreens settings" \
-        --cancel-label "Back" \
-        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-    if [[ -n "$choice" ]]; then
-        case "$choice" in
-            1)
-                dialog_choose_splashscreen_settings "boot_splashscreen"
-                ;;
-            2)
-               dialog_choose_splashscreen_settings "launching_images"
-               ;;
-        esac
-    fi
-}
-
-DIALOG_DEPTH=0
-
 
 function gui() {
     GUI_FLAG=1
@@ -1389,7 +1140,7 @@ function gui() {
                         local title="Success!"
                         local text="Default files restored successfully!"
                             text+="\n\n"
-                            text+="\n- ./$(basename "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH")" \
+                            text+="\n- ./$(basename "$DEFAULT_SPLASHSCREEN_BACKGROUND")" \
                             text+="\n- ./$(basename "$SCRIPT_CFG")" \
                             text+="\n- ./$(basename "$FUN_FACTS_TXT")"
                     fi
