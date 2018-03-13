@@ -51,10 +51,20 @@ readonly LOG_FILE="$SCRIPT_DIR/fun-facts-splashscreens.log"
 readonly RUNCOMMAND_ONEND="$RP_CONFIG_DIR/all/runcommand-onend.sh"
 
 # Defaults
-readonly DEFAULT_SPLASH="$SCRIPT_DIR/retropie-default.png"
-readonly DEFAULT_COLOR="white"
-readonly DEFAULT_BG_COLOR="black"
-readonly DEFAULT_PRESS_BUTTON_TEXT="Press a button to configure launch options"
+
+## Boot splashscreen
+readonly DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH="$SCRIPT_DIR/retropie-default.png"
+readonly DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR="white"
+readonly DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR="black"
+
+## Launching images
+readonly LAUNCHING_IMAGES_BACKGROUND_PATH=""
+readonly LAUNCHING_IMAGES_BACKGROUND_COLOR="black"
+readonly LAUNCHING_IMAGES_TEXT_COLOR="white"
+readonly LAUNCHING_IMAGES_PRESS_BUTTON_TEXT="Press a button to configure launch options"
+readonly LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="white"
+
+## Automate scripts
 readonly DEFAULT_BOOT_SCRIPT="false"
 readonly DEFAULT_LOG="false"
 
@@ -69,8 +79,6 @@ readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 # Flags
 GUI_FLAG=0
 CONFIG_FLAG=0
-SPLASH_BG_IMAGE_FLAG=0
-SPLASH_BG_SOLID_COLOR_FLAG=0
 
 # Global variables
 SPLASH_PATH=
@@ -156,9 +164,9 @@ function check_argument() {
 }
 
 
-function download_default_splash() {
-    if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASH"; then
-        chown -R "$user":"$user" "$DEFAULT_SPLASH"
+function download_default_boot_splashscreen_background() {
+    if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"; then
+        chown -R "$user":"$user" "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"
     else
         log "ERROR: Can't download default splashscreen."
         return 1
@@ -187,14 +195,14 @@ function download_fun_facts() {
 
 
 function restore_default_files() {
-    download_default_splash || return 1
+    download_default_boot_splashscreen_background || return 1
     download_config_file || return 1
     download_fun_facts || return 1
 }
 
 
 function check_default_files() {
-    [[ ! -f "$DEFAULT_SPLASH" ]] && download_default_splash
+    [[ ! -f "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH" ]] && download_default_boot_splashscreen_background
     [[ ! -f "$SCRIPT_CFG" ]] && download_config_file
     [[ ! -f "$FUN_FACTS_TXT" ]] && download_fun_facts
 }
@@ -219,6 +227,13 @@ function get_config() {
 }
 
 
+function reset_config() {
+    while read line; do
+        set_config "$line" ""
+    done < <(grep -Po ".*?(?=\ = )" "$SCRIPT_CFG")
+}
+
+
 function check_config() {
     CONFIG_FLAG=1
 
@@ -234,22 +249,22 @@ function check_config() {
     validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
 
     if [[ -z "$SPLASH_PATH" ]]; then
-        SPLASH_PATH="$DEFAULT_SPLASH"
+        SPLASH_PATH="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"
         set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
     fi
 
     if [[ -z "$TEXT_COLOR" ]]; then
-        TEXT_COLOR="$DEFAULT_COLOR"
+        TEXT_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
         set_config "text_color" "$TEXT_COLOR" > /dev/null
     fi
 
     if [[ -z "$BG_COLOR" ]]; then
-        BG_COLOR="$DEFAULT_BG_COLOR"
+        BG_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR"
         set_config "bg_color" "$BG_COLOR" > /dev/null
     fi
     
     if [[ -z "$PRESS_BUTTON_TEXT" ]]; then
-        PRESS_BUTTON_TEXT="$DEFAULT_PRESS_BUTTON_TEXT"
+        PRESS_BUTTON_TEXT="$LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
         set_config "press_button_text" "$PRESS_BUTTON_TEXT" > /dev/null
     fi
     
@@ -280,13 +295,6 @@ function edit_config() {
     else
         nano "$SCRIPT_CFG"
     fi
-}
-
-
-function reset_config() {
-    while read line; do
-        set_config "$line" ""
-    done < <(grep -Po ".*?(?=\ = )" "$SCRIPT_CFG")
 }
 
 
@@ -926,7 +934,7 @@ function dialog_choose_path() {
             dialog_text="$property_text path unset."
             set_config "${property}_path" "" > /dev/null
         elif [[ "$image_path" == "default" ]]; then
-            declare "$property_var"="$DEFAULT_SPLASH"
+            declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH"
             set_config "${property}_path" "${!property_var}" > /dev/null
             dialog_title="Success!"
             dialog_text="${property_text^} path set to '${!property_var}'."
@@ -995,7 +1003,7 @@ function dialog_choose_color() {
                             --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         if [[ -z "$color" ]]; then
-                            declare "$property_var"="$DEFAULT_COLOR" # This case will never exist!!!!
+                            declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR" # This case will never exist!!!!
                         else
                             declare "$property_var"="$color"
                         fi
@@ -1037,7 +1045,7 @@ function dialog_choose_color() {
                             --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         if [[ -z "$color" ]]; then
-                            declare "$property_var"="$DEFAULT_COLOR"
+                            declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
                         else
                             declare "$property_var"="$color"
                         fi
@@ -1358,7 +1366,7 @@ function gui() {
                         local title="Success!"
                         local text="Default files restored successfully!"
                             text+="\n\n"
-                            text+="\n- ./$(basename "$DEFAULT_SPLASH")" \
+                            text+="\n- ./$(basename "$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_PATH")" \
                             text+="\n- ./$(basename "$SCRIPT_CFG")" \
                             text+="\n- ./$(basename "$FUN_FACTS_TXT")"
                     fi
