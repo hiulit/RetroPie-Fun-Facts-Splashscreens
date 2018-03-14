@@ -379,13 +379,7 @@ function dialog_create_fun_facts_splashscreens() {
     if [[ -n "$choice" ]]; then
         case "$choice" in
             1)
-                local validation
-                validation="$(is_fun_facts_empty)"
-                if [[ -n "$validation" ]]; then
-                    dialog_msgbox "Error!" "$validation"
-                else
-                    create_fun_fact
-                fi
+                create_fun_fact
                 ;;
             2)
                 dialog_choose_launching_image

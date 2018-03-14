@@ -811,8 +811,13 @@ function gui() {
                    dialog_fun_facts_settings 
                     ;;
                 3)
-                    #~ dialog_info "Checking config ..."
-                    dialog_create_fun_facts_splashscreens
+                    local validation
+                    validation="$(is_fun_facts_empty)"
+                    if [[ -n "$validation" ]]; then
+                        dialog_msgbox "Error!" "$validation"
+                    else
+                        dialog_create_fun_facts_splashscreens
+                    fi
                     ;;
                 4)
                     
