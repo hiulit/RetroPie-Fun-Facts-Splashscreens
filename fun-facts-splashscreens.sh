@@ -13,9 +13,6 @@
 # - imagemagick
 # - librsvg2-bin
 
-# External resources ######################################
-
-source "./utils/dialogs.sh"
 
 # Globals #############################################
 
@@ -82,6 +79,11 @@ PRESS_BUTTON_TEXT=
 BOOT_SCRIPT=
 LOG=
 OPTION=
+
+
+# External resources ######################################
+
+source "./utils/dialogs.sh"
 
 
 # Functions ############################################
@@ -973,39 +975,10 @@ function gui() {
                     dialog_splashscreen_settings
                     ;;
                 2)
-                    
+                   dialog_fun_facts_settings 
                     ;;
                 3)
-                    new_fun_fact="$(dialog \
-                        --backtitle "$DIALOG_BACKTITLE" \
-                        --title "Add a new Fun Fact!" \
-                        --cancel-label "Back" \
-                        --inputbox "Enter a new Fun Fact!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
 
-                    result_value="$?"
-                    if [[ "$result_value" == "$DIALOG_OK" ]]; then
-                        if [[ -z "$new_fun_fact" ]]; then
-                            dialog \
-                                --backtitle "$DIALOG_BACKTITLE" \
-                                --title "Error!" \
-                                --msgbox "You must enter a Fun Fact!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        else
-                            local validation
-                            validation="$(add_fun_fact "$new_fun_fact")"
-                            return_value="$?"
-                            if [[ "$return_value" -eq 0 ]]; then
-                                dialog_title="Success!"
-                            else
-                                dialog_title="Error!"
-                            fi
-                            if [[ -n "$validation" ]]; then
-                                dialog \
-                                    --backtitle "$DIALOG_BACKTITLE" \
-                                    --title "$dialog_title" \
-                                    --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                            fi
-                        fi
-                    fi
                     ;;
                 4)
                     while true; do

@@ -13,6 +13,16 @@ readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 
 # Functions ###########################################
 
+function dialog_msgbox() {
+    [[ -z "$1" ]] && log "ERROR: '${FUNCNAME[0]}' needs a title as an argument!" >&2 && exit 1
+    [[ -z "$2" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
+    dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "$1" \
+        --ok-label "OK" \
+        --msgbox "$2"  8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+}
+
 function dialog_splashscreen_settings() {
     options=(
         1 "Boot splashscreen"
@@ -144,19 +154,13 @@ function dialog_choose_color() {
                     color="${options[$((choice*2-1))]}"
                     validation="$(validate_color "$color")"
                     if [[ -n "$validation" ]]; then
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Error!" \
-                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        dialog_msgbox "Error!" "$validation"
                     else
-			declare "$property_var"="$color"
+                        declare "$property_var"="$color"
                         set_config "${property}_color" "${!property_var}" > /dev/null
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Success!" \
-                            --msgbox "${property_text^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        dialog_msgbox "Success!" "${property_text^} color set to '${!property_var}'."
                     fi
-		    dialog_choose_splashscreen_settings "${property%_*}"
+                    dialog_choose_splashscreen_settings "${property%_*}"
                 elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
                     dialog_choose_color "$property"
                 fi
@@ -185,10 +189,7 @@ function dialog_choose_color() {
                     color="${options[$((choice*2-1))]}"
                     validation="$(validate_color $color)"
                     if [[ -n "$validation" ]]; then
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Error!" \
-                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        dialog_msgbox "Error!" "$validation"
                     else
                         if [[ -z "$color" ]]; then
                             declare "$property_var"="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
@@ -196,12 +197,9 @@ function dialog_choose_color() {
                             declare "$property_var"="$color"
                         fi
                         set_config "${property}_color" "${!property_var}" > /dev/null
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Success!" \
-                            --msgbox "${property_text^} color set to '${!property_var}'" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        dialog_msgbox "Success!" "${property_text^} color set to '${!property_var}'."
                     fi
-		    dialog_choose_splashscreen_settings "${property%_*}"
+                    dialog_choose_splashscreen_settings "${property%_*}"
                 elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
                     dialog_choose_color "$property"
                 fi
@@ -228,7 +226,7 @@ function dialog_choose_path() {
     if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
         if [[ -z "$file_path" ]]; then
             dialog_title="Success!"
-            dialog_text="$property_text path unset."
+            dialog_text="${property_text^} path unset."
             set_config "${property}_path" "" > /dev/null
         elif [[ "$file_path" == "default" ]]; then
             dialog_title="Success!"
@@ -250,15 +248,111 @@ function dialog_choose_path() {
                 set_config "${property}_path" "${!property_var}" > /dev/null
             fi
         fi
-        dialog \
-            --backtitle "$DIALOG_BACKTITLE" \
-            --title "$dialog_title" \
-            --msgbox "$dialog_text"  8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+        dialog_msgbox "$dialog_title" "$dialog_text"
+        if [[ "$file_type" == "image" ]]; then
+            dialog_choose_background "$property"
+        elif [[ "$file_type" == "font" ]]; then
+            property="${property%_*}" # $property has too many '_', needed to remove the last one.
+            dialog_choose_splashscreen_settings "${property%_*}"
+        fi
     elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
         if [[ "$file_type" == "image" ]]; then
             dialog_choose_background "$property"
         elif [[ "$file_type" == "font" ]]; then
-            dialog_choose_splashscreen_settings "$property"
+            property="${property%_*}" # $property has too many '_', needed to remove the last one.
+            dialog_choose_splashscreen_settings "${property%_*}"
         fi
+    fi
+}
+
+
+function dialog_fun_facts_settings() {
+    options=(
+        1 "Add"
+        2 "Remove"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Fun Facts! settings" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                new_fun_fact="$(dialog \
+                    --backtitle "$DIALOG_BACKTITLE" \
+                    --title "Add a new Fun Fact!" \
+                    --cancel-label "Back" \
+                    --inputbox "Enter a new Fun Fact!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
+                result_value="$?"
+                if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
+                    if [[ -z "$new_fun_fact" ]]; then
+                        dialog_msgbox "Error!" "You must enter a Fun Fact!"
+                    else
+                        local validation
+                        validation="$(add_fun_fact "$new_fun_fact")"
+                        return_value="$?"
+                        if [[ "$return_value" -eq 0 ]]; then
+                            dialog_title="Success!"
+                        else
+                            dialog_title="Error!"
+                        fi
+                        if [[ -n "$validation" ]]; then
+                            dialog_msgbox "$dialog_title" "$validation"
+                        fi
+                    fi
+                    dialog_fun_facts_settings
+                elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
+                    dialog_fun_facts_settings
+                fi
+                ;;
+            2)
+                while true; do
+                    local validation
+                    validation="$(is_fun_facts_empty)"
+                    if [[ -n "$validation" ]]; then
+                        dialog_msgbox "Error!" "$validation"
+                    else
+                        local fun_facts=()
+                        local fun_fact
+                        local options=()
+                        local i=1
+
+                        while IFS= read -r line; do
+                            #~ fun_facts+=("${line//$'\n\r'}")
+                            fun_facts+=("${line}")
+                        done < "$FUN_FACTS_TXT"
+
+                        for fun_fact in "${fun_facts[@]}"; do
+                            options+=("$i" "$fun_fact")
+                            ((i++))
+                        done
+
+                        cmd=(dialog \
+                            --backtitle "$DIALOG_BACKTITLE" \
+                            --title "Remove a Fun Fact!" \
+                            --cancel-label "Back" \
+                            --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
+                        choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                        if [[ -n "$choice" ]]; then
+                            local fun_fact
+                            fun_fact="${options[$((choice*2-1))]}"
+                            if [[ -z "$fun_fact" ]]; then
+                                dialog_msgbox "Error!" "Can't remove a ghost Fun Fact!.\nTry removing it manually from '$FUN_FACTS_TXT'."
+                            else
+                                remove_fun_fact "$fun_fact" \
+                                && dialog_msgbox "Success!" "'$fun_fact' succesfully removed!"
+                            fi
+                        else
+                            dialog_fun_facts_settings
+                            break
+                        fi
+                    fi
+                done
+                ;;
+        esac
     fi
 }
