@@ -820,11 +820,10 @@ function gui() {
                     fi
                     ;;
                 4)
-                    
-                    ;;
-                5)
-                    ;;
-                6)
+                    #~ Autome scripts
+                        #~ - Enable/disable boot splashscreen
+                        #~ - Enable/disable launching images
+                        
                     check_boot_script
                     local return_value="$?"
                     if [[ "$return_value" -eq 0 ]]; then
@@ -851,13 +850,34 @@ function gui() {
                         fi
                     fi
                     ;;
+                5)
+                    #~ - Edit config
+                    #~ - Reset config
+   
+                    #~ edit_config
+                    #~ reset_config
+                    ;;
+                6)
+                    local validation
+                    validation="$(restore_default_files)"
+                    if [[ -n "$validation" ]]; then
+                        local title="Error!"
+                        local text="$validation"
+                    else
+                        local title="Success!"
+                        local text="Default files restored successfully!"
+                            text+="\n\n"
+                            text+="\n- ./$(basename "$DEFAULT_SPLASHSCREEN_BACKGROUND")" \
+                            text+="\n- ./$(basename "$SCRIPT_CFG")" \
+                            text+="\n- ./$(basename "$FUN_FACTS_TXT")"
+                    fi
+                    dialog \
+                        --backtitle "$DIALOG_BACKTITLE" \
+                        --title "$title" \
+                        --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                    ;;
+                    ;;
                 7)
-                    edit_config
-                    ;;
-                8)
-                    reset_config
-                    ;;
-                9)
                     if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
                         local text="Can't update the script when using it from RetroPie-Setup."
                                 text+="\n\nGo to:"
@@ -881,25 +901,12 @@ function gui() {
                         fi
                     fi
                     ;;
-                10)
-                    local validation
-                    validation="$(restore_default_files)"
-                    if [[ -n "$validation" ]]; then
-                        local title="Error!"
-                        local text="$validation"
-                    else
-                        local title="Success!"
-                        local text="Default files restored successfully!"
-                            text+="\n\n"
-                            text+="\n- ./$(basename "$DEFAULT_SPLASHSCREEN_BACKGROUND")" \
-                            text+="\n- ./$(basename "$SCRIPT_CFG")" \
-                            text+="\n- ./$(basename "$FUN_FACTS_TXT")"
-                    fi
-                    dialog \
-                        --backtitle "$DIALOG_BACKTITLE" \
-                        --title "$title" \
-                        --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    ;;
+                #~ 8)
+                    #~ ;;
+                #~ 9)
+                    #~ ;;
+                #~ 10)
+                    #~ ;;
             esac
         else
             break
