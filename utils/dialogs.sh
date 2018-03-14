@@ -431,14 +431,40 @@ function dialog_choose_launching_image_system() {
     if [[ -n "$choice" ]]; then
         case "$choice" in
             1)
-                echo "all systems"
+                create_fun_fact "all"
                 ;;
             2)
-                echo "choose systems"
+                local systems
+                local system
+                local i=1
+                options=()
+                
+                systems="$(get_all_systems)"
+                IFS=" " read -r -a systems <<< "${systems[@]}"
+                for system in "${systems[@]}"; do
+                    options+=("$i" "$system" off)
+                    ((i++))
+                done
+                menu_items="$(((${#options[@]} / 2)))"
+                menu_text="Choose an option."
+                cmd=(dialog \
+                    --backtitle "$DIALOG_BACKTITLE" \
+                    --title "Create Fun Facts! launching images" \
+                    --cancel-label "Back" \
+                    --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+                choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+                if [[ -n "$choices" ]]; then
+                    systems=()
+                    IFS=" " read -r -a choices <<< "${choices[@]}"
+                    for choice in "${choices[@]}"; do
+                        system="${options[choice*3-2]}"
+                        create_fun_fact "$system"
+                    done
+                fi
                 ;;
         esac
     fi
 }
-
+    
 
 
