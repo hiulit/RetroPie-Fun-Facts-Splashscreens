@@ -439,9 +439,9 @@ function create_fun_fact_boot() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$DIALOG_BACKTITLE" \
-            --infobox "Creating Fun Facts! Splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+            --infobox "Creating Fun Facts! boot splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
-        echo "Creating Fun Facts! Splashscreen ..."
+        echo "Creating Fun Facts! boot splashscreen ..."
     fi
     
     if [[ -z "$splash" ]]; then
@@ -471,14 +471,14 @@ function create_fun_fact_boot() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        local success_message="Fun Facts! Splashscreen successfully created!"
+        local success_message="Fun Facts! boot splashscreen successfully created!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog_msgbox "Success!" "$success_message"
         else
             echo "$success_message"
         fi
     else
-        local error_message="Fun Facts! Splashscreen failed!"
+        local error_message="Fun Facts! boot splashscreen failed!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             log "$error_message" > /dev/null
             dialog_msgbox "Error!" "$error_message"
@@ -783,7 +783,7 @@ function gui() {
         options=(
             1 "Splashscreens settings"
             2 "Fun Facts! settings"
-            3 "Create Fun Facts! Splashscreen"
+            3 "Create Fun Facts! splashscreens"
             4 "Automate scripts"
             5 "Configuration file"
             6 "Restore default files"
@@ -875,7 +875,6 @@ function gui() {
                         --backtitle "$DIALOG_BACKTITLE" \
                         --title "$title" \
                         --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    ;;
                     ;;
                 7)
                     if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule

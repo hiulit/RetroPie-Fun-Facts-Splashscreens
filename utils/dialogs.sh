@@ -372,7 +372,7 @@ function dialog_create_fun_facts_splashscreens() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! Splashscreens" \
+        --title "Create Fun Facts! splashscreens" \
         --cancel-label "Back" \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
