@@ -382,6 +382,19 @@ function get_boxart() {
     fi
 }
 
+get_all_systems() {
+    local all_systems=()
+    local system_dir
+    local system
+    for system_dir in "$RP_CONFIG_DIR/"*; do
+        system="$(basename "$system_dir")"
+        if [[ "$system" != "all" ]]; then
+            all_systems+=("$system")
+        fi
+    done
+    echo "${all_systems[@]}"
+}
+
 
 function create_fun_fact() {
     local theme
