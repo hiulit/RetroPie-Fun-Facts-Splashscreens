@@ -13,6 +13,11 @@ readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 
 # Functions ###########################################
 
+function dialog_info() {
+    [[ -z "$1" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
+    dialog --infobox "$1" 8 "$DIALOG_WIDTH"
+}
+
 function dialog_msgbox() {
     [[ -z "$1" ]] && log "ERROR: '${FUNCNAME[0]}' needs a title as an argument!" >&2 && exit 1
     [[ -z "$2" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
@@ -23,7 +28,7 @@ function dialog_msgbox() {
         --msgbox "$2"  8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
 }
 
-function dialog_splashscreen_settings() {
+function dialog_splashscreens_settings() {
     options=(
         1 "Boot splashscreen"
         2 "Launching images"
@@ -78,7 +83,7 @@ function dialog_choose_splashscreen_settings() {
                 ;;
         esac
     else
-        dialog_splashscreen_settings
+        dialog_splashscreens_settings
     fi
 }
 
@@ -374,7 +379,13 @@ function dialog_create_fun_facts_splashscreens() {
     if [[ -n "$choice" ]]; then
         case "$choice" in
             1)
-                echo "Boot splashscreen"
+                local validation
+                validation="$(is_fun_facts_empty)"
+                if [[ -n "$validation" ]]; then
+                    dialog_msgbox "Error!" "$validation"
+                else
+                    create_fun_fact
+                fi
                 ;;
             2)
                 dialog_choose_launching_image

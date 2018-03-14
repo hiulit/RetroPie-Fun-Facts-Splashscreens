@@ -30,6 +30,7 @@ readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
 readonly DEPENDENCIES=("imagemagick" "librsvg2-bin")
 readonly TMP_DIR="$home/tmp"
+readonly TMP_SPLASHSCREEN="splashscreen.png"
 
 readonly SCRIPT_VERSION="2.0.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -52,16 +53,18 @@ readonly RUNCOMMAND_ONEND="$RP_CONFIG_DIR/all/runcommand-onend.sh"
 
 # Defaults
 readonly DEFAULT_SPLASHSCREEN_BACKGROUND="$SCRIPT_DIR/retropie-default.png"
+readonly DEFAULT_TEXT_COLOR="white"
+readonly DEFAULT_BACKGROUND_COLOR="black"
 
 ## Boot splashscreen
-readonly DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR="white"
-readonly DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR="black"
+readonly DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR="$DEFAULT_TEXT_COLOR"
+readonly DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR="$DEFAULT_BACKGROUND_COLOR"
 
 ## Launching images
-readonly DEFAULT_LAUNCHING_IMAGES_BACKGROUND_COLOR="black"
-readonly DEFAULT_LAUNCHING_IMAGES_TEXT_COLOR="white"
+readonly DEFAULT_LAUNCHING_IMAGES_BACKGROUND_COLOR="$DEFAULT_BACKGROUND_COLOR"
+readonly DEFAULT_LAUNCHING_IMAGES_TEXT_COLOR="$DEFAULT_TEXT_COLOR"
 readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT="Press a button to configure launch options"
-readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="white"
+readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="$DEFAULT_TEXT_COLOR"
 
 ## Automate scripts
 readonly DEFAULT_BOOT_SCRIPT="false"
@@ -83,20 +86,12 @@ OPTION=
 
 # External resources ######################################
 
+source "./utils/base.sh"
 source "./utils/dialogs.sh"
+source "./utils/imagemagick.sh"
 
 
 # Functions ############################################
-
-function is_retropie() {
-    [[ -d "$RP_DIR" && -d "$home/.emulationstation" && -d "/opt/retropie" ]]
-}
-
-
-function is_sudo() {
-    [[ "$(id -u)" -eq 0 ]]
-}
-
 
 function check_log_file(){
     if [[ ! -f "$LOG_FILE" ]]; then
@@ -117,50 +112,7 @@ function log() {
 }
 
 
-function check_dependencies() {
-    local pkg
-    for pkg in "${DEPENDENCIES[@]}";do
-        if ! dpkg-query -W -f='${Status}' "$pkg" | awk '{print $3}' | grep -q "^installed$"; then
-            log "ERROR: The '$pkg' package is not installed!"
-            echo "Would you like to install it now?"
-            local options=("Yes" "No")
-            local option
-            select option in "${options[@]}"; do
-                case "$option" in
-                    Yes)
-                        if ! which apt-get > /dev/null; then
-                            log "ERROR: Can't install '$pkg' automatically. Try to install it manually."
-                            exit 1
-                        else
-                            sudo apt-get install "$pkg"
-                            break
-                        fi
-                        ;;
-                    No)
-                        log "ERROR: Can't launch the script if the '$pkg' package is not installed."
-                        exit 1
-                        ;;
-                    *)
-                        echo "Invalid option. Choose a number between 1 and ${#options[@]}."
-                        ;;
-                esac
-            done
-        fi
-    done
-}
-
-
-function check_argument() {
-    # Note: this method doesn't accept arguments starting with '-'.
-    if [[ -z "$2" || "$2" =~ ^- ]]; then
-        log "ERROR: '$1' is missing an argument."
-        echo "Try 'sudo $0 --help' for more info." >&2
-        return 1
-    fi
-}
-
-
-function download_default_boot_splashscreen_background() {
+function download_default_splashscreen_background() {
     if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASHSCREEN_BACKGROUND"; then
         chown -R "$user":"$user" "$DEFAULT_SPLASHSCREEN_BACKGROUND"
     else
@@ -191,14 +143,14 @@ function download_fun_facts() {
 
 
 function restore_default_files() {
-    download_default_boot_splashscreen_background || return 1
+    download_default_splashscreen_background || return 1
     download_config_file || return 1
     download_fun_facts || return 1
 }
 
 
 function check_default_files() {
-    [[ ! -f "$DEFAULT_SPLASHSCREEN_BACKGROUND" ]] && download_default_boot_splashscreen_background
+    [[ ! -f "$DEFAULT_SPLASHSCREEN_BACKGROUND" ]] && download_default_splashscreen_background
     [[ ! -f "$SCRIPT_CFG" ]] && download_config_file
     [[ ! -f "$FUN_FACTS_TXT" ]] && download_fun_facts
 }
@@ -282,11 +234,7 @@ function edit_config() {
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
         local result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
-            echo "$config_file" > "$SCRIPT_CFG" \
-            && dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Info" \
-                    --msgbox "Config file updated." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+            echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Config file updated."
         fi
     else
         nano "$SCRIPT_CFG"
@@ -410,7 +358,11 @@ function get_console() {
         "/theme/view[contains(@name,'detailed') or contains(@name,'system')]/image[@name='console_overlay']/path" \
         "$ES_THEMES_DIR/$theme/$system/theme.xml" 2> /dev/null | head -1)"
     console="$ES_THEMES_DIR/$theme/$system/$console"
-    echo "$console"
+    if [[ -f "$console" ]]; then
+        echo "$console"
+    else
+        return 1
+    fi
 }
 
 function get_boxart() {
@@ -423,295 +375,23 @@ function get_boxart() {
         "/gameList/game[path=\"./$rom_name\"]/image" \
         "$RP_ROMS_DIR/$system/gamelist.xml" 2> /dev/null | head -1)"
     boxart="$RP_ROMS_DIR/$system/$boxart"
-    echo "$boxart"
-}
-
-
-function IM_add_background() {
-    convert -size "$screen_w"x"$screen_h" xc:"$bg_color" \
-        "$TMP_DIR/launching.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Background ... added!"
+    if [[ -f "$boxart" ]]; then
+        echo "$boxart"
     else
-        echo "Background failed!"
-    fi
-}
-
-
-function IM_convert_svg_to_png() {    
-    convert "$logo" "$TMP_DIR/$system.png"
-    
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "SVG converted to PNG successfully!"
-    else
-        echo "SVG to PNG conversion failed!"
-    fi
-}
-
-
-function IM_resize_logo() {    
-    if get_boxart > /dev/null || get_console > /dev/null; then
-        local size_y="$(((screen_h*10/100)))"
-    else
-        local size_y="$(((screen_h*25/100)))"
-    fi
-    
-    convert -background none \
-        -scale "$(((screen_w*60/100)))"x"$size_y" \
-        "$logo" "$TMP_DIR/$system.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Logo resized successfully!"
-    else
-        echo "Logo resizing failed!"
-    fi
-}
-
-
-function IM_add_logo() {
-    if file --mime-type "$logo" | grep -q "svg"; then
-        echo "mime type is SVG"
-        IM_convert_svg_to_png "$location"
-    elif file --mime-type "$logo" | grep -q "png" || file --mime-type "$logo" | grep -q "jpeg"; then
-        echo "mime type is PNG or JPEG"
-        cp "$logo" "$TMP_DIR/$system.png"
-    else
-        file --mime-type "$logo"
-        log "File type not recognised."
-        exit 1
-    fi
-    
-    IM_resize_logo "$location"
-    
-    if get_boxart > /dev/null || get_console > /dev/null; then
-        local gravity="north"
-        local offset_y="$(((screen_h*5/100)))"
-    else
-        local gravity="center"
-        local image_h
-        image_h="$(identify -format "%h" "$logo")"
-        image_h="$(((image_h/2)))"
-        local offset_y="-$image_h"
-    fi
-    
-    convert "$TMP_DIR/launching.png" \
-        "$TMP_DIR/$system.png" \
-        -gravity "$gravity" \
-        -geometry +0+"$offset_y" \
-        -composite \
-        "$TMP_DIR/launching.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Logo ... added!"
-    else
-        echo "Logo failed!"
-    fi
-}
-
-
-function IM_add_boxart() {
-    local boxart
-    boxart="$(get_boxart)"
-    convert "$TMP_DIR/launching.png" \
-        \( "$boxart" -scale x"$(((screen_h*45/100)))" \) \
-        -gravity center \
-        -geometry +0-"$(((screen_h*(10-(5/2))/100)))" \
-        -composite \
-        "$TMP_DIR/launching.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Boxart ... added!"
-    else
-        echo "Boxart failed!"
-    fi
-}
-
-
-function IM_add_console() {
-    local console
-    console="$(get_console)"
-    convert "$TMP_DIR/launching.png" \
-        \( "$console" -scale x"$(((screen_h*45/100)))" \) \
-        -gravity center \
-        -geometry +0-"$(((screen_h*(10-(5/2))/100)))" \
-        -composite \
-        "$TMP_DIR/launching.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Console ... added!"
-    else
-        echo "Console failed!"
-    fi
-}
-
-
-function IM_add_fun_fact() {
-    convert "$TMP_DIR/launching.png" \
-        -size "$(((screen_w*75/100)))"x"$(((screen_h*15/100)))" \
-        -background none \
-        -fill "$text_color" \
-        -interline-spacing 2 \
-        -font "$font" \
-        -gravity south \
-        caption:"$random_fact" \
-        -geometry +0+"$(((screen_h*15/100)))" \
-        -composite \
-        "$TMP_DIR/launching.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Fun Fact! ... added!"
-    else
-        echo "Fun Fact! failed!"
-    fi
-}
-
-
-function IM_add_press_button_text() {
-    convert "$TMP_DIR/launching.png" \
-        -size "$(((screen_w*60/100)))"x"$(((screen_h*5/100)))" \
-        -background none \
-        -fill "$text_color" \
-        -interline-spacing 2 \
-        -font "$font" \
-        caption:"${press_button_text^^}" \
-        -gravity south \
-        -geometry +0+"$(((screen_h*5/100)))" \
-        -composite \
-        "$TMP_DIR/launching.png"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        echo "Press button ... added!"
-    else
-        echo "Press button failed!"
-    fi
-}
-
-
-function create_fun_fact_boot() {
-    if [[ "$GUI_FLAG" -eq 1 ]]; then
-        dialog \
-            --backtitle "$DIALOG_BACKTITLE" \
-            --infobox "Creating Fun Facts! Splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-    else
-        echo "Creating Fun Facts! Splashscreen ..."
-    fi
-
-    convert "$splash" \
-        -size 1000x100 \
-        -background none \
-        -fill "$text_color" \
-        -interline-spacing 2 \
-        -font "$font" \
-        caption:"$random_fact" \
-        -gravity south \
-        -geometry +0+25 \
-        -composite \
-        "$RESULT_SPLASH"
-
-    local return_value="$?"
-    if [[ "$return_value" -eq 0 ]]; then
-        if [[ "$GUI_FLAG" -eq 1 ]]; then
-            dialog \
-                --backtitle "$DIALOG_BACKTITLE" \
-                --title "Success!" \
-                --msgbox "Fun Facts! Splashscreen successfully created!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-        else
-            echo "Fun Facts! Splashscreen successfully created!"
-        fi
-    else
-        local error_message="Fun Facts! Splashscreen failed!"
-        if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "$error_message" > /dev/null
-            dialog \
-                --backtitle "$DIALOG_BACKTITLE" \
-                --title "Error!" \
-                --msgbox "$error_message" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-        else
-            log "$error_message"
-        fi
         return 1
     fi
 }
 
 
-function create_fun_fact_launching() {
-    local system="$1"
-    if [[ "$system" == "all" ]]; then
-        local system_dir
-        for system_dir in "$RP_CONFIG_DIR/"*; do
-            system_dir="$(basename "$system_dir")"
-            if [[ "$system_dir" != "all" ]]; then
-                if [[ "$system_dir" != *.* ]]; then # In case there a file that's not a directory
-                    create_fun_fact_launching "$system_dir"
-                fi
-            fi
-        done
-    else
-        if [[ -z "$2" ]]; then
-            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
-            local result_splash="$RP_CONFIG_DIR/$system/launching.png"
-            echo "Creating launching image for '$system' ..."
-        else
-            local rom_path="$2"
-            [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
-            if [[ ! -f "$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-image.jpg" ]]; then
-                log "ERROR: '$(basename "${rom_path%.*}")' doesn't have a scraped image!"
-                rom_path=""
-                local result_splash="$RP_CONFIG_DIR/$system/launching.png"
-                echo "Creating launching image for '$system' ..."            
-            else
-                local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-launching.png"
-                echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
-            fi
-        fi
-
-        local screen_w=1024
-        local screen_h=576
-        local logo
-        logo="$(get_system_logo)"
-
-        mkdir -p "$TMP_DIR" && chown -R "$user":"$user" "$TMP_DIR"
-
-        IM_add_background
-        IM_add_logo
-        if get_boxart > /dev/null; then
-            IM_add_boxart
-        elif get_console > /dev/null; then
-            IM_add_console
-        fi
-        IM_add_fun_fact
-        IM_add_press_button_text
-
-        [[ -f "$result_splash" ]] && rm "$result_splash"
-        mv "$TMP_DIR/launching.png" "$result_splash" && chown -R "$user":"$user" "$result_splash" && rm -r "$TMP_DIR"
-    fi
-}
-
-
 function create_fun_fact() {
-    local splash
-    splash="$(get_config "splashscreen_path")"
-    local text_color
-    text_color="$(get_config "text_color")"
-    local bg_color
-    bg_color="$(get_config "bg_color")"
-    local press_button_text
-    press_button_text="$(get_config "press_button_text")"
-    local font
-    font="$(get_font)"
     local theme
     theme="$(get_current_theme)"
     local random_fact
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    local screen_w=1024
+    local screen_h=576
+    
+    mkdir -p "$TMP_DIR" && chown -R "$user":"$user" "$TMP_DIR"
 
     if [[ -z "$1" ]]; then
         create_fun_fact_boot
@@ -727,6 +407,159 @@ function create_fun_fact() {
         fi
     else
         create_fun_fact_launching "$@"
+    fi
+    
+    rm -r "$TMP_DIR"
+}
+
+
+function create_fun_fact_boot() {
+    local system="retropie"
+    
+    local logo
+    logo="$(get_system_logo)"
+    
+    local splash
+    splash="$(get_config "boot_splashscreen_background_path")"
+    
+    local bg_color
+    bg_color="$(get_config "boot_splashscreen_background_color")"
+    
+    local text_color
+    text_color="$(get_config "boot_splashscreen_text_color")"
+    [[ -z "$text_color" ]] &&  text_color="$DEFAULT_TEXT_COLOR"
+    
+    local font
+    font="$(get_config "boot_splashscreen_text_font")"
+    [[ -z "$font" ]] && font="$(get_font)"
+    
+    local size_x="$(((screen_w*75/100)))"
+    local size_y="$(((screen_h*15/100)))"
+    
+    if [[ "$GUI_FLAG" -eq 1 ]]; then
+        dialog \
+            --backtitle "$DIALOG_BACKTITLE" \
+            --infobox "Creating Fun Facts! Splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+    else
+        echo "Creating Fun Facts! Splashscreen ..."
+    fi
+    
+    if [[ -z "$splash" ]]; then
+        [[ -z "$bg_color" ]] &&  bg_color="$DEFAULT_BACKGROUND_COLOR"
+        IM_add_background
+        IM_add_logo
+        if get_console > /dev/null; then
+            IM_add_console
+        fi
+        splash="$TMP_DIR/splashscreen.png"
+    else
+        local bg_color="none"
+    fi
+    
+    # Add Fun Fact!
+    convert "$splash" \
+        -size "$size_x"x"$size_y" \
+        -background "$bg_color" \
+        -fill "$text_color" \
+        -interline-spacing 2 \
+        -font "$font" \
+        caption:"$random_fact" \
+        -gravity south \
+        -geometry +0+25 \
+        -composite \
+        "$RESULT_SPLASH"
+
+    local return_value="$?"
+    if [[ "$return_value" -eq 0 ]]; then
+        local success_message="Fun Facts! Splashscreen successfully created!"
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            dialog_msgbox "Success!" "$success_message"
+        else
+            echo "$success_message"
+        fi
+    else
+        local error_message="Fun Facts! Splashscreen failed!"
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            log "$error_message" > /dev/null
+            dialog_msgbox "Error!" "$error_message"
+        else
+            log "$error_message"
+        fi
+        return 1
+    fi
+}
+
+
+function create_fun_fact_launching() {
+    local system="$1"
+    local rom_path="$2"
+    
+    local splash    
+    splash="$(get_config "launching_images_background_path")"
+    
+    local bg_color
+    bg_color="$(get_config "launching_images_background_color")"
+    
+    local font
+    font="$(get_config "launching_images_text_font_path")"
+    [[ -z "$font" ]] && font="$(get_font)"
+
+    local press_button_text
+    press_button_text="$(get_config "launching_images_press_button_text")"
+    [[ -z "$press_button_text" ]] &&  press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
+    
+    local logo
+    logo="$(get_system_logo)"
+    
+    if [[ "$system" == "all" ]]; then
+        local system_dir
+        for system_dir in "$RP_CONFIG_DIR/"*; do
+            system_dir="$(basename "$system_dir")"
+            if [[ "$system_dir" != "all" ]]; then
+                if [[ "$system_dir" != *.* ]]; then # In case there a file that's not a directory
+                    create_fun_fact_launching "$system_dir"
+                fi
+            fi
+        done
+    else
+        if [[ -z "$rom_path" ]]; then
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
+            local result_splash="$RP_CONFIG_DIR/$system/$TMP_SPLASHSCREEN"
+            echo "Creating launching image for '$system' ..."
+        else    
+            [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
+            # TODO: Check if EmulationStation scraped images exist.
+            if [[ ! -f "$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-image.jpg" ]]; then
+                log "ERROR: '$(basename "${rom_path%.*}")' doesn't have a scraped image!"
+                rom_path=""
+                local result_splash="$RP_CONFIG_DIR/$system/$TMP_SPLASHSCREEN"
+                echo "Creating launching image for '$system' ..."            
+            else
+                local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-$TMP_SPLASHSCREEN"
+                echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
+            fi
+        fi
+
+        if [[ -z "$splash" ]]; then
+            [[ -z "$bg_color" ]] &&  bg_color="$DEFAULT_BACKGROUND_COLOR"
+            IM_add_background
+        else
+            local screen_w="$(identify -format "%w" "$splash")"
+            local screen_h="$(identify -format "%h" "$splash")"
+            cp "$splash" "$TMP_DIR/$TMP_SPLASHSCREEN"
+        fi
+    
+        IM_add_logo
+        if get_boxart > /dev/null; then
+            IM_add_boxart
+        elif get_console > /dev/null; then
+            IM_add_console
+        fi
+        IM_add_fun_fact
+        IM_add_press_button_text
+
+        [[ -f "$result_splash" ]] && rm "$result_splash"
+        mv "$TMP_DIR/$TMP_SPLASHSCREEN" "$result_splash" && chown -R "$user":"$user" "$result_splash"
     fi
 }
 
@@ -972,28 +805,19 @@ function gui() {
         if [[ -n "$choice" ]]; then
             case "$choice" in
                 1)
-                    dialog_splashscreen_settings
+                    dialog_splashscreens_settings
                     ;;
                 2)
                    dialog_fun_facts_settings 
                     ;;
                 3)
+                    #~ dialog_info "Checking config ..."
                     dialog_create_fun_facts_splashscreens
                     ;;
                 4)
                     
                     ;;
                 5)
-                    local validation
-                    validation="$(is_fun_facts_empty)"
-                    if [[ -n "$validation" ]]; then
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Error!" \
-                            --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        create_fun_fact
-                    fi
                     ;;
                 6)
                     check_boot_script
