@@ -356,3 +356,84 @@ function dialog_fun_facts_settings() {
         esac
     fi
 }
+
+
+function dialog_create_fun_facts_splashscreens() {
+    options=(
+        1 "Boot splashscreen"
+        2 "Launching image"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Create Fun Facts! Splashscreens" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                echo "Boot splashscreen"
+                ;;
+            2)
+                dialog_choose_launching_image
+                ;;
+        esac
+    fi
+}
+
+
+function dialog_choose_launching_image() {
+    options=(
+        1 "System launching image"
+        2 "Game launching image"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Create Fun Facts! Splashscreens" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                dialog_choose_launching_image_system
+                ;;
+            2)
+                echo "game launching image"
+                ;;
+        esac
+    fi
+}
+
+
+function dialog_choose_launching_image_system() {
+    options=(
+        1 "All systems"
+        2 "Choose systems"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Create Fun Facts! Splashscreens" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                echo "all systems"
+                ;;
+            2)
+                echo "choose systems"
+                ;;
+        esac
+    fi
+}
+
+
+

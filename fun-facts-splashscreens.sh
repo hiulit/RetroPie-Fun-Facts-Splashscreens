@@ -978,61 +978,10 @@ function gui() {
                    dialog_fun_facts_settings 
                     ;;
                 3)
-
+                    dialog_create_fun_facts_splashscreens
                     ;;
                 4)
-                    while true; do
-                        local validation
-                        validation="$(is_fun_facts_empty)"
-                        if [[ -n "$validation" ]]; then
-                            dialog \
-                                --backtitle "$DIALOG_BACKTITLE" \
-                                --title "Error!" \
-                                --msgbox "$validation" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        else
-                            local fun_facts=()
-                            local fun_fact
-                            local options=()
-                            local i=1
-
-                            while IFS= read -r line; do
-                                #~ fun_facts+=("${line//$'\n\r'}")
-                                fun_facts+=("${line}")
-                            done < "$FUN_FACTS_TXT"
-
-                            for fun_fact in "${fun_facts[@]}"; do
-                                options+=("$i" "$fun_fact")
-                                ((i++))
-                            done
-
-                            cmd=(dialog \
-                                --backtitle "$DIALOG_BACKTITLE" \
-                                --title "Remove a Fun Fact!" \
-                                --cancel-label "Back" \
-                                --menu "Choose a Fun Fact! to remove" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "${#fun_facts[@]}")
-
-                            choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-
-                            if [[ -n "$choice" ]]; then
-                                local fun_fact
-                                fun_fact="${options[$((choice*2-1))]}"
-                                if [[ -z "$fun_fact" ]]; then
-                                    dialog \
-                                        --backtitle "$DIALOG_BACKTITLE" \
-                                        --title "Error!" \
-                                        --msgbox "Can't remove a ghost Fun Fact!.\nTry removing it manually from '$FUN_FACTS_TXT'." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                                else
-                                    remove_fun_fact "$fun_fact" \
-                                    && dialog \
-                                        --backtitle "$DIALOG_BACKTITLE" \
-                                        --title "Success!" \
-                                        --msgbox "'$fun_fact' succesfully removed!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                                fi
-                            else
-                                break
-                            fi
-                        fi
-                    done
+                    
                     ;;
                 5)
                     local validation
