@@ -398,7 +398,7 @@ function dialog_choose_launching_image() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! Splashscreens" \
+        --title "Create Fun Facts! launching images" \
         --cancel-label "Back" \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -424,7 +424,7 @@ function dialog_choose_launching_image_system() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! Splashscreens" \
+        --title "Create Fun Facts! launching images" \
         --cancel-label "Back" \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
