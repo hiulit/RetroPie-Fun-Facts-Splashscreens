@@ -375,14 +375,20 @@ function get_console() {
 
 function get_boxart() {
     [[ -z "$rom_path" ]]  && return 1
-    [[ ! -f "$rom_path" ]] && return 1
-    local rom_name
-    rom_name="$(basename "$rom_path")"
+    if [[ ! -f "$rom_path" ]]; then
+        local rom_name="$rom_path"
+        if [[ ! -f "$RP_ROMS_DIR/$system/$rom_name" ]];then
+            return 1
+        else
+            local rom_name
+            rom_name="$(basename "$rom_path")"
+        fi
+    fi
     local boxart
     boxart="$(xmlstarlet sel -t -v \
-        "/gameList/game[path=\"./$rom_name\"]/image" \
+        "/gameList/game[path[contains(text(),\"$rom_name\")]]/image" \
         "$RP_ROMS_DIR/$system/gamelist.xml" 2> /dev/null | head -1)"
-    boxart="$RP_ROMS_DIR/$system/$boxart"
+    [[ "$boxart" == "."* ]] && boxart="$RP_ROMS_DIR/$system/$boxart" # If path start with "."
     if [[ -f "$boxart" ]]; then
         echo "$boxart"
     else
@@ -546,20 +552,30 @@ function create_fun_fact_launching() {
         done
     else
         if [[ -n "$rom_path" ]]; then
-            [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
-            # TODO: Check if EmulationStation scraped images exist.
-            if [[ ! -f "$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-image.jpg" ]]; then
-                log "ERROR: '$(basename "${rom_path%.*}")' doesn't have a scraped image!"
-                rom_path=""
-                local result_splash="$RP_CONFIG_DIR/$system/$TMP_SPLASHSCREEN"
-                echo "Creating launching image for '$system' ..."            
+            if [[ ! -f "$rom_path" ]]; then # If full rom path doesn't exist
+                rom_file="$rom_path"
+                if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
+                    log "ERROR: Not a valid rom!"
+                    exit 1
+                else
+                    rom_file="${rom_file%.*}"
+                fi
             else
-                local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-$TMP_SPLASHSCREEN"
-                echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
+                rom_file="$(basename "${rom_path%.*}")"
+            fi
+            
+            if get_boxart > /dev/null; then
+                local result_splash="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
+                echo "Creating launching image for '$system - $rom_file' ..."
+            else
+                log "ERROR: '$rom_file' doesn't have a scraped image!"
+                rom_path=""
+                local result_splash="$RP_CONFIG_DIR/$system/launching.png"
+                echo "Creating launching image for '$system' ..."    
             fi
         else    
             [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
-            local result_splash="$RP_CONFIG_DIR/$system/$TMP_SPLASHSCREEN"
+            local result_splash="$RP_CONFIG_DIR/$system/launching.png"
             echo "Creating launching image for '$system' ..."
         fi
 
@@ -791,19 +807,6 @@ function gui() {
             #~ check_updates
             #~ option_updates="Update script ($updates_output)"
         #~ fi
-
-        #~ options=(
-            #~ 1 "Set splashscreen path ($(get_config "splashscreen_path"))"
-            #~ 2 "Set text color ($(get_config "text_color"))"
-            #~ 3 "Add a new Fun Fact!"
-            #~ 4 "Remove Fun Facts!"
-            #~ 5 "Create a new Fun Facts! Splashscreen"
-            #~ 6 "Enable/Disable script at boot ($option_boot)"
-            #~ 7 "Edit config file"
-            #~ 8 "Reset config file"
-            #~ 9 "$option_updates"
-            #~ 10 "Restore default files"
-        #~ )
         
         options=(
             1 "Splashscreens settings"
@@ -932,12 +935,6 @@ function gui() {
                         fi
                     fi
                     ;;
-                #~ 8)
-                    #~ ;;
-                #~ 9)
-                    #~ ;;
-                #~ 10)
-                    #~ ;;
             esac
         else
             break
@@ -1119,3 +1116,9 @@ function main() {
 }
 
 main "$@"
+
+#~ path="/home/pi/RetroPie/roms/megadrive/Sonic the Hedgehog.zip"
+
+#~ xmlstarlet sel -t -v \
+    #~ "/gameList/game[path[contains(text(),'Sonic')]]/image" \
+    #~ "$RP_ROMS_DIR/megadrive/gamelist.xml" 2> /dev/null | head -1
