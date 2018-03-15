@@ -366,7 +366,7 @@ function dialog_fun_facts_settings() {
 function dialog_create_fun_facts_splashscreens() {
     options=(
         1 "Boot splashscreen"
-        2 "Launching image"
+        2 "Launching images"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
@@ -380,19 +380,20 @@ function dialog_create_fun_facts_splashscreens() {
         case "$choice" in
             1)
                 create_fun_fact
+                dialog_create_fun_facts_splashscreens
                 ;;
             2)
-                dialog_choose_launching_image
+                dialog_choose_launching_images
                 ;;
         esac
     fi
 }
 
 
-function dialog_choose_launching_image() {
+function dialog_choose_launching_images() {
     options=(
-        1 "System launching image"
-        2 "Game launching image"
+        1 "System launching images"
+        2 "Game launching images"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
@@ -405,17 +406,19 @@ function dialog_choose_launching_image() {
     if [[ -n "$choice" ]]; then
         case "$choice" in
             1)
-                dialog_choose_launching_image_system
+                dialog_choose_launching_images_system
                 ;;
             2)
-                echo "game launching image"
+                echo "game launching images"
                 ;;
         esac
+    else
+       dialog_create_fun_facts_splashscreens 
     fi
 }
 
 
-function dialog_choose_launching_image_system() {
+function dialog_choose_launching_images_system() {
     options=(
         1 "All systems"
         2 "Choose systems"
@@ -432,39 +435,45 @@ function dialog_choose_launching_image_system() {
         case "$choice" in
             1)
                 create_fun_fact "all"
+                dialog_choose_launching_images_system
                 ;;
             2)
-                local systems
-                local system
-                local i=1
-                options=()
-                
-                systems="$(get_all_systems)"
-                IFS=" " read -r -a systems <<< "${systems[@]}"
-                for system in "${systems[@]}"; do
-                    options+=("$i" "$system" off)
-                    ((i++))
-                done
-                menu_items="$(((${#options[@]} / 2)))"
-                menu_text="Choose an option."
-                cmd=(dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Create Fun Facts! launching images" \
-                    --cancel-label "Back" \
-                    --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-                choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-                if [[ -n "$choices" ]]; then
-                    systems=()
-                    IFS=" " read -r -a choices <<< "${choices[@]}"
-                    for choice in "${choices[@]}"; do
-                        system="${options[choice*3-2]}"
-                        create_fun_fact "$system"
-                    done
-                fi
+                dialog_choose_systems
                 ;;
         esac
+    else
+        dialog_choose_launching_images
     fi
 }
+
+function dialog_choose_systems() {
+    local systems
+    local system
+    local i=1
+    options=()
     
-
-
+    systems="$(get_all_systems)"
+    IFS=" " read -r -a systems <<< "${systems[@]}"
+    for system in "${systems[@]}"; do
+        options+=("$i" "$system" off)
+        ((i++))
+    done
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Create Fun Facts! launching images" \
+        --cancel-label "Back" \
+        --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choices" ]]; then
+        IFS=" " read -r -a choices <<< "${choices[@]}"
+        for choice in "${choices[@]}"; do
+            system="${options[choice*3-2]}"
+            create_fun_fact "$system"
+        done
+        dialog_choose_launching_images_system
+    else
+        dialog_choose_launching_images_system
+    fi
+}

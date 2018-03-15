@@ -343,6 +343,14 @@ function get_font() {
 
 
 function get_system_logo() {
+    if [[ ! -f "$ES_THEMES_DIR/$theme/$system/theme.xml" ]]; then
+        #~ system_path="${logo%/}"
+        #~ system="${system_path##*/}"
+        if [[ "$system" = *"mame-"* ]]; then
+            system="mame"
+            #~ logo="$(get_system_logo)"
+        fi
+    fi
     local logo
     logo="$(xmlstarlet sel -t -v \
         "/theme/view[contains(@name,'detailed') or contains(@name,'system')]/image[@name='logo']/path" \
@@ -460,7 +468,9 @@ function create_fun_fact_boot() {
     if [[ -z "$splash" ]]; then
         [[ -z "$bg_color" ]] &&  bg_color="$DEFAULT_BACKGROUND_COLOR"
         IM_add_background
-        IM_add_logo
+        if [[ -f "$logo" ]]; then
+            IM_add_logo
+        fi
         if get_console > /dev/null; then
             IM_add_console
         fi
@@ -535,11 +545,7 @@ function create_fun_fact_launching() {
             fi
         done
     else
-        if [[ -z "$rom_path" ]]; then
-            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
-            local result_splash="$RP_CONFIG_DIR/$system/$TMP_SPLASHSCREEN"
-            echo "Creating launching image for '$system' ..."
-        else    
+        if [[ -n "$rom_path" ]]; then
             [[ ! -f "$rom_path" ]] && log "ERROR: Not a valid rom path!" && exit 1
             # TODO: Check if EmulationStation scraped images exist.
             if [[ ! -f "$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-image.jpg" ]]; then
@@ -551,6 +557,10 @@ function create_fun_fact_launching() {
                 local result_splash="$RP_ROMS_DIR/$system/images/$(basename "${rom_path%.*}")-$TMP_SPLASHSCREEN"
                 echo "Creating launching image for '$system - $(basename "${rom_path%.*}")' ..."
             fi
+        else    
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
+            local result_splash="$RP_CONFIG_DIR/$system/$TMP_SPLASHSCREEN"
+            echo "Creating launching image for '$system' ..."
         fi
 
         if [[ -z "$splash" ]]; then
@@ -562,7 +572,9 @@ function create_fun_fact_launching() {
             cp "$splash" "$TMP_DIR/$TMP_SPLASHSCREEN"
         fi
     
-        IM_add_logo
+        if [[ -f "$logo" ]]; then
+            IM_add_logo
+        fi
         if get_boxart > /dev/null; then
             IM_add_boxart
         elif get_console > /dev/null; then
@@ -796,10 +808,14 @@ function gui() {
         options=(
             1 "Splashscreens settings"
             2 "Fun Facts! settings"
+            "-" "----------"
             3 "Create Fun Facts! splashscreens"
+            "-" "----------"
             4 "Automate scripts"
+            "-" "----------"
             5 "Configuration file"
             6 "Restore default files"
+            "-" "----------"
             7 "Update script"
         )
         menu_items="$(((${#options[@]} / 2)))"
@@ -817,6 +833,9 @@ function gui() {
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
         if [[ -n "$choice" ]]; then
             case "$choice" in
+                "-")
+                    :
+                    ;;
                 1)
                     dialog_splashscreens_settings
                     ;;

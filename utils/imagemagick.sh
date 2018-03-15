@@ -127,6 +127,9 @@ function IM_add_console() {
 
 
 function IM_add_fun_fact() {
+    local random_fact
+    random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+    
     convert "$TMP_DIR/$TMP_SPLASHSCREEN" \
         -size "$(((screen_w*75/100)))"x"$(((screen_h*15/100)))" \
         -background none \
