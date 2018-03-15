@@ -409,7 +409,7 @@ function dialog_choose_launching_images() {
                 dialog_choose_launching_images_system
                 ;;
             2)
-                echo "game launching images"
+                dialog_choose_games
                 ;;
         esac
     else
@@ -475,5 +475,52 @@ function dialog_choose_systems() {
         dialog_choose_launching_images_system
     else
         dialog_choose_launching_images_system
+    fi
+}
+
+function dialog_choose_games() {
+    local systems
+    local system
+    local i=1
+    options=()
+    
+    systems="$(get_all_systems)"
+    IFS=" " read -r -a systems <<< "${systems[@]}"
+    for system in "${systems[@]}"; do
+        options+=("$i" "$system" off)
+        ((i++))
+    done
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Create Fun Facts! launching images" \
+        --cancel-label "Back" \
+        --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choices" ]]; then
+        IFS=" " read -r -a choices <<< "${choices[@]}"
+        for choice in "${choices[@]}"; do
+            system="${options[choice*3-2]}"
+            system_extensions="$(xmlstarlet sel -t -v \
+                "/systemList/system[name=\"$system\"]/extension" \
+                "/etc/emulationstation/es_systems.cfg")"
+            IFS=" " read -r -a system_extensions <<< "$system_extensions"
+            games=()
+            for extension in "${system_extensions[@]}"; do
+                game="$(find "$RP_ROMS_DIR/$system/" -maxdepth 1 -type f  -name "*$extension")"
+                if [[ -n "$game" ]]; then
+                    games+=("$game")
+                fi
+            done
+            if [[ "${#games[@]}" -gt 0 ]]; then
+                for game in "${games[@]}"; do
+                    create_fun_fact "$system" "$game"
+                done
+            fi
+        done
+        dialog_choose_games
+    else
+        dialog_choose_launching_images
     fi
 }
