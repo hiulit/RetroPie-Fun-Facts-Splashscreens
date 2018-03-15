@@ -805,18 +805,12 @@ function gui() {
 
         version="$SCRIPT_VERSION"
 
-        #~ if check_boot_script; then
-            #~ option_boot="enabled"
-        #~ else
-            #~ option_boot="disabled"
-        #~ fi
-
-        #~ if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
-            #~ option_updates="Update script"
-        #~ else
-            #~ check_updates
-            #~ option_updates="Update script ($updates_output)"
-        #~ fi
+        if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
+            option_updates="Update script"
+        else
+            check_updates
+            option_updates="Update script ($updates_output)"
+        fi
         
         options=(
             1 "Splashscreens settings"
@@ -829,7 +823,7 @@ function gui() {
             5 "Configuration file"
             6 "Restore default files"
             "-" "----------"
-            7 "Update script"
+            7 "$option_updates"
         )
         menu_items="$(((${#options[@]} / 2)))"
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
@@ -1087,6 +1081,12 @@ function main() {
         disable_boot_script
     elif [[ "$check_boot" == "true" ]]; then
         enable_boot_script
+    fi
+    check_launching="$(get_config "launching_images_script")"
+    if [[ "$check_launching" == "false" || "$check_launching" == "" ]]; then
+        disable_launching_images
+    elif [[ "$check_launching" == "true" ]]; then
+        enable_launching_images
     fi
 
     check_default_files

@@ -526,9 +526,19 @@ function dialog_choose_games() {
 }
 
 function dialog_automate_scripts() {
+    if check_boot_script; then
+        option_boot="enabled"
+    else
+        option_boot="disabled"
+    fi
+    if check_runcommand_onend; then
+        option_launching="enabled"
+    else
+        option_launching="disabled"
+    fi
     options=(
-        1 "Enable/disable boot splashscreen"
-        2 "Enable/disable launching images"
+        1 "Enable/disable boot splashscreen ($option_boot)"
+        2 "Enable/disable launching images ($option_launching)"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
@@ -577,6 +587,7 @@ function dialog_automate_scripts() {
                 fi
                 ;;
         esac
+        dialog_automate_scripts
     fi
 }
 
