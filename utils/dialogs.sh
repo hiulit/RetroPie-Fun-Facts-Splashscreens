@@ -524,3 +524,84 @@ function dialog_choose_games() {
         dialog_choose_launching_images
     fi
 }
+
+function dialog_automate_scripts() {
+    options=(
+        1 "Enable/disable boot splashscreen"
+        2 "Enable/disable launching images"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Automate scripts" \
+        --cancel-label "Back" \
+        --help-button \
+        --help-label "Help" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                check_boot_script
+                local return_value="$?"
+                if [[ "$return_value" -eq 0 ]]; then
+                    if disable_boot_script; then
+                        set_config "boot_splashscreen_script" "false" > /dev/null
+                     else
+                        dialog_msgbox "Error!" "Failed to DISABLE script at boot."
+                    fi
+                else
+                    if enable_boot_script; then
+                        set_config "boot_splashscreen_script" "true" > /dev/null
+                     else
+                        dialog_msgbox "Error!" "Failed to ENABLE script at boot."
+                    fi
+                fi
+                ;;
+            2)
+                check_runcommand_onend
+                local return_value="$?"
+                if [[ "$return_value" -eq 0 ]]; then
+                    if disable_launching_images; then
+                        set_config "launching_images_script" "false" > /dev/null
+                    else
+                        dialog_msgbox "Error!" "Failed to DISABLE launching images."
+                    fi
+                else
+                    if enable_launching_images; then
+                        set_config "launching_images_script" "true" > /dev/null
+                    else
+                        dialog_msgbox "Error!" "Failed to ENABLE launching images."
+                    fi
+                fi
+                ;;
+        esac
+    fi
+}
+
+
+function dialog_configuration_file() {
+    options=(
+        1 "Edit configuration file"
+        2 "Reset configuration file"
+    )
+    menu_items="$(((${#options[@]} / 2)))"
+    menu_text="Choose an option."
+    cmd=(dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --title "Automate scripts" \
+        --cancel-label "Back" \
+        --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+    choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+    if [[ -n "$choice" ]]; then
+        case "$choice" in
+            1)
+                edit_config
+                ;;
+            2)
+                reset_config
+                ;;
+        esac
+    fi
+}

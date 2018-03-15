@@ -189,12 +189,12 @@ function check_config() {
     TEXT_COLOR="$(get_config "text_color")"
     BG_COLOR="$(get_config "bg_color")"
     PRESS_BUTTON_TEXT="$(get_config "press_button_text")"
-    BOOT_SCRIPT="$(get_config "boot_script")"
+    BOOT_SCRIPT="$(get_config "boot_splashscreen_script")"
 
     validate_splash "$SPLASH_PATH" || exit 1
     validate_color "$TEXT_COLOR" || exit 1
     validate_color "$BG_COLOR" || exit 1
-    validate_true_false "boot_script" "$BOOT_SCRIPT" || exit 1
+    validate_true_false "boot_splashscreen_script" "$BOOT_SCRIPT" || exit 1
 
     if [[ -z "$SPLASH_PATH" ]]; then
         SPLASH_PATH="$DEFAULT_SPLASHSCREEN_BACKGROUND"
@@ -218,7 +218,7 @@ function check_config() {
     
     if [[ -z "$BOOT_SCRIPT" ]]; then
         BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        set_config "boot_script" "$BOOT_SCRIPT" > /dev/null
+        set_config "boot_splashscreen_script" "$BOOT_SCRIPT" > /dev/null
     fi
 }
 
@@ -227,14 +227,16 @@ function edit_config() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         local config_file
         config_file="$(dialog \
-                    --backtitle "$DIALOG_BACKTITLE" \
-                    --title "Config file" \
+                    --backtitle "$DIALOG_BACKTITLE" \f
+                    --title "Edit configuration file" \
                     --ok-label "Save" \
                     --cancel-label "Back" \
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
         local result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
             echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Config file updated."
+        else
+            dialog_configuration_file
         fi
     else
         nano "$SCRIPT_CFG"
@@ -344,11 +346,8 @@ function get_font() {
 
 function get_system_logo() {
     if [[ ! -f "$ES_THEMES_DIR/$theme/$system/theme.xml" ]]; then
-        #~ system_path="${logo%/}"
-        #~ system="${system_path##*/}"
         if [[ "$system" = *"mame-"* ]]; then
             system="mame"
-            #~ logo="$(get_system_logo)"
         fi
     fi
     local logo
@@ -356,11 +355,20 @@ function get_system_logo() {
         "/theme/view[contains(@name,'detailed') or contains(@name,'system')]/image[@name='logo']/path" \
         "$ES_THEMES_DIR/$theme/$system/theme.xml" 2> /dev/null | head -1)"
     logo="$ES_THEMES_DIR/$theme/$system/$logo"
-    echo "$logo"
+    if [[ -f "$logo" ]]; then
+        echo "$logo"
+    else
+        return 1
+    fi
 }
 
 
 function get_console() {
+    if [[ ! -f "$ES_THEMES_DIR/$theme/$system/theme.xml" ]]; then
+        if [[ "$system" = *"mame-"* ]]; then
+            system="mame"
+        fi
+    fi
     local console
     console="$(xmlstarlet sel -t -v \
         "/theme/view[contains(@name,'detailed') or contains(@name,'system')]/image[@name='console_overlay']/path" \
@@ -554,27 +562,29 @@ function create_fun_fact_launching() {
         if [[ -n "$rom_path" ]]; then
             if [[ ! -f "$rom_path" ]]; then # If full rom path doesn't exist
                 rom_file="$rom_path"
+                #~ log "ERROR: '$rom_path' is not a valid '$system' rom!"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
-                    log "ERROR: Not a valid rom!"
+                    log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid rom path!"
                     exit 1
                 else
                     rom_file="${rom_file%.*}"
+                    rom_ext="${rom_file#*.}"
                 fi
             else
                 rom_file="$(basename "${rom_path%.*}")"
+                rom_ext="$(basename "${rom_path#*.}")"
             fi
-            
             if get_boxart > /dev/null; then
                 local result_splash="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
                 echo "Creating launching image for '$system - $rom_file' ..."
             else
-                log "ERROR: '$rom_file' doesn't have a scraped image!"
+                log "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
                 rom_path=""
                 local result_splash="$RP_CONFIG_DIR/$system/launching.png"
                 echo "Creating launching image for '$system' ..."    
             fi
         else    
-            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' folder doesn't exist!" && exit 1
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$RP_CONFIG_DIR/$system' folder doesn't exist!" && exit 1
             local result_splash="$RP_CONFIG_DIR/$system/launching.png"
             echo "Creating launching image for '$system' ..."
         fi
@@ -791,7 +801,7 @@ function get_last_commit() {
 function gui() {
     GUI_FLAG=1
     while true; do
-        check_config #> /dev/null
+        #~ check_config #> /dev/null
 
         version="$SCRIPT_VERSION"
 
@@ -855,37 +865,10 @@ function gui() {
                     fi
                     ;;
                 4)
-                    #~ Autome scripts
-                        #~ - Enable/disable boot splashscreen
-                        #~ - Enable/disable launching images
-                        
-                    check_boot_script
-                    local return_value="$?"
-                    if [[ "$return_value" -eq 0 ]]; then
-                        if disable_boot_script; then
-                            set_config "boot_script" "false" > /dev/null
-                         else
-                            local output="Failed to DISABLE script at boot."
-                            local dialog_title="Error!"
-                            dialog \
-                                --backtitle "$DIALOG_BACKTITLE" \
-                                --title "$dialog_title" \
-                                --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        fi
-                    else
-                        if enable_boot_script; then
-                            set_config "boot_script" "true" > /dev/null
-                         else
-                            local output="Failed to DISABLE script at boot."
-                            local dialog_title="Error!"
-                            dialog \
-                                --backtitle "$DIALOG_BACKTITLE" \
-                                --title "$dialog_title" \
-                                --msgbox "$output" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        fi
-                    fi
+                    dialog_automate_scripts
                     ;;
                 5)
+                    dialog_configuration_file
                     #~ - Edit config
                     #~ - Reset config
    
@@ -1002,7 +985,7 @@ function get_options() {
                 ;;
 #H --create-fun-fact                        Create a new Fun Facts! Splashscreen.
             --create-fun-fact)
-                check_config #> /dev/null
+                #~ check_config #> /dev/null
                 is_fun_facts_empty
                 if [[ -z "$2" ]]; then
                     create_fun_fact
@@ -1015,7 +998,7 @@ function get_options() {
 #H --enable-boot                            Enable script at boot.
             --enable-boot)
                 if enable_boot_script; then
-                    set_config "boot_script" "true" > /dev/null
+                    set_config "boot_splashscreen_script" "true" > /dev/null
                     echo "Script ENABLED at boot."
                 else
                     log "ERROR: failed to ENABLE script at boot."
@@ -1024,7 +1007,7 @@ function get_options() {
 #H --disable-boot                           Disable script at boot.
             --disable-boot)
                 if disable_boot_script; then
-                    set_config "boot_script" "false" > /dev/null
+                    set_config "boot_splashscreen_script" "false" > /dev/null
                     echo "Script DISABLED at boot."
                 else
                     log "ERROR: failed to DISABLE script at boot."
@@ -1033,7 +1016,7 @@ function get_options() {
 #H --enable-launching-images                Enable launching images.
             --enable-launching-images)
                 if enable_launching_images; then
-                    set_config "launching_images" "true" > /dev/null
+                    set_config "launching_images_script" "true" > /dev/null
                     echo "Launching images ENABLED."
                 else
                     log "ERROR: failed to ENABLE launching images."
@@ -1042,7 +1025,7 @@ function get_options() {
 #H --disable-launching-images               Disable launching images.
             --disable-launching-images)
                 if disable_launching_images; then
-                    set_config "launching_images" "false" > /dev/null
+                    set_config "launching_images_script" "false" > /dev/null
                     echo "Launching images DISABLED."
                 else
                     log "ERROR: failed to DISABLE launching images."
@@ -1099,7 +1082,7 @@ function main() {
 
     check_dependencies
 
-    check_boot="$(get_config "boot_script")"
+    check_boot="$(get_config "boot_splashscreen_script")"
     if [[ "$check_boot" == "false" || "$check_boot" == "" ]]; then
         disable_boot_script
     elif [[ "$check_boot" == "true" ]]; then
