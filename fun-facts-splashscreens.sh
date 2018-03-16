@@ -47,7 +47,7 @@ readonly SCRIPT_RUNCOMMAND_ONEND="$SCRIPT_DIR/fun-facts-splashscreens-runcommand
 
 # Files
 readonly FUN_FACTS_TXT="$SCRIPT_DIR/fun-facts.txt"
-readonly RESULT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
+readonly RESULT_BOOT_SPLASH="$RP_DIR/splashscreens/fun-facts-splashscreen.png"
 readonly LOG_FILE="$SCRIPT_DIR/fun-facts-splashscreens.log"
 readonly RUNCOMMAND_ONEND="$RP_CONFIG_DIR/all/runcommand-onend.sh"
 
@@ -75,6 +75,7 @@ GUI_FLAG=0
 CONFIG_FLAG=0
 
 # Global variables
+RESULT_SPLASH=
 SPLASH_PATH=
 TEXT_COLOR=
 BG_COLOR=
@@ -182,45 +183,45 @@ function reset_config() {
 }
 
 
-function check_config() {
-    CONFIG_FLAG=1
+#~ function check_config() {
+    #~ CONFIG_FLAG=1
 
-    SPLASH_PATH="$(get_config "splashscreen_path")"
-    TEXT_COLOR="$(get_config "text_color")"
-    BG_COLOR="$(get_config "bg_color")"
-    PRESS_BUTTON_TEXT="$(get_config "press_button_text")"
-    BOOT_SCRIPT="$(get_config "boot_splashscreen_script")"
+    #~ SPLASH_PATH="$(get_config "splashscreen_path")"
+    #~ TEXT_COLOR="$(get_config "text_color")"
+    #~ BG_COLOR="$(get_config "bg_color")"
+    #~ PRESS_BUTTON_TEXT="$(get_config "press_button_text")"
+    #~ BOOT_SCRIPT="$(get_config "boot_splashscreen_script")"
 
-    validate_splash "$SPLASH_PATH" || exit 1
-    validate_color "$TEXT_COLOR" || exit 1
-    validate_color "$BG_COLOR" || exit 1
-    validate_true_false "boot_splashscreen_script" "$BOOT_SCRIPT" || exit 1
+    #~ validate_splash "$SPLASH_PATH" || exit 1
+    #~ validate_color "$TEXT_COLOR" || exit 1
+    #~ validate_color "$BG_COLOR" || exit 1
+    #~ validate_true_false "boot_splashscreen_script" "$BOOT_SCRIPT" || exit 1
 
-    if [[ -z "$SPLASH_PATH" ]]; then
-        SPLASH_PATH="$DEFAULT_SPLASHSCREEN_BACKGROUND"
-        set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
-    fi
+    #~ if [[ -z "$SPLASH_PATH" ]]; then
+        #~ SPLASH_PATH="$DEFAULT_SPLASHSCREEN_BACKGROUND"
+        #~ set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
+    #~ fi
 
-    if [[ -z "$TEXT_COLOR" ]]; then
-        TEXT_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
-        set_config "text_color" "$TEXT_COLOR" > /dev/null
-    fi
+    #~ if [[ -z "$TEXT_COLOR" ]]; then
+        #~ TEXT_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
+        #~ set_config "text_color" "$TEXT_COLOR" > /dev/null
+    #~ fi
 
-    if [[ -z "$BG_COLOR" ]]; then
-        BG_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR"
-        set_config "bg_color" "$BG_COLOR" > /dev/null
-    fi
+    #~ if [[ -z "$BG_COLOR" ]]; then
+        #~ BG_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR"
+        #~ set_config "bg_color" "$BG_COLOR" > /dev/null
+    #~ fi
     
-    if [[ -z "$PRESS_BUTTON_TEXT" ]]; then
-        PRESS_BUTTON_TEXT="$LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
-        set_config "press_button_text" "$PRESS_BUTTON_TEXT" > /dev/null
-    fi
+    #~ if [[ -z "$PRESS_BUTTON_TEXT" ]]; then
+        #~ PRESS_BUTTON_TEXT="$LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
+        #~ set_config "press_button_text" "$PRESS_BUTTON_TEXT" > /dev/null
+    #~ fi
     
-    if [[ -z "$BOOT_SCRIPT" ]]; then
-        BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        set_config "boot_splashscreen_script" "$BOOT_SCRIPT" > /dev/null
-    fi
-}
+    #~ if [[ -z "$BOOT_SCRIPT" ]]; then
+        #~ BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
+        #~ set_config "boot_splashscreen_script" "$BOOT_SCRIPT" > /dev/null
+    #~ fi
+#~ }
 
 
 function edit_config() {
@@ -442,6 +443,12 @@ function create_fun_fact() {
         fi
     else
         create_fun_fact_launching "$@"
+        local return_value
+        return_value="$?"
+        if [[ "$return_value" -eq 0 ]]; then
+            [[ -f "$RESULT_SPLASH" ]] && rm "$RESULT_SPLASH"
+            mv "$TMP_DIR/$TMP_SPLASHSCREEN" "$RESULT_SPLASH" && chown -R "$user":"$user" "$RESULT_SPLASH"
+        fi
     fi
     
     rm -r "$TMP_DIR"
@@ -449,6 +456,8 @@ function create_fun_fact() {
 
 
 function create_fun_fact_boot() {
+    RESULT_SPLASH="$RESULT_BOOT_SPLASH"
+    
     local system="retropie"
     
     local logo
@@ -508,7 +517,7 @@ function create_fun_fact_boot() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        local success_message="Fun Facts! boot splashscreen successfully created!"
+        local success_message="Fun Facts! boot splashscreen created successfully!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog_msgbox "Success!" "$success_message"
         else
@@ -532,7 +541,7 @@ function create_fun_fact_launching() {
     local rom_path="$2"
     
     local splash    
-    splash="$(get_config "launching_images_background_path")"
+    splash="$(get_config "  ")"
     
     local bg_color
     bg_color="$(get_config "launching_images_background_color")"
@@ -575,18 +584,18 @@ function create_fun_fact_launching() {
                 rom_ext="$(basename "${rom_path#*.}")"
             fi
             if get_boxart > /dev/null; then
-                local result_splash="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
-                echo "Creating launching image for '$system - $rom_file' ..."
+                RESULT_SPLASH="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
+                echo "Creating Fun Facts! launching image for '$system - $rom_file' ..."
             else
                 log "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
                 rom_path=""
-                local result_splash="$RP_CONFIG_DIR/$system/launching.png"
-                echo "Creating launching image for '$system' ..."    
+                RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
+                echo "Creating Fun Facts! launching image for '$system' ..."    
             fi
         else    
             [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$RP_CONFIG_DIR/$system' folder doesn't exist!" && exit 1
-            local result_splash="$RP_CONFIG_DIR/$system/launching.png"
-            echo "Creating launching image for '$system' ..."
+            RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
+            echo "Creating Fun Facts! launching image for '$system' ..."
         fi
 
         if [[ -z "$splash" ]]; then
@@ -608,9 +617,25 @@ function create_fun_fact_launching() {
         fi
         IM_add_fun_fact
         IM_add_press_button_text
-
-        [[ -f "$result_splash" ]] && rm "$result_splash"
-        mv "$TMP_DIR/$TMP_SPLASHSCREEN" "$result_splash" && chown -R "$user":"$user" "$result_splash"
+        
+        local return_value="$?"
+        if [[ "$return_value" -eq 0 ]]; then
+            local success_message="Fun Facts! launching image created successfully!"
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                dialog_msgbox "Success!" "$success_message"
+            else
+                echo "$success_message"
+            fi
+        else
+            local error_message="Fun Facts! launching image failed!"
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                log "$error_message" > /dev/null
+                dialog_msgbox "Error!" "$error_message"
+            else
+                log "$error_message"
+            fi
+            return 1
+        fi
     fi
 }
 
@@ -977,7 +1002,7 @@ function get_options() {
             --remove-fun-fact)
                 remove_fun_fact
                 ;;
-#H --create-fun-fact                        Create a new Fun Facts! Splashscreen.
+#H --create-fun-fact [system, rom]                        Create a new Fun Facts! Splashscreen.
             --create-fun-fact)
                 #~ check_config #> /dev/null
                 is_fun_facts_empty
@@ -1099,9 +1124,3 @@ function main() {
 }
 
 main "$@"
-
-#~ path="/home/pi/RetroPie/roms/megadrive/Sonic the Hedgehog.zip"
-
-#~ xmlstarlet sel -t -v \
-    #~ "/gameList/game[path[contains(text(),'Sonic')]]/image" \
-    #~ "$RP_ROMS_DIR/megadrive/gamelist.xml" 2> /dev/null | head -1

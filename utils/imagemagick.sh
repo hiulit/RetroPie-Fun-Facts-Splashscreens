@@ -7,9 +7,11 @@ function IM_add_background() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Background ... added!"
+        #~ echo "Background ... added!"
+        return 0
     else
-        echo "Background failed!"
+        log "Background failed!"
+        return 1
     fi
 }
 
@@ -19,9 +21,11 @@ function IM_convert_svg_to_png() {
     
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "SVG converted to PNG successfully!"
+        #~ echo "SVG converted to PNG successfully!"
+        return 0
     else
-        echo "SVG to PNG conversion failed!"
+        log "SVG to PNG conversion failed!"
+        return 1
     fi
 }
 
@@ -39,19 +43,21 @@ function IM_resize_logo() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Logo resized successfully!"
+        #~ echo "Logo resized successfully!"
+        return 0
     else
-        echo "Logo resizing failed!"
+        log "Logo resizing failed!"
+        return 1
     fi
 }
 
 
 function IM_add_logo() {
     if file --mime-type "$logo" | grep -q "svg"; then
-        echo "mime type is SVG"
+        #~ echo "mime type is SVG"
         IM_convert_svg_to_png
     elif file --mime-type "$logo" | grep -q "png" || file --mime-type "$logo" | grep -q "jpeg"; then
-        echo "mime type is PNG or JPEG"
+        #~ echo "mime type is PNG or JPEG"
         cp "$logo" "$TMP_DIR/$system.png"
     else
         file --mime-type "$logo"
@@ -81,9 +87,11 @@ function IM_add_logo() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Logo ... added!"
+        #~ echo "Logo ... added!"
+        return 0
     else
-        echo "Logo failed!"
+        log "Logo failed!"
+        return 1
     fi
 }
 
@@ -100,9 +108,11 @@ function IM_add_boxart() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Boxart ... added!"
+        #~ echo "Boxart ... added!"
+        return 0
     else
-        echo "Boxart failed!"
+        log "Boxart failed!"
+        return 1
     fi
 }
 
@@ -119,9 +129,11 @@ function IM_add_console() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Console ... added!"
+        #~ echo "Console ... added!"
+        return 0
     else
-        echo "Console failed!"
+        log "Console failed!"
+        return 1
     fi
 }
 
@@ -144,9 +156,11 @@ function IM_add_fun_fact() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Fun Fact! ... added!"
+        #~ echo "Fun Fact! ... added!"
+        return 0
     else
-        echo "Fun Fact! failed!"
+        log "Fun Fact! failed!"
+        return 1
     fi
 }
 
@@ -166,8 +180,10 @@ function IM_add_press_button_text() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        echo "Press button ... added!"
+        #~ echo "Press button ... added!"
+        return 0
     else
-        echo "Press button failed!"
+        log "Press button failed!"
+        return 1
     fi
 }

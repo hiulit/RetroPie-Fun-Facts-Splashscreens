@@ -117,7 +117,7 @@ function dialog_choose_splashscreen_settings() {
                 dialog_choose_path "${property}_text_font" "font"
                 ;;
             4)
-                dialog_choose_string "${property}_press_button" # Remove '_text' ?
+                dialog_choose_text "${property}_press_button" # Remove '_text' ?
                 ;;
             5)
                 dialog_choose_color "${property}_press_button_text"
@@ -128,11 +128,11 @@ function dialog_choose_splashscreen_settings() {
     fi
 }
 
-function dialog_choose_string() {
+function dialog_choose_text() {
     local property="$1"
     local property_var="${property^^}_TEXT"
     local property_text="${property//_/ }"
-    string="$(dialog \
+    text="$(dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
                     --title "Set $property_text text" \
                     --cancel-label "Back" \
@@ -140,17 +140,17 @@ function dialog_choose_string() {
                     12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
     result_value="$?"
     if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
-        if [[ -z "$string" ]]; then
+        if [[ -z "$text" ]]; then
             dialog_title="Success!"
             dialog_text="${property_text^} path unset."
             set_config "${property}_text" "" > /dev/null
-        elif [[ "$string" == "default" ]]; then
+        elif [[ "$text" == "default" ]]; then
             dialog_title="Success!"
             declare "$property_var"="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
             dialog_text="${property_text^} text set to '${!property_var}'."
             set_config "${property}_text" "${!property_var}" > /dev/null
         else
-            declare "$property_var"="$string"
+            declare "$property_var"="$text"
             dialog_title="Success!"
             dialog_text="${property_text^} text set to '${!property_var}'."
             set_config "${property}_text" "${!property_var}" > /dev/null
@@ -559,7 +559,7 @@ function dialog_choose_systems() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! launching images" \
+        --title "Create Fun Facts! system    launching images" \
         --cancel-label "Back" \
         --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -591,7 +591,7 @@ function dialog_choose_games() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! launching images" \
+        --title "Create Fun Facts! game launching images" \
         --cancel-label "Back" \
         --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
