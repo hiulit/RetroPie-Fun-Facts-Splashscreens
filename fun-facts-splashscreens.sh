@@ -183,47 +183,6 @@ function reset_config() {
 }
 
 
-#~ function check_config() {
-    #~ CONFIG_FLAG=1
-
-    #~ SPLASH_PATH="$(get_config "splashscreen_path")"
-    #~ TEXT_COLOR="$(get_config "text_color")"
-    #~ BG_COLOR="$(get_config "bg_color")"
-    #~ PRESS_BUTTON_TEXT="$(get_config "press_button_text")"
-    #~ BOOT_SCRIPT="$(get_config "boot_splashscreen_script")"
-
-    #~ validate_splash "$SPLASH_PATH" || exit 1
-    #~ validate_color "$TEXT_COLOR" || exit 1
-    #~ validate_color "$BG_COLOR" || exit 1
-    #~ validate_true_false "boot_splashscreen_script" "$BOOT_SCRIPT" || exit 1
-
-    #~ if [[ -z "$SPLASH_PATH" ]]; then
-        #~ SPLASH_PATH="$DEFAULT_SPLASHSCREEN_BACKGROUND"
-        #~ set_config "splashscreen_path" "$SPLASH_PATH" > /dev/null
-    #~ fi
-
-    #~ if [[ -z "$TEXT_COLOR" ]]; then
-        #~ TEXT_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_TEXT_COLOR"
-        #~ set_config "text_color" "$TEXT_COLOR" > /dev/null
-    #~ fi
-
-    #~ if [[ -z "$BG_COLOR" ]]; then
-        #~ BG_COLOR="$DEFAULT_BOOT_SPLASHSCREEN_BACKGROUND_COLOR"
-        #~ set_config "bg_color" "$BG_COLOR" > /dev/null
-    #~ fi
-    
-    #~ if [[ -z "$PRESS_BUTTON_TEXT" ]]; then
-        #~ PRESS_BUTTON_TEXT="$LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
-        #~ set_config "press_button_text" "$PRESS_BUTTON_TEXT" > /dev/null
-    #~ fi
-    
-    #~ if [[ -z "$BOOT_SCRIPT" ]]; then
-        #~ BOOT_SCRIPT="$DEFAULT_BOOT_SCRIPT"
-        #~ set_config "boot_splashscreen_script" "$BOOT_SCRIPT" > /dev/null
-    #~ fi
-#~ }
-
-
 function edit_config() {
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         local config_file
@@ -826,8 +785,6 @@ function get_last_commit() {
 function gui() {
     GUI_FLAG=1
     while true; do
-        #~ check_config #> /dev/null
-
         version="$SCRIPT_VERSION"
 
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
@@ -1004,7 +961,6 @@ function get_options() {
                 ;;
 #H --create-fun-fact [system, rom]                        Create a new Fun Facts! Splashscreen.
             --create-fun-fact)
-                #~ check_config #> /dev/null
                 is_fun_facts_empty
                 if [[ -z "$2" ]]; then
                     create_fun_fact
