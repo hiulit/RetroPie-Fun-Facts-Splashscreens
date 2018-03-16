@@ -212,32 +212,32 @@ function usage() {
 }
 
 
-function enable_boot_script() {
+function enable_boot_splashscreen() {
     local command="\"$SCRIPT_FULL\" --create-fun-fact \&"
-    disable_boot_script # deleting any previous config (do nothing if there isn't).
+    disable_boot_splashscreen # deleting any previous config (do nothing if there isn't).
     sed -i "s|^exit 0$|${command}\\nexit 0|" "$RCLOCAL"
     local return_value="$?"
     [[ "$return_value" -eq 0 ]] || return 1
-    assure_safe_exit_boot_script
-    check_boot_script
+    assure_safe_exit_boot_splashscreen
+    check_boot_splashscreen
 }
 
 
-function disable_boot_script() {
+function disable_boot_splashscreen() {
     sed -i "/$(basename "$0")/d" "$RCLOCAL"
     local return_value="$?"
     [[ "$return_value" -eq 0 ]] || return 1
-    assure_safe_exit_boot_script
-    ! check_boot_script
+    assure_safe_exit_boot_splashscreen
+    ! check_boot_splashscreen
 }
 
 
-function assure_safe_exit_boot_script() {
+function assure_safe_exit_boot_splashscreen() {
     grep -q '^exit 0$' "$RCLOCAL" || echo "exit 0" >> "$RCLOCAL"
 }
 
 
-function check_boot_script() {
+function check_boot_splashscreen() {
     grep -q "$SCRIPT_DIR" "$RCLOCAL"
 }
 
@@ -402,12 +402,6 @@ function create_fun_fact() {
         fi
     else
         create_fun_fact_launching "$@"
-        local return_value
-        return_value="$?"
-        if [[ "$return_value" -eq 0 ]]; then
-            [[ -f "$RESULT_SPLASH" ]] && rm "$RESULT_SPLASH"
-            mv "$TMP_DIR/$TMP_SPLASHSCREEN" "$RESULT_SPLASH" && chown -R "$user":"$user" "$RESULT_SPLASH"
-        fi
     fi
     
     rm -r "$TMP_DIR"
@@ -556,7 +550,7 @@ function create_fun_fact_launching() {
             RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
             echo "Creating Fun Facts! launching image for '$system' ..."
         fi
-
+        
         if [[ -z "$splash" ]]; then
             [[ -z "$bg_color" ]] &&  bg_color="$DEFAULT_BACKGROUND_COLOR"
             IM_add_background
@@ -577,23 +571,16 @@ function create_fun_fact_launching() {
         IM_add_fun_fact
         IM_add_press_button_text
         
+        # TODO: better handling of errors.
         local return_value="$?"
         if [[ "$return_value" -eq 0 ]]; then
+            [[ -f "$RESULT_SPLASH" ]] && rm "$RESULT_SPLASH"
+            mv "$TMP_DIR/$TMP_SPLASHSCREEN" "$RESULT_SPLASH" && chown -R "$user":"$user" "$RESULT_SPLASH"
             local success_message="Fun Facts! launching image created successfully!"
-            if [[ "$GUI_FLAG" -eq 1 ]]; then
-                dialog_msgbox "Success!" "$success_message"
-            else
-                echo "$success_message"
-            fi
+            echo "$success_message"
         else
             local error_message="Fun Facts! launching image failed!"
-            if [[ "$GUI_FLAG" -eq 1 ]]; then
-                log "$error_message" > /dev/null
-                dialog_msgbox "Error!" "$error_message"
-            else
-                log "$error_message"
-            fi
-            return 1
+            log "$error_message"
         fi
     fi
 }
@@ -970,25 +957,25 @@ function get_options() {
                     shift
                 fi
                 ;;
-#H --enable-boot                            Enable script at boot.
-            --enable-boot)
-                if enable_boot_script; then
+#H --enable-boot-splashscreen                            Enable script to create boot splashscreen at system startup.
+            --enable-boot-splashscreen)
+                if enable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "true" > /dev/null
                     echo "Script ENABLED at boot."
                 else
                     log "ERROR: failed to ENABLE script at boot."
                 fi
                 ;;
-#H --disable-boot                           Disable script at boot.
-            --disable-boot)
-                if disable_boot_script; then
+#H --disable-boot                           Disable script to create boot splashscreen at system startup.
+            --disable-boot-splashscreen)
+                if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
                     echo "Script DISABLED at boot."
                 else
                     log "ERROR: failed to DISABLE script at boot."
                 fi
                 ;;
-#H --enable-launching-images                Enable launching images.
+#H --enable-launching-images                Enable script to create launching images when a game stops.
             --enable-launching-images)
                 if enable_launching_images; then
                     set_config "launching_images_script" "true" > /dev/null
@@ -997,7 +984,7 @@ function get_options() {
                     log "ERROR: failed to ENABLE launching images."
                 fi
                 ;;
-#H --disable-launching-images               Disable launching images.
+#H --disable-launching-images               Enable script to create launching images when a game stops.
             --disable-launching-images)
                 if disable_launching_images; then
                     set_config "launching_images_script" "false" > /dev/null
@@ -1057,16 +1044,16 @@ function main() {
 
     check_dependencies
 
-    check_boot="$(get_config "boot_splashscreen_script")"
-    if [[ "$check_boot" == "false" || "$check_boot" == "" ]]; then
-        disable_boot_script
-    elif [[ "$check_boot" == "true" ]]; then
-        enable_boot_script
+    check_boot_splashscreen="$(get_config "boot_splashscreen_script")"
+    if [[ "$check_boot_splashscreen" == "false" || "$check_boot_splashscreen" == "" ]]; then
+        disable_boot_splashscreen
+    elif [[ "$check_boot_splashscreen" == "true" ]]; then
+        enable_boot_splashscreen
     fi
-    check_launching="$(get_config "launching_images_script")"
-    if [[ "$check_launching" == "false" || "$check_launching" == "" ]]; then
+    check_launching_images="$(get_config "launching_images_script")"
+    if [[ "$check_launching_images" == "false" || "$check_launching_images" == "" ]]; then
         disable_launching_images
-    elif [[ "$check_launching" == "true" ]]; then
+    elif [[ "$check_launching_images" == "true" ]]; then
         enable_launching_images
     fi
 

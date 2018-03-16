@@ -10,7 +10,7 @@ function IM_add_background() {
         #~ echo "Background ... added!"
         return 0
     else
-        log "Background failed!"
+        log "'$system' Background failed!"
         return 1
     fi
 }
@@ -90,7 +90,7 @@ function IM_add_logo() {
         #~ echo "Logo ... added!"
         return 0
     else
-        log "Logo failed!"
+        log "'$system' Logo failed!"
         return 1
     fi
 }
@@ -132,7 +132,7 @@ function IM_add_console() {
         #~ echo "Console ... added!"
         return 0
     else
-        log "Console failed!"
+        log "'$system' Console failed!"
         return 1
     fi
 }
@@ -159,7 +159,7 @@ function IM_add_fun_fact() {
         #~ echo "Fun Fact! ... added!"
         return 0
     else
-        log "Fun Fact! failed!"
+        log "'$system' Fun Fact! failed!"
         return 1
     fi
 }
@@ -183,7 +183,7 @@ function IM_add_press_button_text() {
         #~ echo "Press button ... added!"
         return 0
     else
-        log "Press button failed!"
+        log "'$system' Press button failed!"
         return 1
     fi
 }

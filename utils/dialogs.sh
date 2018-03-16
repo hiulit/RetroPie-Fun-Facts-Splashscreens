@@ -623,7 +623,7 @@ function dialog_choose_games() {
 }
 
 function dialog_automate_scripts() {
-    if check_boot_script; then
+    if check_boot_splashscreen; then
         option_boot="enabled"
     else
         option_boot="disabled"
@@ -650,16 +650,16 @@ function dialog_automate_scripts() {
     if [[ -n "$choice" ]]; then
         case "$choice" in
             1)
-                check_boot_script
+                check_boot_splashscreen
                 local return_value="$?"
                 if [[ "$return_value" -eq 0 ]]; then
-                    if disable_boot_script; then
+                    if disable_boot_splashscreen; then
                         set_config "boot_splashscreen_script" "false" > /dev/null
                      else
                         dialog_msgbox "Error!" "Failed to DISABLE script at boot."
                     fi
                 else
-                    if enable_boot_script; then
+                    if enable_boot_splashscreen; then
                         set_config "boot_splashscreen_script" "true" > /dev/null
                      else
                         dialog_msgbox "Error!" "Failed to ENABLE script at boot."
