@@ -14,7 +14,7 @@ rp_module_section="exp"
 rp_module_flags="noinstclean !x86 !osmc !xbian !mali !kms"
 
 function depends_fun-facts-splashscreens() {
-    getDepends "imagemagick"
+    getDepends "imagemagick librsvg2-bin"
 }
 
 function sources_fun-facts-splashscreens() {
@@ -24,9 +24,13 @@ function sources_fun-facts-splashscreens() {
 function install_fun-facts-splashscreens() {
     md_ret_files=(
         'fun-facts-splashscreens.sh'
-        'fun-facts.txt'
         'fun-facts-splashscreens-settings.cfg'
+        'fun-facts-splashscreens-runcommand-onend.sh'
+        'fun-facts.txt'
         'retropie-default.png'
+        'utils/base.sh'
+        'utils/dialogs.sh'
+        'utils/imagemagick.sh'
     )
 }
 
