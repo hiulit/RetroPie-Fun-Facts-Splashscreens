@@ -832,11 +832,6 @@ function gui() {
                     ;;
                 5)
                     dialog_configuration_file
-                    #~ - Edit config
-                    #~ - Reset config
-   
-                    #~ edit_config
-                    #~ reset_config
                     ;;
                 6)
                     local validation
