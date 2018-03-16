@@ -57,11 +57,46 @@ function dialog_splashscreens_settings() {
 function dialog_choose_splashscreen_settings() {
     local property="$1"
     local property_text="${property//_/ }"
+    
+    local text_color="$(get_config "${property}_text_color")"
+    if [[ -n "$text_color" ]]; then
+        option_text_color="Text color ($text_color)"
+    else
+        option_text_color="Text color"
+    fi
+    
+    local text_font_path="$(get_config "${property}_text_font_path")"
+    if [[ -n "$text_font_path" ]]; then
+        option_text_font_path="Text font ($text_font_path)"
+    else
+        option_text_font_path="Text font"
+    fi
+    
     options=(
         1 "Background"
-        2 "Text color ($(get_config "${property}_text_color"))"
-        3 "Text font ($(get_config "${property}_text_font_path"))"
+        2 "$option_text_color"
+        3 "$option_text_font_path"
     )
+    if [[ "$property" == "launching_images" ]]; then
+        local press_button_text="$(get_config "${property}_press_button_text")"
+        if [[ -n "$press_button_text" ]]; then
+            option_press_button_text="'Press a button' text ($press_button_text)"
+        else
+            option_press_button_text="'Press a button' text"
+        fi
+        
+        local press_button_text_color="$(get_config "${property}_press_button_text_color")"
+        if [[ -n "$press_button_text_color" ]]; then
+            option_press_button_text_color="'Press a button' text color ($press_button_text_color)"
+        else
+            option_press_button_text_color="'Press a button' text color"
+        fi
+        
+        options+=(
+            4 "$option_press_button_text"
+            5 "$option_press_button_text_color"
+        )
+    fi
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
     cmd=(dialog \
@@ -81,9 +116,46 @@ function dialog_choose_splashscreen_settings() {
             3)
                 dialog_choose_path "${property}_text_font" "font"
                 ;;
+            4)
+                dialog_choose_string "${property}_press_button" # Remove '_text' ?
+                ;;
+            5)
+                dialog_choose_color "${property}_press_button_text"
+                ;;
         esac
     else
         dialog_splashscreens_settings
+    fi
+}
+
+function dialog_choose_string() {
+    local property="$1"
+    local property_var="${property^^}_TEXT"
+    local property_text="${property//_/ }"
+    string="$(dialog \
+                    --backtitle "$DIALOG_BACKTITLE" \
+                    --title "Set $property_text text" \
+                    --cancel-label "Back" \
+                    --inputbox "Enter $property_text text.\n\nEnter 'default' to set the default text.\nLeave the input empty to unset the text." \
+                    12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
+    result_value="$?"
+    if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
+        if [[ -z "$string" ]]; then
+            dialog_title="Success!"
+            dialog_text="${property_text^} path unset."
+            set_config "${property}_text" "" > /dev/null
+        elif [[ "$string" == "default" ]]; then
+            dialog_title="Success!"
+            declare "$property_var"="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
+            dialog_text="${property_text^} text set to '${!property_var}'."
+            set_config "${property}_text" "${!property_var}" > /dev/null
+        else
+            declare "$property_var"="$string"
+            dialog_title="Success!"
+            dialog_text="${property_text^} text set to '${!property_var}'."
+            set_config "${property}_text" "${!property_var}" > /dev/null
+        fi
+        dialog_msgbox "$dialog_title" "$dialog_text"
     fi
 }
 
@@ -91,9 +163,24 @@ function dialog_choose_splashscreen_settings() {
 function dialog_choose_background() {
     local property="$1"
     local property_text="${property//_/ }"
+    
+    local image_path="$(get_config "${property}_path")"
+    if [[ -n "$image_path" ]]; then
+        option_image_path="Image ($image_path)"
+    else
+        option_image_path="Image"
+    fi
+    
+    local solid_color="$(get_config "${property}_color")"
+    if [[ -n "$solid_color" ]]; then
+        option_solid_color="Solid color ($solid_color)"
+    else
+        option_solid_color="Solid color"
+    fi
+    
     options=(
-        1 "Image ($(get_config "${property}_path"))"
-        2 "Solid color ($(get_config "${property}_color"))"
+        1 "$option_image_path"
+        2 "$option_solid_color"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option.\n\nIf both options are set, 'Image' takes precedence over 'Solid color'."
@@ -165,7 +252,12 @@ function dialog_choose_color() {
                         set_config "${property}_color" "${!property_var}" > /dev/null
                         dialog_msgbox "Success!" "${property_text^} color set to '${!property_var}'."
                     fi
-                    dialog_choose_splashscreen_settings "${property%_*}"
+                    if [[ "$property" = *"press_button"* ]]; then
+                        property="launching_images"
+                        dialog_choose_splashscreen_settings "$property"
+                    else
+                        dialog_choose_splashscreen_settings "${property%_*}"
+                    fi
                 elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
                     dialog_choose_color "$property"
                 fi
@@ -204,7 +296,12 @@ function dialog_choose_color() {
                         set_config "${property}_color" "${!property_var}" > /dev/null
                         dialog_msgbox "Success!" "${property_text^} color set to '${!property_var}'."
                     fi
-                    dialog_choose_splashscreen_settings "${property%_*}"
+                    if [[ "$property" = *"press_button"* ]]; then
+                        property="launching_images"
+                        dialog_choose_splashscreen_settings "$property"
+                    else
+                        dialog_choose_splashscreen_settings "${property%_*}"
+                    fi
                 elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
                     dialog_choose_color "$property"
                 fi
