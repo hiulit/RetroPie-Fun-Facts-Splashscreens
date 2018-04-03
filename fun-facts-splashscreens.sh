@@ -582,9 +582,9 @@ function select_fun_facts() {
     local options
     local start="$1"
     local items="$2"
-    local next="--> NEXT -->"
-    local prev="<-- PREVIOUS <--"
-    local quit="--> QUIT <--"
+    local next="NEXT -->"
+    local prev="<-- PREVIOUS"
+    local quit="QUIT"
     [[ -z "$breaks" ]] && local breaks=1
 
     clear
@@ -672,13 +672,13 @@ function remove_fun_fact() {
     else
         select_fun_facts 0 5
         sed -i "/^$option$/ d" "$FUN_FACTS_TXT" # $option comes from select_fun_facts()
-        echo "'$option' removed successfully!" && sleep 0.5
+        echo "'$option' Fun Fact! removed successfully!" && sleep 0.5
         remove_fun_fact
     fi
 }
 
 
-function validate_splash() {
+function validate_path() {
     [[ -z "$1" ]] && return 0
 
     if [[ ! -f "$1" ]]; then
@@ -881,8 +881,8 @@ function get_options() {
 
     while [[ -n "$1" ]]; do
         case "$1" in
-#H --help                                   Print the help message and exit.
-            --help)
+#H -h,   --help                                           Print help message.
+            -h|--help)
                 echo
                 underline "$SCRIPT_TITLE"
                 echo "$SCRIPT_DESCRIPTION"
@@ -896,39 +896,39 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-#H --splash-path [path/to/splashscreen]     Set the image to use as Fun Facts! Splashscreen.
-            --splash-path)
-                check_argument "$1" "$2" || exit 1
-                shift
-                validate_splash "$1" || exit 1
-                set_config "splashscreen_path" "$1"
-                ;;
-#H --text-color [color]                     Set the text color to use on the Fun Facts! Splashscreen.
-            --text-color)
-                check_argument "$1" "$2" || exit 1
-                shift
-                validate_color "$1" || exit 1
-                set_config "text_color" "$1"
-                ;;
-#H --bg-color [color]                       Set the background color to use on the Fun Facts! Splashscreen.
-            --bg-color)
-                check_argument "$1" "$2" || exit 1
-                shift
-                validate_color "$1" || exit 1
-                set_config "bg_color" "$1"
-                ;;
-#H --add-fun-fact [text]                    Add new Fun Facts!.
-            --add-fun-fact)
+#~ #H --splash-path [path/to/splashscreen]     Set the image to use as Fun Facts! Splashscreen.
+            #~ --splash-path)
+                #~ check_argument "$1" "$2" || exit 1
+                #~ shift
+                #~ validate_path "$1" || exit 1
+                #~ set_config "splashscreen_path" "$1"
+                #~ ;;
+#~ #H --text-color [color]                     Set the text color to use on the Fun Facts! Splashscreen.
+            #~ --text-color)
+                #~ check_argument "$1" "$2" || exit 1
+                #~ shift
+                #~ validate_color "$1" || exit 1
+                #~ set_config "text_color" "$1"
+                #~ ;;
+#~ #H --bg-color [color]                       Set the background color to use on the Fun Facts! Splashscreen.
+            #~ --bg-color)
+                #~ check_argument "$1" "$2" || exit 1
+                #~ shift
+                #~ validate_color "$1" || exit 1
+                #~ set_config "bg_color" "$1"
+                #~ ;;
+#H -aff, --add-fun-fact "TEXT"                            Add new Fun Facts!.
+            -aff|--add-fun-fact)
                 check_argument "$1" "$2" || exit 1
                 shift
                 add_fun_fact "$1"
                 ;;
-#H --remove-fun-fact                        Remove Fun Facts!.
-            --remove-fun-fact)
+#H -rff, --remove-fun-fact                                Remove Fun Facts!.
+            -rff|--remove-fun-fact)
                 remove_fun_fact
                 ;;
-#H --create-fun-fact [system, rom]                        Create a new Fun Facts! Splashscreen.
-            --create-fun-fact)
+#H -cff, --create-fun-fact ["SYSTEM"] ["ROM NAME.ext"]    Create a new Fun Facts! Splashscreen.
+            -cff|--create-fun-fact)
                 is_fun_facts_empty
                 if [[ -z "$2" ]]; then
                     create_fun_fact
@@ -938,8 +938,8 @@ function get_options() {
                     shift
                 fi
                 ;;
-#H --enable-boot-splashscreen                            Enable script to create boot splashscreen at system startup.
-            --enable-boot-splashscreen)
+#H -ebs, --enable-boot-splashscreen                       Enable script to create boot splashscreen.
+            -ebs|--enable-boot-splashscreen)
                 if enable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "true" > /dev/null
                     echo "Script ENABLED at boot."
@@ -947,8 +947,8 @@ function get_options() {
                     log "ERROR: failed to ENABLE script at boot."
                 fi
                 ;;
-#H --disable-boot                           Disable script to create boot splashscreen at system startup.
-            --disable-boot-splashscreen)
+#H -dbs, --disable-boot-splashscreen                      Disable script to create boot splashscreen.
+            -dbs|--disable-boot-splashscreen)
                 if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
                     echo "Script DISABLED at boot."
@@ -956,8 +956,8 @@ function get_options() {
                     log "ERROR: failed to DISABLE script at boot."
                 fi
                 ;;
-#H --enable-launching-images                Enable script to create launching images when a game stops.
-            --enable-launching-images)
+#H -eli, --enable-launching-images                        Enable script to create launching images.
+            -eli|--enable-launching-images)
                 if enable_launching_images; then
                     set_config "launching_images_script" "true" > /dev/null
                     echo "Launching images ENABLED."
@@ -965,8 +965,8 @@ function get_options() {
                     log "ERROR: failed to ENABLE launching images."
                 fi
                 ;;
-#H --disable-launching-images               Enable script to create launching images when a game stops.
-            --disable-launching-images)
+#H -dli, --disable-launching-images                       Disable script to create launching images.
+            -dli|--disable-launching-images)
                 if disable_launching_images; then
                     set_config "launching_images_script" "false" > /dev/null
                     echo "Launching images DISABLED."
@@ -974,32 +974,32 @@ function get_options() {
                     log "ERROR: failed to DISABLE launching images."
                 fi
                 ;;
-#H --gui                                    Start GUI.
-            --gui)
+#H -g,   --gui                                            Start GUI.
+            -g|--gui)
                 gui
                 ;;
-#H --edit-config                            Edit config file.
-            --edit-config)
+#H -ec,  --edit-config                                    Edit config file.
+            -ec|--edit-config)
                 edit_config
                 ;;
-#H --reset-config                           Reset config file.
-            --reset-config)
+#H -rc,  --reset-config                                   Reset config file.
+            -rc|--reset-config)
                 reset_config
                 ;;
-#H --update                                 Update script.
-            --update)
+#H -u,   --update                                         Update script.
+            -u|--update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
                     git pull && chown -R "$user":"$user" .
                 fi
                 ;;
-#H --version                                Show script version.
-            --version)
-                echo "$SCRIPT_VERSION"
-                ;;
-#H --restore-defaults                       Restore default files.
-            --restore-defaults)
+#H -rd,  --restore-defaults                               Restore default files.
+            -rd|--restore-defaults)
                 restore_default_files
+                ;;
+#H -v,   --version                                        Show script version.
+            -v|--version)
+                echo "$SCRIPT_VERSION"
                 ;;
             *)
                 log "ERROR: Invalid option '$1'."
