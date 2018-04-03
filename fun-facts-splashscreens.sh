@@ -362,26 +362,19 @@ function create_fun_fact() {
 
 function create_fun_fact_boot() {
     RESULT_SPLASH="$RESULT_BOOT_SPLASH"
-    
     local system="retropie"
-    
     local logo
     logo="$(get_system_logo)"
-    
     local splash
     splash="$(get_config "boot_splashscreen_background_path")"
-    
     local bg_color
     bg_color="$(get_config "boot_splashscreen_background_color")"
-    
     local text_color
     text_color="$(get_config "boot_splashscreen_text_color")"
     [[ -z "$text_color" ]] &&  text_color="$DEFAULT_TEXT_COLOR"
-    
     local font
     font="$(get_config "boot_splashscreen_text_font")"
     [[ -z "$font" ]] && font="$(get_font)"
-    
     local size_x="$(((screen_w*75/100)))"
     local size_y="$(((screen_h*15/100)))"
     
@@ -444,21 +437,16 @@ function create_fun_fact_boot() {
 function create_fun_fact_launching() {
     local system="$1"
     local rom_path="$2"
-    
     local splash    
-    splash="$(get_config "  ")"
-    
+    splash="$(get_config "launching_images_background_path")"
     local bg_color
     bg_color="$(get_config "launching_images_background_color")"
-    
     local font
     font="$(get_config "launching_images_text_font_path")"
     [[ -z "$font" ]] && font="$(get_font)"
-
     local press_button_text
     press_button_text="$(get_config "launching_images_press_button_text")"
     [[ -z "$press_button_text" ]] &&  press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
-    
     local logo
     logo="$(get_system_logo)"
     
@@ -476,7 +464,6 @@ function create_fun_fact_launching() {
         if [[ -n "$rom_path" ]]; then
             if [[ ! -f "$rom_path" ]]; then # If full rom path doesn't exist
                 rom_file="$rom_path"
-                #~ log "ERROR: '$rom_path' is not a valid '$system' rom!"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
                     log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid rom path!"
                     exit 1
