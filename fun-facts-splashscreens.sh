@@ -466,6 +466,7 @@ function create_fun_fact_launching() {
                 rom_file="$rom_path"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
                     log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid rom path!"
+                    log "Check if the system '$system' and the rom '$rom_file' are correct."
                     exit 1
                 else
                     rom_ext="${rom_file#*.}"
@@ -485,7 +486,7 @@ function create_fun_fact_launching() {
                 echo "Creating Fun Facts! launching image for '$system' ..."    
             fi
         else    
-            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$RP_CONFIG_DIR/$system' folder doesn't exist!" && exit 1
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' is not a valid system." && exit 1
             RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
             echo "Creating Fun Facts! launching image for '$system' ..."
         fi
@@ -801,7 +802,7 @@ function get_options() {
 
     while [[ -n "$1" ]]; do
         case "$1" in
-#H -h,   --help                                           Print help message.
+#H -h,   --help                                 Print help message.
             -h|--help)
                 echo
                 underline "$SCRIPT_TITLE"
@@ -816,17 +817,20 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-#H -aff, --add-fun-fact [TEXT]                            Add new Fun Facts!.
+#H -aff, --add-fun-fact [TEXT]                  Add new Fun Facts!.
             -aff|--add-fun-fact)
                 check_argument "$1" "$2" || exit 1
                 shift
                 add_fun_fact "$1"
                 ;;
-#H -rff, --remove-fun-fact                                Remove Fun Facts!.
+#H -rff, --remove-fun-fact                      Remove Fun Facts!.
             -rff|--remove-fun-fact)
                 remove_fun_fact
                 ;;
-#H -cff, --create-fun-fact ([SYSTEM] [ROM])               Create a new Fun Facts! Splashscreen.
+#H -cff, --create-fun-fact ([SYSTEM] [ROM])     Create a new Fun Facts! Splashscreen.
+#H                                                - no arguments: create boot splashscreen.
+#H                                                - [SYSTEM]: create launching image for a given system.
+#H                                                - [SYSTEM] [ROM]: create a launching image for a given game.
             -cff|--create-fun-fact)
                 is_fun_facts_empty
                 if [[ -z "$2" ]]; then
@@ -837,7 +841,7 @@ function get_options() {
                     shift
                 fi
                 ;;
-#H -ebs, --enable-boot-splashscreen                       Enable script to create a boot splashscreen.
+#H -ebs, --enable-boot-splashscreen             Enable script to create a boot splashscreen at startup.
             -ebs|--enable-boot-splashscreen)
                 if enable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "true" > /dev/null
@@ -846,7 +850,7 @@ function get_options() {
                     log "ERROR: failed to ENABLE script at boot."
                 fi
                 ;;
-#H -dbs, --disable-boot-splashscreen                      Disable script to create a boot splashscreen.
+#H -dbs, --disable-boot-splashscreen            Disable script to create a boot splashscreen at startup.
             -dbs|--disable-boot-splashscreen)   
                 if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
@@ -855,7 +859,7 @@ function get_options() {
                     log "ERROR: failed to DISABLE script at boot."
                 fi
                 ;;
-#H -eli, --enable-launching-images                        Enable script to create launching images.
+#H -eli, --enable-launching-images              Enable script to create launching images in runcommand_onend.
             -eli|--enable-launching-images)
                 if enable_launching_images; then
                     set_config "launching_images_script" "true" > /dev/null
@@ -864,7 +868,7 @@ function get_options() {
                     log "ERROR: failed to ENABLE launching images."
                 fi
                 ;;
-#H -dli, --disable-launching-images                       Disable script to create launching images.
+#H -dli, --disable-launching-images             Disable script to create launching images in runcommand_onend.
             -dli|--disable-launching-images)
                 if disable_launching_images; then
                     set_config "launching_images_script" "false" > /dev/null
@@ -873,30 +877,30 @@ function get_options() {
                     log "ERROR: failed to DISABLE launching images."
                 fi
                 ;;
-#H -ec,  --edit-config                                    Edit config file.
+#H -ec,  --edit-config                          Edit config file.
             -ec|--edit-config)
                 edit_config
                 ;;
-#H -rc,  --reset-config                                   Reset config file.
+#H -rc,  --reset-config                         Reset config file.
             -rc|--reset-config)
                 reset_config
                 ;;
-#H -rd,  --restore-defaults                               Restore default files.
+#H -rd,  --restore-defaults                     Restore default files.
             -rd|--restore-defaults)
                 restore_default_files
                 ;;
-#H -g,   --gui                                            Start GUI.
+#H -g,   --gui                                  Start GUI.
             -g|--gui)
                 gui
                 ;;
-#H -u,   --update                                         Update script.
+#H -u,   --update                               Update script.
             -u|--update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
                     git pull && chown -R "$user":"$user" .
                 fi
                 ;;
-#H -v,   --version                                        Show script version.
+#H -v,   --version                              Show script version.
             -v|--version)
                 echo "$SCRIPT_VERSION"
                 ;;
