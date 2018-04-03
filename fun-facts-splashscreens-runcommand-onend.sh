@@ -9,4 +9,4 @@ readonly LAUNCHING="$RP_CONFIG_DIR/$SYSTEM/launching"
 
 rm -f "$LAUNCHING.png" "$LAUNCHING.jpg"
 
-sudo "$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$ROM_PATH" #> /dev/null
+sudo "$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$ROM_PATH"
