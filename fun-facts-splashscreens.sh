@@ -28,9 +28,9 @@ readonly RP_ROMS_DIR="$RP_DIR/roms"
 readonly ES_THEMES_DIR="/etc/emulationstation/themes"
 readonly SPLASH_LIST="/etc/splashscreen.list"
 readonly RCLOCAL="/etc/rc.local"
-readonly DEPENDENCIES=("imagemagick" "librsvg2-bin")
 readonly TMP_DIR="$home/tmp"
 readonly TMP_SPLASHSCREEN="splashscreen.png"
+readonly DEPENDENCIES=("imagemagick" "librsvg2-bin")
 
 readonly SCRIPT_VERSION="2.0.0"
 readonly SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -79,6 +79,11 @@ PRESS_BUTTON_TEXT=
 BOOT_SCRIPT=
 LOG=
 OPTION=
+DEFAULT_FILES=(
+    "$SCRIPT_CFG"
+    "$FUN_FACTS_TXT"
+    "$DEFAULT_SPLASHSCREEN_BACKGROUND"
+)
 
 
 # External resources ######################################
@@ -90,68 +95,31 @@ source "./utils/imagemagick.sh"
 
 # Functions ############################################
 
-function check_log_file(){
-    if [[ ! -f "$LOG_FILE" ]]; then
-        touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
-    fi
-}
-
-
-function log() {
-    check_log_file
-    if [[ "$GUI_FLAG" -eq 1 ]] ; then
-        #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
-        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $*" >> "$LOG_FILE"
-        echo "$*"
+function download_github_file() {
+    local file_path="$1"
+    local file_name
+    file_name="$(basename "$file_path")"
+    if curl -s -f "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/new-gui-menu/$file_name" -o "$file_path"; then
+        chown -R "$user":"$user" "$file_path"
+        [[ "$GUI_FLAG" -eq 0 ]] && echo "'$file_name' downloaded succesfully!"
     else
-        #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
-        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $*" >> "$LOG_FILE"
-        echo "$*" >&2
-    fi
-}
-
-
-function download_default_splashscreen_background() {
-    if curl -s -f "https://raw.githubusercontent.com/RetroPie/retropie-splashscreens/master/retropie-default.png" -o "$DEFAULT_SPLASHSCREEN_BACKGROUND"; then
-        chown -R "$user":"$user" "$DEFAULT_SPLASHSCREEN_BACKGROUND"
-    else
-        log "ERROR: Can't download default splashscreen."
-        return 1
-    fi
-}
-
-
-function download_config_file() {
-    if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts-splashscreens-settings.cfg" -o "$SCRIPT_CFG"; then
-        chown -R "$user":"$user" "$SCRIPT_CFG"
-    else
-        log "ERROR: Can't download config file."
-        return 1
-    fi
-}
-
-
-function download_fun_facts() {
-    if curl -s -f  "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/master/fun-facts.txt" -o "$FUN_FACTS_TXT"; then
-        chown -R "$user":"$user" "$FUN_FACTS_TXT"
-    else
-        log "ERROR: Can't download Fun Facts! text file."
+        log "ERROR: Can't download '$file_name'."
         return 1
     fi
 }
 
 
 function restore_default_files() {
-    download_default_splashscreen_background || return 1
-    download_config_file || return 1
-    download_fun_facts || return 1
+    for file in "${DEFAULT_FILES[@]}"; do
+        download_github_file "$file"
+    done
 }
 
 
 function check_default_files() {
-    [[ ! -f "$DEFAULT_SPLASHSCREEN_BACKGROUND" ]] && download_default_splashscreen_background
-    [[ ! -f "$SCRIPT_CFG" ]] && download_config_file
-    [[ ! -f "$FUN_FACTS_TXT" ]] && download_fun_facts
+    for file in "${DEFAULT_FILES[@]}"; do
+        [[ ! -f "$file" ]] && download_github_file "$file"
+    done
 }
 
 
@@ -678,22 +646,6 @@ function remove_fun_fact() {
 }
 
 
-function validate_path() {
-    [[ -z "$1" ]] && return 0
-
-    if [[ ! -f "$1" ]]; then
-        if [[ "$GUI_FLAG" -eq 1 ]]; then
-            local error_message="Can't set/get splashscreen path. '$1' file not found!"
-        else
-            local error_message="ERROR: Can't set/get splashscreen path. '$1' file not found!"
-        fi
-        log "$error_message"
-        [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the 'splashscreen_path' value in '$SCRIPT_CFG'"
-        return 1
-    fi
-}
-
-
 function validate_color() {
     [[ -z "$1" ]] && return 0
 
@@ -714,15 +666,6 @@ function validate_color() {
             echo >&2
             echo "TIP: run the 'convert -list color' command to get a full list." >&2
         fi
-        return 1
-    fi
-}
-
-function validate_true_false() {
-    [[ -z "$2" ]] && return 0
-    if [[ "$2" != "false" && "$2" != "true" ]]; then
-        log "ERROR: Can't enable/disable $1. Invalid boolean '$2'"
-        [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the '$1' value in '$SCRIPT_CFG'"
         return 1
     fi
 }
@@ -833,9 +776,9 @@ function gui() {
                         local title="Success!"
                         local text="Default files restored successfully!"
                             text+="\n\n"
-                            text+="\n- ./$(basename "$DEFAULT_SPLASHSCREEN_BACKGROUND")" \
-                            text+="\n- ./$(basename "$SCRIPT_CFG")" \
-                            text+="\n- ./$(basename "$FUN_FACTS_TXT")"
+                            for file in "${DEFAULT_FILES[@]}"; do
+                                text+="\n- '$(basename "$file")'"
+                            done
                     fi
                     dialog \
                         --backtitle "$DIALOG_BACKTITLE" \
@@ -850,7 +793,6 @@ function gui() {
                                 text+="\n -> Manage experimental packages"
                                 text+="\n -> fun-facts-splashscreens"
                                 text+="\n -> Update from source"
-
                         dialog \
                             --backtitle "$DIALOG_BACKTITLE" \
                             --title "Info" \
@@ -859,10 +801,7 @@ function gui() {
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
                             git pull && chown -R "$user":"$user" .
                         else
-                            dialog \
-                                --backtitle "$DIALOG_BACKTITLE" \
-                                --title "Info" \
-                                --msgbox "Fun Facts! Splashscreens is $updates_output!" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                            dialog_msgbox "Info"  "Fun Facts! Splashscreens is $updates_output!"
                         fi
                     fi
                     ;;
@@ -896,28 +835,7 @@ function get_options() {
                 echo
                 exit 0
                 ;;
-#~ #H --splash-path [path/to/splashscreen]     Set the image to use as Fun Facts! Splashscreen.
-            #~ --splash-path)
-                #~ check_argument "$1" "$2" || exit 1
-                #~ shift
-                #~ validate_path "$1" || exit 1
-                #~ set_config "splashscreen_path" "$1"
-                #~ ;;
-#~ #H --text-color [color]                     Set the text color to use on the Fun Facts! Splashscreen.
-            #~ --text-color)
-                #~ check_argument "$1" "$2" || exit 1
-                #~ shift
-                #~ validate_color "$1" || exit 1
-                #~ set_config "text_color" "$1"
-                #~ ;;
-#~ #H --bg-color [color]                       Set the background color to use on the Fun Facts! Splashscreen.
-            #~ --bg-color)
-                #~ check_argument "$1" "$2" || exit 1
-                #~ shift
-                #~ validate_color "$1" || exit 1
-                #~ set_config "bg_color" "$1"
-                #~ ;;
-#H -aff, --add-fun-fact "TEXT"                            Add new Fun Facts!.
+#H -aff, --add-fun-fact [TEXT]                            Add new Fun Facts!.
             -aff|--add-fun-fact)
                 check_argument "$1" "$2" || exit 1
                 shift
@@ -927,7 +845,7 @@ function get_options() {
             -rff|--remove-fun-fact)
                 remove_fun_fact
                 ;;
-#H -cff, --create-fun-fact ["SYSTEM"] ["ROM NAME.ext"]    Create a new Fun Facts! Splashscreen.
+#H -cff, --create-fun-fact ([SYSTEM] [ROM])               Create a new Fun Facts! Splashscreen.
             -cff|--create-fun-fact)
                 is_fun_facts_empty
                 if [[ -z "$2" ]]; then
@@ -938,7 +856,7 @@ function get_options() {
                     shift
                 fi
                 ;;
-#H -ebs, --enable-boot-splashscreen                       Enable script to create boot splashscreen.
+#H -ebs, --enable-boot-splashscreen                       Enable script to create a boot splashscreen.
             -ebs|--enable-boot-splashscreen)
                 if enable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "true" > /dev/null
@@ -947,8 +865,8 @@ function get_options() {
                     log "ERROR: failed to ENABLE script at boot."
                 fi
                 ;;
-#H -dbs, --disable-boot-splashscreen                      Disable script to create boot splashscreen.
-            -dbs|--disable-boot-splashscreen)
+#H -dbs, --disable-boot-splashscreen                      Disable script to create a boot splashscreen.
+            -dbs|--disable-boot-splashscreen)   
                 if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
                     echo "Script DISABLED at boot."
@@ -974,10 +892,6 @@ function get_options() {
                     log "ERROR: failed to DISABLE launching images."
                 fi
                 ;;
-#H -g,   --gui                                            Start GUI.
-            -g|--gui)
-                gui
-                ;;
 #H -ec,  --edit-config                                    Edit config file.
             -ec|--edit-config)
                 edit_config
@@ -986,16 +900,20 @@ function get_options() {
             -rc|--reset-config)
                 reset_config
                 ;;
+#H -rd,  --restore-defaults                               Restore default files.
+            -rd|--restore-defaults)
+                restore_default_files
+                ;;
+#H -g,   --gui                                            Start GUI.
+            -g|--gui)
+                gui
+                ;;
 #H -u,   --update                                         Update script.
             -u|--update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
                     git pull && chown -R "$user":"$user" .
                 fi
-                ;;
-#H -rd,  --restore-defaults                               Restore default files.
-            -rd|--restore-defaults)
-                restore_default_files
                 ;;
 #H -v,   --version                                        Show script version.
             -v|--version)
