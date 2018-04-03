@@ -66,10 +66,6 @@ readonly DEFAULT_LAUNCHING_IMAGES_TEXT_COLOR="$DEFAULT_TEXT_COLOR"
 readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT="Press a button to configure launch options"
 readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="$DEFAULT_TEXT_COLOR"
 
-## Automate scripts
-readonly DEFAULT_BOOT_SCRIPT="false"
-readonly DEFAULT_LOG="false"
-
 # Flags
 GUI_FLAG=0
 CONFIG_FLAG=0
@@ -104,10 +100,12 @@ function check_log_file(){
 function log() {
     check_log_file
     if [[ "$GUI_FLAG" -eq 1 ]] ; then
-        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $*" >> "$LOG_FILE"
         echo "$*"
     else
-        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $*" >> "$LOG_FILE"
         echo "$*" >&2
     fi
 }
@@ -201,14 +199,6 @@ function edit_config() {
     else
         nano "$SCRIPT_CFG"
     fi
-}
-
-
-function usage() {
-    echo
-    echo "USAGE: sudo $0 [OPTIONS]"
-    echo
-    echo "Use 'sudo $0 --help' to see all the options."
 }
 
 
@@ -885,10 +875,7 @@ function gui() {
 
 
 function get_options() {
-    if [[ -z "$1" ]]; then
-        usage
-        exit 0
-    fi
+    [[ -z "$1" ]] && usage
 
     OPTION="$1"
 
@@ -897,8 +884,7 @@ function get_options() {
 #H --help                                   Print the help message and exit.
             --help)
                 echo
-                echo "$SCRIPT_TITLE"
-                for ((i=1; i<="${#SCRIPT_TITLE}"; i+=1)); do [[ -n "$dashes" ]] && dashes+="-" || dashes="-"; done && echo "$dashes"
+                underline "$SCRIPT_TITLE"
                 echo "$SCRIPT_DESCRIPTION"
                 echo
                 echo

@@ -52,3 +52,39 @@ function check_argument() {
         return 1
     fi
 }
+
+function usage() {
+    echo
+    underline "$SCRIPT_TITLE"
+    echo "$SCRIPT_DESCRIPTION"
+    echo
+    echo
+    echo "USAGE: sudo $0 [OPTIONS]"
+    echo
+    echo "Use 'sudo $0 --help' to see all the options."
+    echo
+    exit 0
+}
+
+function underline() {
+    local dashes
+    local string="$1"
+    if [[ -z "$string" ]]; then
+        error_report
+        log "Missing a string as an argument."
+        exit 1
+    fi
+    echo "$string"
+    for ((i=1; i<="${#string}"; i+=1)); do [[ -n "$dashes" ]] && dashes+="-" || dashes="-"; done && echo "$dashes"
+}
+
+function join_by() {
+    #Usage example: join_by , a b c
+    local IFS="$1"
+    shift
+    echo "$*"
+}
+
+function error_report() {
+    log "ERROR: '${FUNCNAME[1]}' function on line $(caller)"
+}
