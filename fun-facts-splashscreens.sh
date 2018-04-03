@@ -468,12 +468,12 @@ function create_fun_fact_launching() {
                     log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid rom path!"
                     exit 1
                 else
-                    rom_file="${rom_file%.*}"
                     rom_ext="${rom_file#*.}"
+                    rom_file="${rom_file%.*}"
                 fi
             else
-                rom_file="$(basename "${rom_path%.*}")"
                 rom_ext="$(basename "${rom_path#*.}")"
+                rom_file="$(basename "${rom_path%.*}")"
             fi
             if get_boxart > /dev/null; then
                 RESULT_SPLASH="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
