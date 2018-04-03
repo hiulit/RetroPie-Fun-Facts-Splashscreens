@@ -53,6 +53,7 @@ function check_argument() {
     fi
 }
 
+
 function usage() {
     echo
     underline "$SCRIPT_TITLE"
@@ -66,6 +67,7 @@ function usage() {
     exit 0
 }
 
+
 function underline() {
     local dashes
     local string="$1"
@@ -78,6 +80,7 @@ function underline() {
     for ((i=1; i<="${#string}"; i+=1)); do [[ -n "$dashes" ]] && dashes+="-" || dashes="-"; done && echo "$dashes"
 }
 
+
 function join_by() {
     #Usage example: join_by , a b c
     local IFS="$1"
@@ -85,6 +88,27 @@ function join_by() {
     echo "$*"
 }
 
+
 function error_report() {
     log "ERROR: '${FUNCNAME[1]}' function on line $(caller)"
+}
+
+function check_log_file(){
+    if [[ ! -f "$LOG_FILE" ]]; then
+        touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
+    fi
+}
+
+
+function log() {
+    check_log_file
+    if [[ "$GUI_FLAG" -eq 1 ]] ; then
+        #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $*" >> "$LOG_FILE"
+        echo "$*"
+    else
+        #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $*" >> "$LOG_FILE"
+        echo "$*" >&2
+    fi
 }
