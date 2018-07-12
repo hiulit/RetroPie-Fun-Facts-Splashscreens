@@ -7,11 +7,12 @@
 ### Fixed
 
 * Refixed `check_dependencies`.
+* Fixed the creation of `runcommand-onend.sh` if it doesn't exist.
 
 ### Added
 
 * New dependency `librsvg2-bin`.
-* Support for launching images with **Fun Facts!**.
+* Support for `launching images` with **Fun Facts!**.
 * Added options for `--create-fun-fact`. See the [documentation](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#--create-fun-fact).
 * Added `--bg-color` option to set the background of the launching image.
 * Added `fun-facts-splashscreen-runcommand-onend.sh`.
