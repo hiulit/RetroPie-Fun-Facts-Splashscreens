@@ -606,10 +606,10 @@ function add_fun_fact() {
     while IFS= read -r line; do
         if [[ "$1" == "$line" ]]; then
             if [[ "$GUI_FLAG" -eq 1 ]]; then
-                log "'$1' is already in '$FUN_FACTS_TXT'"
+                log "'$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
                 return 1
             else
-                log "ERROR: '$1' is already in '$FUN_FACTS_TXT'"
+                log "ERROR: '$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
                 exit 1
             fi
         fi

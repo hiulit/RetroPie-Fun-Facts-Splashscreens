@@ -446,7 +446,7 @@ function dialog_fun_facts_settings() {
                                 dialog_msgbox "Error!" "Can't remove a ghost Fun Fact!.\nTry removing it manually from '$FUN_FACTS_TXT'."
                             else
                                 remove_fun_fact "$fun_fact" \
-                                && dialog_msgbox "Success!" "'$fun_fact' succesfully removed!"
+                                && dialog_msgbox "Success!" "'$fun_fact' Fun Fact! removed successfully!"
                             fi
                         else
                             dialog_fun_facts_settings
