@@ -193,8 +193,7 @@ function check_boot_splashscreen() {
     grep -q "$SCRIPT_DIR" "$RCLOCAL"
 }
 
-
-function enable_launching_images() {
+function create_runcommand_onend() {
     if [[ ! -f "$RUNCOMMAND_ONEND" ]]; then
         touch "$RUNCOMMAND_ONEND" && chown -R "$user":"$user" "$RUNCOMMAND_ONEND"
         cat > "$RUNCOMMAND_ONEND" << _EOF_
@@ -203,6 +202,10 @@ function enable_launching_images() {
 
 _EOF_
     fi
+}
+
+
+function enable_launching_images() {
     local command="\"$SCRIPT_RUNCOMMAND_ONEND\" \"\$1\" \"\$2\" \"\$3\" \"\$4\""
     disable_launching_images # deleting any previous config (do nothing if there isn't).
     sed -i "\$a$command" "$RUNCOMMAND_ONEND"
@@ -927,6 +930,8 @@ function main() {
     fi
 
     check_dependencies
+
+    create_runcommand_onend
 
     check_boot_splashscreen="$(get_config "boot_splashscreen_script")"
     if [[ "$check_boot_splashscreen" == "false" || "$check_boot_splashscreen" == "" ]]; then
