@@ -805,7 +805,7 @@ function get_options() {
 
     while [[ -n "$1" ]]; do
         case "$1" in
-#H -h,   --help                                 Print help message.
+#H -h,   --help                                 Print the help message.
             -h|--help)
                 echo
                 underline "$SCRIPT_TITLE"
@@ -831,9 +831,9 @@ function get_options() {
                 remove_fun_fact
                 ;;
 #H -cff, --create-fun-fact ([SYSTEM] [ROM])     Create a new Fun Facts! Splashscreen.
-#H                                                - no arguments: create boot splashscreen.
-#H                                                - [SYSTEM]: create launching image for a given system.
-#H                                                - [SYSTEM] [ROM]: create a launching image for a given game.
+#H                                                - No arguments: Create a boot splashscreen.
+#H                                                - [SYSTEM]: Create a launching image for a given system.
+#H                                                - [SYSTEM] [ROM]: Create a launching image for a given game.
             -cff|--create-fun-fact)
                 is_fun_facts_empty
                 if [[ -z "$2" ]]; then
@@ -844,7 +844,7 @@ function get_options() {
                     shift
                 fi
                 ;;
-#H -ebs, --enable-boot-splashscreen             Enable script to create a boot splashscreen at startup.
+#H -ebs, --enable-boot-splashscreen             Enable the script to create a boot splashscreen at startup.
             -ebs|--enable-boot-splashscreen)
                 if enable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "true" > /dev/null
@@ -853,7 +853,7 @@ function get_options() {
                     log "ERROR: failed to ENABLE script at boot."
                 fi
                 ;;
-#H -dbs, --disable-boot-splashscreen            Disable script to create a boot splashscreen at startup.
+#H -dbs, --disable-boot-splashscreen            Disable the script to create a boot splashscreen at startup.
             -dbs|--disable-boot-splashscreen)   
                 if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
@@ -862,7 +862,7 @@ function get_options() {
                     log "ERROR: failed to DISABLE script at boot."
                 fi
                 ;;
-#H -eli, --enable-launching-images              Enable script to create launching images using runcommand-onend.sh.
+#H -eli, --enable-launching-images              Enable the script to create launching images using runcommand-onend.sh.
             -eli|--enable-launching-images)
                 if enable_launching_images; then
                     set_config "launching_images_script" "true" > /dev/null
@@ -871,7 +871,7 @@ function get_options() {
                     log "ERROR: failed to ENABLE launching images."
                 fi
                 ;;
-#H -dli, --disable-launching-images             Disable script to create launching images using runcommand-onend.sh.
+#H -dli, --disable-launching-images             Disable the script to create launching images using runcommand-onend.sh.
             -dli|--disable-launching-images)
                 if disable_launching_images; then
                     set_config "launching_images_script" "false" > /dev/null
@@ -880,30 +880,30 @@ function get_options() {
                     log "ERROR: failed to DISABLE launching images."
                 fi
                 ;;
-#H -ec,  --edit-config                          Edit config file.
+#H -ec,  --edit-config                          Edit the configuration file.
             -ec|--edit-config)
                 edit_config
                 ;;
-#H -rc,  --reset-config                         Reset config file.
+#H -rc,  --reset-config                         Reset the configuration file.
             -rc|--reset-config)
                 reset_config
                 ;;
-#H -rd,  --restore-defaults                     Restore default files.
+#H -rd,  --restore-defaults                     Restore the default files.
             -rd|--restore-defaults)
                 restore_default_files
                 ;;
-#H -g,   --gui                                  Start GUI.
+#H -g,   --gui                                  Start the GUI.
             -g|--gui)
                 gui
                 ;;
-#H -u,   --update                               Update script.
+#H -u,   --update                               Update the script.
             -u|--update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
                     git pull && chown -R "$user":"$user" .
                 fi
                 ;;
-#H -v,   --version                              Show script version.
+#H -v,   --version                              Show the script version.
             -v|--version)
                 echo "$SCRIPT_VERSION"
                 ;;

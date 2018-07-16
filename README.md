@@ -29,33 +29,32 @@ Use '--help' to see all the options.
 
 ## Options
 
-* `--help`: Print the help message and exit.
-* `--splash-path [OPTIONS]`: Set the image to use as **Fun Facts! Splashscreen**.
-* `--text-color [OPTIONS]`: Set the text color to use on the **Fun Facts! Splashscreen**.
-* `--bg-color [OPTIONS]`: Set the background color to use on the **Fun Facts! Splashscreen**.
-* `--add-fun-fact [OPTIONS]`: Add new **Fun Facts!**.
+* `--help`: Print the help message.
+* `--add-fun-fact [TEXT]`: Add new **Fun Facts!**.
 * `--remove-fun-fact`: Remove **Fun Facts!**.
-* `--create-fun-fact`: Create a new **Fun Facts! Splashscreen**.
-* `--apply-splash`: Apply the **Fun Facts! Splashscreen**.
-* `--enable-boot`: Enable script at boot.
-* `--disable-boot`: Disable script at boot.
-* `--gui`: Start GUI.
-* `--edit-config`: Edit config file.
-* `--reset-config`: Reset config file.
-* `--update`: Update script.
-* `--version`: Show script version.
-* `--enable-log`: Enable logging.
-* `--disable-log`: Disable logging.
-* `--restore-defaults`: Restore default files.
+* `--create-fun-fact ([SYSTEM] [ROM])`: Create a new **Fun Facts! Splashscreen**.
+	* No arguments: Create a boot splashscreen.
+	* `[SYSTEM]`: Create a launching image for a given system.
+	* `[SYSTEM]` `[ROM]`: Create a launching image for a given game.
+* `--enable-boot-splashscreen`: Enable the script to create a boot splashscreen at startup.
+* `--disable-boot-splashscreen`: Disable the script to create a boot splashscreen at startup.
+* `--enable-launching-images`: Enable the script to create launching images using `runcommand-onend.sh`.
+* `--disable-launching-images`: Disable the script to create launching images using `runcommand-onend.sh`.
+* `--edit-config`: Edit the configuration file.
+* `--reset-config`: Reset the configuration file.
+* `--restore-defaults`: Restore the default files.
+* `--gui`: Start the GUI.
+* `--update`: Update the script.
+* `--version`: Show the script version.
 
-If `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log` are not set, the script takes the defaults:
+## Default configuration
 
 * `splashscreen_path`: `./retropie-default.png`
 * `text_color`: `white`
 * `boot_script`: `false`
 * `log`: `false`
 
-See the [config file](#config-file).
+See the [configuration file](#configuration-file).
 
 ## Examples
 
@@ -227,11 +226,11 @@ sudo ./fun-facts-splashscreens.sh --gui
 ![Fun Facts! Splashscreens GUI - 15](gui-examples/fun-facts-splashscreens-gui-15.jpg)
 #### Disable script at boot (`--disable-boot`)
 ![Fun Facts! Splashscreens GUI - 16](gui-examples/fun-facts-splashscreens-gui-16.jpg)
-#### Edit config file (`--edit-config`)
+#### Edit configuration file (`--edit-config`)
 ![Fun Facts Splashscreens GUI - 17](gui-examples/fun-facts-splashscreens-gui-17.jpg)
 #### Text editor
 ![Fun Facts Splashscreens GUI - 18](gui-examples/fun-facts-splashscreens-gui-18.jpg)
-#### Reset config file (`--reset-config`)
+#### Reset configuration file (`--reset-config`)
 ![Fun Facts Splashscreens GUI - 19](gui-examples/fun-facts-splashscreens-gui-19.jpg)
 #### Update script (up to date) (`--update`)
 ![Fun Facts! Splashscreens GUI - 20](gui-examples/fun-facts-splashscreens-gui-20.jpg)
@@ -246,7 +245,7 @@ sudo ./fun-facts-splashscreens.sh --gui
 
 ### `--edit-config`
 
-Edit config file.
+Edit configuration file.
 
 Opens a simple text editor.
 
@@ -262,9 +261,9 @@ sudo ./fun-facts-splashscreens.sh --edit-config
 
 ### `--reset-config`
 
-Reset config file.
+Reset configuration file.
 
-Removes all values from the config file. Next time the script is executed, it will populate the config file with defaults.
+Removes all values from the configuration file. Next time the script is executed, it will populate the configuration file with defaults.
 
 #### Example
 
@@ -328,7 +327,7 @@ sudo ./fun-facts-splashscreens.sh --disable-log
 Restore default files.
 
 * `./retropie-default.png` (default splashscreen)
-* `./fun-facts-splashscreens-settings.cfg` (default config file)
+* `./fun-facts-splashscreens-settings.cfg` (default configuration file)
 * `./fun-facts.txt` (default **Fun Facts!**)
 
 #### Example
@@ -337,7 +336,7 @@ Restore default files.
 sudo ./fun-facts-splashscreens.sh --restore-defaults
 ```
 
-## Config file
+## Configuration file
 
 When using `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the terminal or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
 
@@ -377,8 +376,8 @@ You can edit this file directly instead of using `--splash-path`, `--text-color`
 
 ## Add a new Fun Fact!
 
-* Open `fun-facts.txt`.
-* Add a new **Fun Fact!** (see [style guide](#style-guide)).
+* Open [fun-facts.txt](/fun-facts.txt).
+* Add a new **Fun Fact!** (see the [style guide](#style-guide)).
 
 ### Style guide
 
