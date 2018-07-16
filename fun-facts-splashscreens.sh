@@ -862,7 +862,7 @@ function get_options() {
                     log "ERROR: failed to DISABLE script at boot."
                 fi
                 ;;
-#H -eli, --enable-launching-images              Enable script to create launching images in runcommand_onend.
+#H -eli, --enable-launching-images              Enable script to create launching images using runcommand-onend.sh.
             -eli|--enable-launching-images)
                 if enable_launching_images; then
                     set_config "launching_images_script" "true" > /dev/null
@@ -871,7 +871,7 @@ function get_options() {
                     log "ERROR: failed to ENABLE launching images."
                 fi
                 ;;
-#H -dli, --disable-launching-images             Disable script to create launching images in runcommand_onend.
+#H -dli, --disable-launching-images             Disable script to create launching images using runcommand-onend.sh.
             -dli|--disable-launching-images)
                 if disable_launching_images; then
                     set_config "launching_images_script" "false" > /dev/null
