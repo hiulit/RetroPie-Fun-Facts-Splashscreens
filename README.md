@@ -4,7 +4,7 @@ A tool for RetroPie to generate splashscreens with random video game related Fun
 
 ## Installation
 
-```
+```bash
 cd /home/pi/
 git clone https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens.git
 cd RetroPie-Fun-Facts-Splashscreens/
@@ -15,7 +15,7 @@ You can also install **Fun Facts! Splashscreens** as a scriptmodule via the [Ret
 
 ## Usage
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh [OPTIONS]
 ```
 
@@ -60,56 +60,12 @@ See the [configuration file](#configuration-file).
 
 ### `--help`
 
-Print the help message and exit.
+Print the help message.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --help
-```
-
-### `--splash-path [OPTIONS]`
-
-Set the image to use as **Fun Facts! Splashscreen**.
-
-#### Options
-
-Must be an absolute path (e.g `/home/pi/my-awesome-splashscreen.png`).
-
-* `path/to/splashscreen`: Path of the image to use as **Fun Facts! Splashscreen**.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --splash-path "/home/pi/my-awesome-splashscreen.png"
-```
-
-### `--text-color [OPTIONS]`
-
-Set the text color to use on the **Fun Facts! Splashscreen**.
-
-#### Options
-
-* `color`: Text color of the **Fun Facts! Splashscreen**.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --text-color "white"
-```
-
-### `--bg-color [OPTIONS]`
-
-Set the background color to use on the **Fun Facts! Splashscreen**.
-
-#### Options
-
-* `color`: Background color of the **Fun Facts! Splashscreen**.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --bg-color "black"
 ```
 
 ### `--add-fun-fact [OPTIONS]`
@@ -120,10 +76,12 @@ Add new **Fun Facts!**.
 
 * `text`: **Fun Fact!** text.
 
+Wrap the text with double quotes `"`.
+
 #### Example
 
-```
-sudo ./fun-facts-splashscreens.sh --add-fun-fact "You're new and amazing Fun Fact!"
+```bash
+sudo ./fun-facts-splashscreens.sh --add-fun-fact "I'm a new and amazing Fun Fact!"
 ```
 
 ### `--remove-fun-fact`
@@ -132,7 +90,7 @@ Remove **Fun Facts!**.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 ```
 
@@ -146,102 +104,9 @@ The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --create-fun-fact
 ```
-
-### `--apply-splash`
-
-Apply the **Fun Facts! Splashscreen**.
-
-This command must be run in order to use the **Fun Facts! Splashscreen**.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --apply-splash
-```
-
-### `--enable-boot`
-
-Enable script at boot.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --enable-boot
-```
-
-### `--disable-boot`
-
-Disable script at boot.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --disable-boot
-```
-
-### `--gui`
-
-Start GUI.
-
-It lets you perform all the functions, but in a more friendly manner.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --gui
-```
-
-#### Set splashscreen path (`--splash-path [options]`)
-![Fun Facts! Splashscreens GUI - 01](gui-examples/fun-facts-splashscreens-gui-01.jpg)
-#### Enter splashscreen path
-![Fun Facts! Splashscreens GUI - 02](gui-examples/fun-facts-splashscreens-gui-02.jpg)
-#### Set text color (`--text-color [options]`)
-![Fun Facts! Splashscreens GUI - 03](gui-examples/fun-facts-splashscreens-gui-03.jpg)
-#### Basic colors
-![Fun Facts! Splashscreens GUI - 04](gui-examples/fun-facts-splashscreens-gui-04.jpg)
-#### Choose a color
-![Fun Facts! Splashscreens GUI - 05](gui-examples/fun-facts-splashscreens-gui-05.jpg)
-#### Full list of colors
-![Fun Facts! Splashscreens GUI - 06](gui-examples/fun-facts-splashscreens-gui-06.jpg)
-#### Choose a color
-![Fun Facts! Splashscreens GUI - 07](gui-examples/fun-facts-splashscreens-gui-07.jpg)
-#### Add a new Fun Fact! (`--add-fun-fact [options]`)
-![Fun Facts! Splashscreens GUI - 08](gui-examples/fun-facts-splashscreens-gui-08.jpg)
-#### Enter a new Fun Fact!
-![Fun Facts! Splashscreens GUI - 09](gui-examples/fun-facts-splashscreens-gui-09.jpg)
-#### Remove Fun Facts! (`--remove-fun-fact`)
-![Fun Facts! Splashscreens GUI - 10](gui-examples/fun-facts-splashscreens-gui-10.jpg)
-#### Choose a Fun Fact! to remove
-![Fun Facts! Splashscreens GUI - 11](gui-examples/fun-facts-splashscreens-gui-11.jpg)
-#### Create a new Fun Facts! Splashscreen (`--create-fun-fact`)
-![Fun Facts! Splashscreens GUI - 12](gui-examples/fun-facts-splashscreens-gui-12.jpg)
-#### Apply the Fun Facts! Splashscreen (`--apply-splash`)
-![Fun Facts! Splashscreens GUI - 13](gui-examples/fun-facts-splashscreens-gui-13.jpg)
-#### Apply the Fun Facts! Splashscreen (already applied)
-![Fun Facts! Splashscreens GUI - 14](gui-examples/fun-facts-splashscreens-gui-14.jpg)
-#### Enable script at boot (`--enable-boot`)
-![Fun Facts! Splashscreens GUI - 15](gui-examples/fun-facts-splashscreens-gui-15.jpg)
-#### Disable script at boot (`--disable-boot`)
-![Fun Facts! Splashscreens GUI - 16](gui-examples/fun-facts-splashscreens-gui-16.jpg)
-#### Edit configuration file (`--edit-config`)
-![Fun Facts Splashscreens GUI - 17](gui-examples/fun-facts-splashscreens-gui-17.jpg)
-#### Text editor
-![Fun Facts Splashscreens GUI - 18](gui-examples/fun-facts-splashscreens-gui-18.jpg)
-#### Reset configuration file (`--reset-config`)
-![Fun Facts Splashscreens GUI - 19](gui-examples/fun-facts-splashscreens-gui-19.jpg)
-#### Update script (up to date) (`--update`)
-![Fun Facts! Splashscreens GUI - 20](gui-examples/fun-facts-splashscreens-gui-20.jpg)
-#### Update script (there are updates)
-![Fun Facts! Splashscreens GUI - 21](gui-examples/fun-facts-splashscreens-gui-21.jpg)
-#### Enable logging (`--enable-log`)
-![Fun Facts! Splashscreens GUI - 22](gui-examples/fun-facts-splashscreens-gui-22.jpg)
-#### Disable logging (`--disable-log`)
-![Fun Facts! Splashscreens GUI - 23](gui-examples/fun-facts-splashscreens-gui-23.jpg)
-#### Restore default files (`--restore-defaults`)
-![Fun Facts! Splashscreens GUI - 24](gui-examples/fun-facts-splashscreens-gui-24.jpg)
 
 ### `--edit-config`
 
@@ -255,33 +120,59 @@ When using the GUI, use the `tab` key to select `Save` or `Back`.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --edit-config
 ```
 
 ### `--reset-config`
 
-Reset configuration file.
+Reset the configuration file.
 
-Removes all values from the configuration file. Next time the script is executed, it will populate the configuration file with defaults.
+Removes all values from the configuration file.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --reset-config
+```
+
+### `--restore-defaults`
+
+Restore the default files.
+
+* `./retropie-default.png` (default splashscreen)
+* `./fun-facts-splashscreens-settings.cfg` (default configuration file)
+* `./fun-facts.txt` (default **Fun Facts!**)
+
+#### Example
+
+```bash
+sudo ./fun-facts-splashscreens.sh --restore-defaults
+```
+
+### `--gui`
+
+Start GUI.
+
+It lets you perform all the functions, but in a more friendly manner.
+
+#### Example
+
+```bash
+sudo ./fun-facts-splashscreens.sh --gui
 ```
 
 ### `--update`
 
-Update script.
+Update the script.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --update
 ```
 
-If you're using **Fun Facts! Splashscreens** via RetroPie-Setup (if you installed it as a scriptmodule via the [RetroPie-Extra](https://github.com/zerojay/RetroPie-Extra) repository), this function won't work. The scriptmodules have their own update function.
+If you're using **Fun Facts! Splashscreens** via **RetroPie-Setup** (if you installed it as a scriptmodule via the [RetroPie-Extra](https://github.com/zerojay/RetroPie-Extra) repository), this function won't work. Scriptmodules have their own update function.
 
 If that's the case, go to:
 
@@ -292,48 +183,12 @@ If that's the case, go to:
 
 ### `--version`
 
-Show script version.
+Show the script version.
 
 #### Example
 
-```
+```bash
 sudo ./fun-facts-splashscreens.sh --version
-```
-
-### `--enable-log`
-
-Enable logging.
-
-The log file is `fun-facts-splashscreens.log`.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --enable-log
-```
-
-### `--disable-log`
-
-Disable logging.
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --disable-log
-```
-
-### `--restore-defaults`
-
-Restore default files.
-
-* `./retropie-default.png` (default splashscreen)
-* `./fun-facts-splashscreens-settings.cfg` (default configuration file)
-* `./fun-facts.txt` (default **Fun Facts!**)
-
-#### Example
-
-```
-sudo ./fun-facts-splashscreens.sh --restore-defaults
 ```
 
 ## Configuration file
