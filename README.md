@@ -2,8 +2,6 @@
 
 A tool for RetroPie to generate splashscreens with random video game related Fun Facts!.
 
-**WARNING: Splashscreens are only available on the Raspberry Pi.**
-
 ## Installation
 
 ```
