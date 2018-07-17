@@ -33,9 +33,6 @@ Use '--help' to see all the options.
 * `--add-fun-fact [TEXT]`: Add new **Fun Facts!**.
 * `--remove-fun-fact`: Remove **Fun Facts!**.
 * `--create-fun-fact ([SYSTEM] [ROM])`: Create a new **Fun Facts! Splashscreen**.
-	* No arguments: Create a boot splashscreen.
-	* `[SYSTEM]`: Create a launching image for a given system.
-	* `[SYSTEM]` `[ROM]`: Create a launching image for a given game.
 * `--enable-boot-splashscreen`: Enable the script to create a boot splashscreen at startup.
 * `--disable-boot-splashscreen`: Disable the script to create a boot splashscreen at startup.
 * `--enable-launching-images`: Enable the script to create launching images using `runcommand-onend.sh`.
@@ -102,9 +99,9 @@ Create a new **Fun Facts! Splashscreen/Launching image**.
 
 #### Options
 
-* No arguments: Create a boot splashscreen (the resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`).
-* `[SYSTEM]`: Create a launching image for a given system (the resulting launching image will be in `/opt/retropie/configs/[SYSTEM]/`). 
-* `[SYSTEM]` `[ROM]`: Create a launching image for a given game (the resulting launching image will be in `/home/pi/RetroPie/roms/[SYSTEM]/`).
+* **No arguments**: Create a boot splashscreen. The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
+* `[SYSTEM]`: Create a launching image for a given system. The resulting launching image will be in `/opt/retropie/configs/[SYSTEM]/`). 
+* `[SYSTEM]` `[ROM]`: Create a launching image for a given game. The resulting launching image will be in `/home/pi/RetroPie/roms/[SYSTEM]/`).
 
 `[SYSTEM]` can be:
 
@@ -134,7 +131,7 @@ sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "Sonic The Hedgeho
 
 ### `--edit-config`
 
-Edit configuration file.
+Edit the configuration file.
 
 Opens a simple text editor.
 
@@ -164,9 +161,9 @@ sudo ./fun-facts-splashscreens.sh --reset-config
 
 Restore the default files.
 
-* `./retropie-default.png` (default splashscreen)
-* `./fun-facts-splashscreens-settings.cfg` (default configuration file)
-* `./fun-facts.txt` (default **Fun Facts!**)
+* `retropie-default.png` (default splashscreen)
+* `fun-facts-splashscreens-settings.cfg` (default configuration file)
+* `fun-facts.txt` (default **Fun Facts!** file)
 
 #### Example
 
@@ -176,7 +173,7 @@ sudo ./fun-facts-splashscreens.sh --restore-defaults
 
 ### `--gui`
 
-Start GUI.
+Start the GUI.
 
 It lets you perform all the functions, but in a more friendly manner.
 
@@ -217,17 +214,12 @@ sudo ./fun-facts-splashscreens.sh --version
 
 ## Configuration file
 
-When using `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`, whether it's done via the terminal or the GUI, the generated values are stored in `fun-facts-splashscreens-settings.cfg`.
-
 ```
-# Fun Facts! Splashscreens Settings.
+# ---------------------------------
+# Fun Facts! Splashscreens Settings
+# ---------------------------------
 
-# Set splashscreen path
-#
-# Must be an absolute path (e.g /home/pi/my-awesome-splashscreen.png).
-splashscreen_path = ""
-
-# Set splashscreen text color
+# Paths must be absolute (e.g /home/pi/my-awesome-splashscreen.png).
 #
 # Short list of available colors:
 #
@@ -235,23 +227,55 @@ splashscreen_path = ""
 # pink, red, orange, yellow, green, silver, blue, cyan, purple, brown.
 #
 # TIP: run the 'convert -list color' command to get a full list.
-text_color = ""
 
-# Set background color
-bg_color = ""
+# -----------------
+# Boot splashscreen
+# -----------------
 
-# Enable/disable script at boot
-#
-# Boolean: true/false.
-boot_script = ""
+# Background image
+boot_splashscreen_background_path = ""
 
-# Enable/disable logging
-#
-# Boolean: true/false.
-log = ""
+# Background solid color
+boot_splashscreen_background_color = ""
+
+# Text color
+boot_splashscreen_text_color = ""
+
+# Text font
+boot_splashscreen_text_font_path = ""
+
+# ----------------
+# Launching images
+# ----------------
+
+# Background image
+launching_images_background_path = ""
+
+# Background solid color
+launching_images_background_color = ""
+
+# Text color
+launching_images_text_color = ""
+
+# Text font
+launching_images_text_font_path = ""
+
+# "Press button" text
+launching_images_press_button_text = ""
+
+# "Press button" text color
+launching_images_press_button_text_color = ""
+
+# ----------------
+# Automate scripts
+# ----------------
+
+# Enable/disable script at boot (Boolean: true/false)
+boot_splashscreen_script = ""
+
+# Enable/disable launching images (Boolean: true/false)
+launching_images_script = ""
 ```
-
-You can edit this file directly instead of using `--splash-path`, `--text-color`, `--bg-color`, `--enable-boot`, `disable-boot`, `enable--log` or `disable-log`.
 
 ## Add a new Fun Fact!
 
