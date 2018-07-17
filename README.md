@@ -95,7 +95,7 @@ sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 
 ### `--create-fun-fact [OPTIONS]`
 
-Create a new **Fun Facts! Splashscreen/Launching image**.
+Create a new **Fun Facts! Splashscreen**.
 
 #### Options
 
