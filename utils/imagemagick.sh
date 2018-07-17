@@ -7,10 +7,9 @@ function IM_add_background() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Background ... added!"
         return 0
     else
-        log "'$system' Background failed!"
+        log "ERROR: Imagemagick - Adding background ... failed!"
         return 1
     fi
 }
@@ -21,10 +20,9 @@ function IM_convert_svg_to_png() {
     
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "SVG converted to PNG successfully!"
         return 0
     else
-        log "SVG to PNG conversion failed!"
+        log "ERROR: Imagemagick - SVG to PNG conversion ... failed!"
         return 1
     fi
 }
@@ -43,10 +41,9 @@ function IM_resize_logo() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Logo resized successfully!"
         return 0
     else
-        log "Logo resizing failed!"
+        log "ERROR: Imagemagick - Logo resizing ... failed!"
         return 1
     fi
 }
@@ -54,14 +51,12 @@ function IM_resize_logo() {
 
 function IM_add_logo() {
     if file --mime-type "$logo" | grep -q "svg"; then
-        #~ echo "mime type is SVG"
         IM_convert_svg_to_png
     elif file --mime-type "$logo" | grep -q "png" || file --mime-type "$logo" | grep -q "jpeg"; then
-        #~ echo "mime type is PNG or JPEG"
         cp "$logo" "$TMP_DIR/$system.png"
     else
         file --mime-type "$logo"
-        log "File type not recognised."
+        log "ERROR: Imagemagick - File type not recognised!"
         exit 1
     fi
     
@@ -87,10 +82,9 @@ function IM_add_logo() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Logo ... added!"
         return 0
     else
-        log "'$system' Logo failed!"
+        log "ERROR: Imagemagick - Adding '$system' logo image ... failed!"
         return 1
     fi
 }
@@ -108,10 +102,9 @@ function IM_add_boxart() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Boxart ... added!"
         return 0
     else
-        log "Boxart failed!"
+        log "ERROR: Imagemagick - Adding boxart image ... failed!"
         return 1
     fi
 }
@@ -129,10 +122,9 @@ function IM_add_console() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Console ... added!"
         return 0
     else
-        log "'$system' Console failed!"
+        log "ERROR: Imagemagick - Adding '$system' console image ... failed!"
         return 1
     fi
 }
@@ -156,10 +148,9 @@ function IM_add_fun_fact() {
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Fun Fact! ... added!"
         return 0
     else
-        log "'$system' Fun Fact! failed!"
+        log "ERROR: Imagemagick - Adding 'Fun Fact!' ... failed!"
         return 1
     fi
 }
@@ -167,23 +158,19 @@ function IM_add_fun_fact() {
 
 function IM_add_press_button_text() {
     convert "$TMP_DIR/$TMP_SPLASHSCREEN" \
-        -size "$(((screen_w*60/100)))"x"$(((screen_h*5/100)))" \
-        -background none \
         -fill "$text_color" \
         -interline-spacing 2 \
         -font "$font" \
-        caption:"${press_button_text^^}" \
+        -pointsize 16 \
         -gravity south \
-        -geometry +0+"$(((screen_h*5/100)))" \
-        -composite \
+        -annotate +0+"$(((screen_h*5/100)))" "${press_button_text^^}" \
         "$TMP_DIR/$TMP_SPLASHSCREEN"
 
     local return_value="$?"
     if [[ "$return_value" -eq 0 ]]; then
-        #~ echo "Press button ... added!"
         return 0
     else
-        log "'$system' Press button failed!"
+        log "ERROR: Imagemagick - Adding 'Press button text' ... failed!"
         return 1
     fi
 }
