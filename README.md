@@ -96,16 +96,40 @@ sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 
 ![Fun Facts! Splashscreens Terminal - 01](terminal-examples/fun-facts-splashscreens-terminal-01.jpg)
 
-### `--create-fun-fact`
+### `--create-fun-fact [OPTIONS]`
 
-Create a new **Fun Facts! Splashscreen**.
+Create a new **Fun Facts! Splashscreen/Launching image**.
 
-The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
+#### Options
+
+* No arguments: Create a boot splashscreen (the resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`).
+* `[SYSTEM]`: Create a launching image for a given system (the resulting launching image will be in `/opt/retropie/configs/[SYSTEM]/`). 
+* `[SYSTEM]` `[ROM]`: Create a launching image for a given game (the resulting launching image will be in `/home/pi/RetroPie/roms/[SYSTEM]/`).
+
+`[SYSTEM]` can be:
+
+* `all` (will create launching images for all the systems).
+* Any system found in `/opt/retropie/configs/`. 
+
+`[ROM]` can be:
+
+* The full path of the ROM (e.g. `/home/pi/RetroPie/megadrive/Sonic The Hedgehog.zip`).
+* Just the name **with the file extension** (e.g. `Sonic The Hedgehog.zip`)
+
+Wrap `[ROM]` with double quotes `"`.
 
 #### Example
 
 ```bash
 sudo ./fun-facts-splashscreens.sh --create-fun-fact
+```
+
+```bash
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive
+```
+
+```bash
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "Sonic The Hedgehog.zip"
 ```
 
 ### `--edit-config`

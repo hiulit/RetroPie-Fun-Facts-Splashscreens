@@ -458,14 +458,14 @@ function create_fun_fact_launching() {
         for system_dir in "$RP_CONFIG_DIR/"*; do
             system_dir="$(basename "$system_dir")"
             if [[ "$system_dir" != "all" ]]; then
-                if [[ "$system_dir" != *.* ]]; then # In case there a file that's not a directory
+                if [[ "$system_dir" != *.* ]]; then # In case there's a file that's not a directory
                     create_fun_fact_launching "$system_dir"
                 fi
             fi
         done
     else
         if [[ -n "$rom_path" ]]; then
-            if [[ ! -f "$rom_path" ]]; then # If full rom path doesn't exist
+            if [[ ! -f "$rom_path" ]]; then # If full ROM path doesn't exist
                 rom_file="$rom_path"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
                     log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid rom path!"
