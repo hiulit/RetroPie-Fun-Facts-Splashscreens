@@ -471,8 +471,9 @@ function create_fun_fact_launching() {
             if [[ ! -f "$rom_path" ]]; then # If full ROM path doesn't exist
                 rom_file="$rom_path"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
-                    log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid rom path!"
-                    log "Check if the system '$system' and the rom '$rom_file' are correct."
+                    log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!"
+                    log "Check if the system '$system' and the ROM '$rom_file' are correct."
+                    log "Remember to add the file extension of the ROM."
                     exit 1
                 else
                     rom_ext="${rom_file#*.}"
@@ -489,6 +490,8 @@ function create_fun_fact_launching() {
                 log "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
                 rom_path=""
                 RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
+                echo "Can't create launching image with boxart without a scraped image."
+                echo "Switching to default launching image for '$system' ..."
                 echo "Creating Fun Facts! launching image for '$system' ..."    
             fi
         else    
