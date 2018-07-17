@@ -91,8 +91,6 @@ Remove **Fun Facts!**.
 sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 ```
 
-![Fun Facts! Splashscreens Terminal - 01](terminal-examples/fun-facts-splashscreens-terminal-01.jpg)
-
 ### `--create-fun-fact [OPTIONS]`
 
 Create a new **Fun Facts! Splashscreen**.
@@ -123,6 +121,10 @@ sudo ./fun-facts-splashscreens.sh --create-fun-fact
 
 ```bash
 sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive
+```
+
+```bash
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "/home/pi/RetroPie/megadrive/Sonic The Hedgehog.zip"
 ```
 
 ```bash
