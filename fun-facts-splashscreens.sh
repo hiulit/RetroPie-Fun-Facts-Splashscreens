@@ -78,6 +78,7 @@ DEFAULT_FILES=(
     "$FUN_FACTS_TXT"
     "$DEFAULT_SPLASHSCREEN_BACKGROUND"
 )
+DEFAULT_THEME="carbon"
 
 
 # External resources ######################################
@@ -229,16 +230,18 @@ function check_runcommand_onend() {
 
 
 function get_current_theme() {
-    sed -n "/name=\"ThemeSet\"/ s/^.*value=['\"]\(.*\)['\"].*/\1/p" "$home/.emulationstation/es_settings.cfg"
+    if [[ ! -f "$home/.emulationstation/es_settings.cfg" ]]; then
+        echo "$DEFAULT_THEME"
+    else
+        sed -n "/name=\"ThemeSet\"/ s/^.*value=['\"]\(.*\)['\"].*/\1/p" "$home/.emulationstation/es_settings.cfg"
+    fi
 }
 
 
 function get_font() {
     local theme
     theme="$(get_current_theme)"
-
-    [[ -z "$theme" ]] && theme="carbon"
-
+    [[ -z "$theme" ]] && theme="$DEFAULT_THEME"
     local font
     font="$(xmlstarlet sel -t -v \
         "/theme/view[contains(@name,'detailed')]/textlist/fontPath" \
@@ -248,7 +251,7 @@ function get_font() {
         font="$ES_THEMES_DIR/$theme/$font"
     else
         # Note: the find function below returns the full path file name.
-        font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit)"
+        font="$(find "$ES_THEMES_DIR/$theme/" -type f -name '*.ttf' -print -quit 2> /dev/null)"
         if [[ -z "$font" ]]; then
             log "ERROR: Unable to get the font from the '$theme' theme files."
             echo "Aborting ..." >&2
@@ -377,7 +380,7 @@ function create_fun_fact_boot() {
     [[ -z "$text_color" ]] &&  text_color="$DEFAULT_TEXT_COLOR"
     local font
     font="$(get_config "boot_splashscreen_text_font")"
-    [[ -z "$font" ]] && font="$(get_font)"
+    [[ -z "$font" ]] && font="$(get_font)" || exit 1
     local size_x="$(((screen_w*75/100)))"
     local size_y="$(((screen_h*15/100)))"
     
@@ -446,7 +449,7 @@ function create_fun_fact_launching() {
     bg_color="$(get_config "launching_images_background_color")"
     local font
     font="$(get_config "launching_images_text_font_path")"
-    [[ -z "$font" ]] && font="$(get_font)"
+    [[ -z "$font" ]] && font="$(get_font)" || exit 1
     local press_button_text
     press_button_text="$(get_config "launching_images_press_button_text")"
     [[ -z "$press_button_text" ]] &&  press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
