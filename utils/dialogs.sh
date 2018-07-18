@@ -581,11 +581,15 @@ function dialog_choose_games() {
     local i=1
     options=()
     
-    systems="$(get_all_systems)"
-    IFS=" " read -r -a systems <<< "${systems[@]}"
-    for system in "${systems[@]}"; do
-        options+=("$i" "$system" off)
-        ((i++))
+    for system in "$RP_ROMS_DIR/"*; do
+        if [[ ! -L "$system" ]]; then # Filter out symlinks.
+            if [[ $(ls -A "$system") ]]; then # Check if folder is NOT empty
+                if [[ $(find "$system" -maxdepth 1 -type f -name "*.*") ]]; then # Check if file has extension
+                    options+=("$i" "$(basename "$system")" off)
+                    ((i++))
+                fi
+            fi
+        fi
     done
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
