@@ -95,6 +95,8 @@ sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 
 Create a new **Fun Facts! Splashscreen**.
 
+**If you want to create launching images for games, you must have scraped images. It doens't matter if they are scraped from the built-in EmulationStation scraper or they are from Sselph's scraper.**
+
 #### Options
 
 * **No arguments**: Create a boot splashscreen. The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
