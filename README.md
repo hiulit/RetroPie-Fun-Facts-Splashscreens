@@ -110,8 +110,8 @@ Create a new **Fun Facts! Splashscreen**.
 
 `[ROM]` can be:
 
-* The full path of the ROM (e.g. `/home/pi/RetroPie/megadrive/Sonic The Hedgehog.zip`).
-* Just the name **with the file extension** (e.g. `Sonic The Hedgehog.zip`)
+* The full path of the ROM (e.g. `/home/pi/RetroPie/megadrive/Sonic the Hedgehog.zip`).
+* Just the name **with the file extension** (e.g. `Sonic the Hedgehog.zip`)
 
 Wrap `[ROM]` with double quotes `"`.
 
@@ -126,11 +126,11 @@ sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive
 ```
 
 ```bash
-sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "/home/pi/RetroPie/megadrive/Sonic The Hedgehog.zip"
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "/home/pi/RetroPie/megadrive/Sonic the Hedgehog.zip"
 ```
 
 ```bash
-sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "Sonic The Hedgehog.zip"
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "Sonic the Hedgehog.zip"
 ```
 
 ### `--edit-config`
