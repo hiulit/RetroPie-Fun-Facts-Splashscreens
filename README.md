@@ -165,9 +165,11 @@ sudo ./fun-facts-splashscreens.sh --reset-config
 
 Restore the default files.
 
-* `retropie-default.png` (default splashscreen)
+* `retropie-default.png` (default splashscreen image)
 * `fun-facts-splashscreens-settings.cfg` (default configuration file)
 * `fun-facts.txt` (default **Fun Facts!** file)
+
+This action will overwrite those files and erase any changes you may have made to them.
 
 #### Example
 
