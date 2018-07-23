@@ -680,6 +680,26 @@ function validate_color() {
 }
 
 
+function check_major_version() {
+    local git_version
+    git_version="$(git tag | sort -V | tail -1 | grep -Po "([0-9]{1,}\.)+[0-9]{1,}")"
+    local script_version_major
+    script_version_major="$(echo "$SCRIPT_VERSION" | grep -Po "^[0-9]")"
+    local git_version_major
+    git_version_major="$(echo "$git_version" | grep -Po "^[0-9]")"
+    
+    if [[ "$git_version_major" -gt "$script_version_major" ]]; then
+        echo "WARNING: A new major version is released!"
+        echo "As major versions usually involve breaking changes, it's best to:"
+        echo "- Save or backup the default files (splashscreen image, configuration file and Fun Facts! file), if you made any changes to them."
+        echo "- Delete the 'RetroPie-Fun-Facts-Splashscreens' folder."
+        echo "- Go to 'https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/'"
+        echo "- Download and install the script again."
+        exit 1
+    fi
+}
+
+
 function check_updates() {
     [[ "$GUI_FLAG" -eq 0 ]] && echo "Let's see if there are any updates ..."
     cd "$SCRIPT_DIR"
@@ -688,10 +708,6 @@ function check_updates() {
     LOCAL="$(git rev-parse @)"
     REMOTE="$(git rev-parse $UPSTREAM)"
     BASE="$(git merge-base @ $UPSTREAM)"
-    echo "$UPSTREAM"
-    echo "$LOCAL"
-    echo "$REMOTE"
-    echo "$BASE"
     if [[ "$LOCAL" == "$REMOTE" ]]; then
         updates_status="up-to-date"
         updates_output="up to date"
@@ -928,6 +944,7 @@ function get_options() {
             -u|--update)
                 check_updates
                 if [[ "$updates_status" == "needs-to-pull" ]]; then
+                    check_major_version
                     git pull && chown -R "$user":"$user" .
                 fi
                 ;;
