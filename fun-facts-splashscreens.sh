@@ -105,9 +105,27 @@ function download_github_file() {
 
 
 function restore_default_files() {
-    for file in "${DEFAULT_FILES[@]}"; do
-        download_github_file "$file"
+    echo "Would you like to restore the default files (splashscreen image, configuration file and Fun Facts! file)?"
+    echo "This action will overwrite those files and erase any changes you may have made to them."
+    local options=("Yes" "No")
+    select option in "${options[@]}"; do
+        case "$option" in
+            Yes)
+                for file in "${DEFAULT_FILES[@]}"; do
+                    download_github_file "$file"
+                done
+                exit 1
+                ;;
+            No)
+                exit 1
+                ;;
+            *)
+                echo "Invalid option. Choose a number between 1 and ${#options[@]}."
+                ;;
+        esac
     done
+
+
 }
 
 
@@ -670,6 +688,10 @@ function check_updates() {
     LOCAL="$(git rev-parse @)"
     REMOTE="$(git rev-parse $UPSTREAM)"
     BASE="$(git merge-base @ $UPSTREAM)"
+    echo "$UPSTREAM"
+    echo "$LOCAL"
+    echo "$REMOTE"
+    echo "$BASE"
     if [[ "$LOCAL" == "$REMOTE" ]]; then
         updates_status="up-to-date"
         updates_output="up to date"
