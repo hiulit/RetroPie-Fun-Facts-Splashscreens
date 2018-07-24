@@ -254,16 +254,18 @@ sudo ./fun-facts-splashscreens.sh --version
 # pink, red, orange, yellow, green, silver, blue, cyan, purple, brown.
 #
 # TIP: run the 'convert -list color' command to get a full list.
+#
+# If both 'Background image' and 'Background solid color' are set, 'Background image' takes precedence over 'Background solid color'.
 
 # -----------------
 # Boot splashscreen
 # -----------------
 
 # Background image
-boot_splashscreen_background_path = ""
+boot_splashscreen_background_path = "/home/pi/RetroPie-Fun-Facts-Splashscreens/retropie-default.png"
 
 # Background solid color
-boot_splashscreen_background_color = ""
+boot_splashscreen_background_color = "blue"
 
 # Text color
 boot_splashscreen_text_color = ""
@@ -297,10 +299,10 @@ launching_images_press_button_text_color = ""
 # Automate scripts
 # ----------------
 
-# Enable/disable script at boot (Boolean: true/false)
+# Enable/disable the script to create a boot splashscreen at startup (Boolean: true/false)
 boot_splashscreen_script = ""
 
-# Enable/disable launching images (Boolean: true/false)
+# Enable/disable the script to create launching images using 'runcommand-onend.sh' (Boolean: true/false)
 launching_images_script = ""
 ```
 
