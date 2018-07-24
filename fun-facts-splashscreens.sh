@@ -502,6 +502,7 @@ function create_fun_fact_launching() {
                 rom_file="$(basename "${rom_path%.*}")"
             fi
             if get_boxart > /dev/null; then
+                mkdir -p "$RP_ROMS_DIR/$system/images" && chown -R "$user":"$user" "$RP_ROMS_DIR/$system/images"
                 RESULT_SPLASH="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
                 echo "Creating Fun Facts! launching image for '$system - $rom_file' ..."
             else
