@@ -109,11 +109,11 @@ function log() {
     check_log_file
     if [[ "$GUI_FLAG" -eq 1 ]] ; then
         #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
-        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << $OPTION" >> "$LOG_FILE"
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* $([[ -n "$OPTION" ]] && echo "<< $OPTION")" >> "$LOG_FILE"
         echo "$*"
     else
         #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
-        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* << $OPTION" >> "$LOG_FILE"
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* $([[ -n "$OPTION" ]] && echo "<< $OPTION")" >> "$LOG_FILE"
         echo "$*" >&2
     fi
 }
