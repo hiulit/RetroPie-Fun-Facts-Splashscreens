@@ -46,12 +46,24 @@ Use '--help' to see all the options.
 
 ## Default configuration
 
-* `splashscreen_path`: `./retropie-default.png`
-* `text_color`: `white`
-* `boot_script`: `false`
-* `log`: `false`
+### Boot splashscreen and launching images
 
-See the [configuration file](#configuration-file).
+* Background image: `retropie-default.png`.
+* Backgorund solid color: `black`.
+* Text color: `white`.
+* Text font: `Active theme's font`.
+
+### Launching images only
+
+* "Press button" text: `Press a button to configure launch options`.
+* "Press button" text color: `white`.
+
+### Automate scripts
+
+* Create a boot splashscreen at startup: `false`.
+* Create launching images using `runcommand-onend.sh`: `false`.
+
+All these parameters can be modified. See the [configuration file](#configuration-file).
 
 ## Examples
 
@@ -71,7 +83,7 @@ Add new **Fun Facts!**.
 
 #### Options
 
-* `text`: **Fun Fact!** text.
+* `[TEXT]`: **Fun Fact!** text.
 
 Wrap the text with double quotes `"`.
 
@@ -95,13 +107,22 @@ sudo ./fun-facts-splashscreens.sh --remove-fun-fact
 
 Create a new **Fun Facts! Splashscreen**.
 
-**If you want to create launching images for games, you must have scraped images. It doens't matter if they are scraped from the built-in EmulationStation scraper or they are from Sselph's scraper.**
+**If you want to create launching images for games you must have scraped images.**
+
+It shouldn't matter what scraper it's used, but these are the tested ones:
+
+* Built-in EmulationStation scraper.
+* Sselph's scraper.
+* Skyscrapper.
 
 #### Options
 
-* **No arguments**: Create a boot splashscreen. The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
-* `[SYSTEM]`: Create a launching image for a given system. The resulting launching image will be in `/opt/retropie/configs/[SYSTEM]/`). 
-* `[SYSTEM]` `[ROM]`: Create a launching image for a given game. The resulting launching image will be in `/home/pi/RetroPie/roms/[SYSTEM]/`).
+* **No arguments**: Create a boot splashscreen.
+	The resulting splashscreen will be in `/home/pi/RetroPie/splashscreens/`.
+* `[SYSTEM]`: Create a launching image for a given system.
+	The resulting launching image will be in `/opt/retropie/configs/[SYSTEM]/`). 
+* `[SYSTEM]` `[ROM]`: Create a launching image for a given game.
+	The resulting launching image will be in `/home/pi/RetroPie/roms/[SYSTEM]/`).
 
 `[SYSTEM]` can be:
 
@@ -110,8 +131,8 @@ Create a new **Fun Facts! Splashscreen**.
 
 `[ROM]` can be:
 
+* Just the ROM name **with the file extension** (e.g. `Sonic the Hedgehog.zip`)
 * The full path of the ROM (e.g. `/home/pi/RetroPie/megadrive/Sonic the Hedgehog.zip`).
-* Just the name **with the file extension** (e.g. `Sonic the Hedgehog.zip`)
 
 Wrap `[ROM]` with double quotes `"`.
 
@@ -126,11 +147,11 @@ sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive
 ```
 
 ```bash
-sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "/home/pi/RetroPie/megadrive/Sonic the Hedgehog.zip"
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "Sonic the Hedgehog.zip"
 ```
 
 ```bash
-sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "Sonic the Hedgehog.zip"
+sudo ./fun-facts-splashscreens.sh --create-fun-fact megadrive "/home/pi/RetroPie/megadrive/Sonic the Hedgehog.zip"
 ```
 
 ### `--edit-config`
@@ -169,7 +190,7 @@ Restore the default files.
 * `fun-facts-splashscreens-settings.cfg` (default configuration file)
 * `fun-facts.txt` (default **Fun Facts!** file)
 
-This action will overwrite those files and erase any changes you may have made to them.
+**This action will overwrite those files and erase any changes you may have made to them**.
 
 #### Example
 
