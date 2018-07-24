@@ -979,12 +979,14 @@ function main() {
 
     create_runcommand_onend
 
+    local check_boot_splashscreen
     check_boot_splashscreen="$(get_config "boot_splashscreen_script")"
     if [[ "$check_boot_splashscreen" == "false" || "$check_boot_splashscreen" == "" ]]; then
         disable_boot_splashscreen
     elif [[ "$check_boot_splashscreen" == "true" ]]; then
         enable_boot_splashscreen
     fi
+    local check_launching_images
     check_launching_images="$(get_config "launching_images_script")"
     if [[ "$check_launching_images" == "false" || "$check_launching_images" == "" ]]; then
         disable_launching_images
