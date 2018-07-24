@@ -68,7 +68,6 @@ readonly DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT_COLOR="$DEFAULT_TEXT_COLOR"
 
 # Flags
 GUI_FLAG=0
-CONFIG_FLAG=0
 
 # Global variables
 RESULT_SPLASH=
@@ -366,8 +365,7 @@ function create_fun_fact() {
 
     if [[ -z "$1" ]]; then
         create_fun_fact_boot
-        local return_value
-        return_value="$?"
+        local return_value="$?"
         if [[ "$return_value" -eq 0 ]]; then
             if [[ -f "$RESULT_SPLASH" ]]; then
                 if [[ ! -f "$SPLASH_LIST" ]]; then
@@ -385,23 +383,6 @@ function create_fun_fact() {
 
 
 function create_fun_fact_boot() {
-    RESULT_SPLASH="$RESULT_BOOT_SPLASH"
-    local system="retropie"
-    local logo
-    logo="$(get_system_logo)"
-    local splash
-    splash="$(get_config "boot_splashscreen_background_path")"
-    local bg_color
-    bg_color="$(get_config "boot_splashscreen_background_color")"
-    local text_color
-    text_color="$(get_config "boot_splashscreen_text_color")"
-    [[ -z "$text_color" ]] &&  text_color="$DEFAULT_TEXT_COLOR"
-    local font
-    font="$(get_config "boot_splashscreen_text_font")"
-    [[ -z "$font" ]] && font="$(get_font)" || exit 1
-    local size_x="$(((screen_w*75/100)))"
-    local size_y="$(((screen_h*15/100)))"
-    
     if [[ "$GUI_FLAG" -eq 1 ]]; then
         dialog \
             --backtitle "$DIALOG_BACKTITLE" \
@@ -409,9 +390,39 @@ function create_fun_fact_boot() {
     else
         echo "Creating Fun Facts! boot splashscreen ..."
     fi
+
+    RESULT_SPLASH="$RESULT_BOOT_SPLASH"
+    
+    local system="retropie"
+    
+    local logo
+    logo="$(get_system_logo)"
+    
+    local splash
+    splash="$(get_config "boot_splashscreen_background_path")"
+    
+    local bg_color
+    bg_color="$(get_config "boot_splashscreen_background_color")"
+    [[ -z "$bg_color" ]] && bg_color="$DEFAULT_BACKGROUND_COLOR"
+    
+    local text_color
+    text_color="$(get_config "boot_splashscreen_text_color")"
+    if [[ -z "$text_color" ]]; then
+        text_color="$DEFAULT_TEXT_COLOR"
+    else
+        validate_color "$text_color"
+        local return_value="$?"
+        [[ "$return_value" -eq 1 ]] && exit 1
+    fi
+    
+    local font
+    font="$(get_config "boot_splashscreen_text_font")"
+    [[ -z "$font" ]] && font="$(get_font)" || exit 1
+    
+    local size_x="$(((screen_w*75/100)))"
+    local size_y="$(((screen_h*15/100)))"
     
     if [[ -z "$splash" ]]; then
-        [[ -z "$bg_color" ]] &&  bg_color="$DEFAULT_BACKGROUND_COLOR"
         IM_add_background
         if [[ -f "$logo" ]]; then
             IM_add_logo
@@ -421,7 +432,7 @@ function create_fun_fact_boot() {
         fi
         splash="$TMP_DIR/splashscreen.png"
     else
-        local bg_color="none"
+        bg_color="none"
     fi
     
     # Add Fun Fact!
@@ -448,10 +459,10 @@ function create_fun_fact_boot() {
     else
         local error_message="Fun Facts! boot splashscreen failed!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "$error_message" > /dev/null
+            # log "$error_message" > /dev/null
             dialog_msgbox "Error!" "$error_message"
         else
-            log "$error_message"
+            echo "ERROR: $error_message"
         fi
         return 1
     fi
@@ -489,9 +500,9 @@ function create_fun_fact_launching() {
             if [[ ! -f "$rom_path" ]]; then # If full ROM path doesn't exist
                 rom_file="$rom_path"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
-                    log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!"
-                    log "Check if the system '$system' and the ROM '$rom_file' are correct."
-                    log "Remember to add the file extension of the ROM."
+                    echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!"
+                    echo "Check if the system '$system' and the ROM '$rom_file' are correct."
+                    echo "Remember to add the file extension of the ROM."
                     exit 1
                 else
                     rom_ext="${rom_file#*.}"
@@ -506,7 +517,7 @@ function create_fun_fact_launching() {
                 RESULT_SPLASH="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
                 echo "Creating Fun Facts! launching image for '$system - $rom_file' ..."
             else
-                log "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
+                echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
                 rom_path=""
                 RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
                 echo "Can't create launching image with boxart without a scraped image."
@@ -514,7 +525,7 @@ function create_fun_fact_launching() {
                 echo "Creating Fun Facts! launching image for '$system' ..."    
             fi
         else    
-            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' is not a valid system." && exit 1
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && echo "ERROR: '$system' is not a valid system." && exit 1
             RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
             echo "Creating Fun Facts! launching image for '$system' ..."
         fi
@@ -548,7 +559,7 @@ function create_fun_fact_launching() {
             echo "$success_message"
         else
             local error_message="Fun Facts! launching image failed!"
-            log "$error_message"
+            echo "ERROR: $error_message"
         fi
     fi
 }
@@ -615,10 +626,10 @@ function select_fun_facts() {
 function is_fun_facts_empty() {
     if [[ ! -s "$FUN_FACTS_TXT" ]]; then
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "'$FUN_FACTS_TXT' is empty!"
+            echo "'$FUN_FACTS_TXT' is empty!"
             return 1
         else
-            log "'$FUN_FACTS_TXT' is empty!"
+            echo "'$FUN_FACTS_TXT' is empty!"
             exit 1
         fi
     else
@@ -631,10 +642,10 @@ function add_fun_fact() {
     while IFS= read -r line; do
         if [[ "$1" == "$line" ]]; then
             if [[ "$GUI_FLAG" -eq 1 ]]; then
-                log "'$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
+                echo "'$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
                 return 1
             else
-                log "ERROR: '$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
+                echo "ERROR: '$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
                 exit 1
             fi
         fi
@@ -663,11 +674,11 @@ function validate_color() {
         return 0
     else
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            log "Can't set/get text color. Invalid color '$1'."
-            [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the 'text_color' value in '$SCRIPT_CFG'"
+            log "Can't set/get the text color. Invalid color: '$1'."
+            log "Check the 'XXX_text_color' values in '$SCRIPT_CFG'"
         else
-            log "ERROR: Can't set/get text color. Invalid color '$1'."
-            [[ "$CONFIG_FLAG" -eq 1 ]] && log "Check the 'text_color' value in '$SCRIPT_CFG'"
+            echo "ERROR: Can't set/get the text color. Invalid color: '$1'." >&2
+            echo "Check the 'XXX_text_color' values in '$SCRIPT_CFG'" >&2
             echo >&2
             echo "Short list of available colors:" >&2
             echo "-------------------------------" >&2
@@ -954,8 +965,8 @@ function get_options() {
                 echo "$SCRIPT_VERSION"
                 ;;
             *)
-                log "ERROR: Invalid option '$1'."
-                log "Try 'sudo $0 --help' for more info."
+                echo "ERROR: Invalid option '$1'."
+                echo "Try 'sudo $0 --help' for more info."
                 exit 2
                 ;;
         esac
@@ -965,13 +976,13 @@ function get_options() {
 
 function main() {
     if ! is_sudo; then
-        log "ERROR: Script must be run under 'sudo'."
+        echo "ERROR: Script must be run under 'sudo'."
         echo "Try 'sudo ./$SCRIPT_NAME'."
         exit 1
     fi
 
     if ! is_retropie; then
-        log "ERROR: RetroPie is not installed. Aborting ..."
+        echo "ERROR: RetroPie is not installed. Aborting ..."
         exit 1
     fi
 
