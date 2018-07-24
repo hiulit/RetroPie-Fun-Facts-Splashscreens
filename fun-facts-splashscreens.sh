@@ -965,8 +965,8 @@ function get_options() {
 
 function main() {
     if ! is_sudo; then
-        log "ERROR: Script must be run under sudo."
-        usage
+        log "ERROR: Script must be run under 'sudo'."
+        echo "Try 'sudo ./$SCRIPT_NAME'."
         exit 1
     fi
 
