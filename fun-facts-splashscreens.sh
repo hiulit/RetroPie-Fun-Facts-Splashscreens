@@ -683,8 +683,7 @@ function validate_color() {
             echo "ERROR: Can't set/get the text color. Invalid color: '$1'." >&2
             echo "Check the 'XXX_text_color' values in '$SCRIPT_CFG'" >&2
             echo >&2
-            echo "Short list of available colors:" >&2
-            echo "-------------------------------" >&2
+            underline "Short list of available colors:" >&2
             echo "black white gray gray10 gray25 gray50 gray75 gray90" >&2
             echo "pink red orange yellow green silver blue cyan purple brown" >&2
             echo >&2
