@@ -15,7 +15,7 @@ function check_dependencies() {
     local pkg
     for pkg in "${DEPENDENCIES[@]}"; do
         if ! dpkg-query -W -f='${Status}' "$pkg" | awk '{print $3}' | grep -q "^installed$"; then
-            log "WHOOPS! The '$pkg' package is not installed!"
+            echo "WHOOPS! The '$pkg' package is not installed!"
             echo "Would you like to install it now?"
             local options=("Yes" "No")
             local option
@@ -26,7 +26,9 @@ function check_dependencies() {
                             log "ERROR: Can't install '$pkg' automatically. Try to install it manually."
                             exit 1
                         else
-                            sudo apt-get install "$pkg"
+                            if sudo apt-get install "$pkg"; then
+                                log "YIPPEE! The '$pkg' package installation was successfull!"
+                            fi
                             break
                         fi
                         ;;
