@@ -82,9 +82,6 @@ DEFAULT_THEME="carbon"
 
 # External resources ######################################
 
-source "./utils/base.sh"
-source "./utils/dialogs.sh"
-source "./utils/imagemagick.sh"
 source "$SCRIPT_DIR/utils/base.sh"
 source "$SCRIPT_DIR/utils/dialogs.sh"
 source "$SCRIPT_DIR/utils/imagemagick.sh"
