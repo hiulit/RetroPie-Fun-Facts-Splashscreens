@@ -330,10 +330,14 @@ function get_boxart() {
             rom_name="$(basename "$rom_path")"
         fi
     fi
+    local game_list="$RP_ROMS_DIR/$system/gamelist.xml" # Using SSelph scraper option: 'Use rom folder for gamelist & images' or SkyScraper.
+    if [[ ! -f "$game_list" ]]; then
+        game_list="/home/pi/.emulationstation/gamelists/$system/gamelist.xml" # Default EmulationStation gamelist.xml.
+    fi
     local boxart
     boxart="$(xmlstarlet sel -t -v \
         "/gameList/game[path[contains(text(),\"$rom_name\")]]/image" \
-        "$RP_ROMS_DIR/$system/gamelist.xml" 2> /dev/null | head -1)"
+        "$game_list" 2> /dev/null | head -1)"
     [[ "$boxart" == "."* ]] && boxart="$RP_ROMS_DIR/$system/$boxart" # If path start with "."
     if [[ -f "$boxart" ]]; then
         echo "$boxart"
