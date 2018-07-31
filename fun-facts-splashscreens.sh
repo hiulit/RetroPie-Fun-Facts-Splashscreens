@@ -104,7 +104,7 @@ function download_github_file() {
 
 
 function restore_default_files() {
-    echo "Would you like to restore the default files (splashscreen image, configuration file and Fun Facts! file)?"
+    echo "Would you like to restore the default files?"
     echo "This action will overwrite those files and erase any changes you may have made to them."
     local options=("Yes" "No")
     select option in "${options[@]}"; do
@@ -172,7 +172,7 @@ function edit_config() {
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
         local result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
-            echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Config file updated."
+            echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Configuration file updated."
         else
             dialog_configuration_file
         fi
@@ -466,7 +466,7 @@ function create_fun_fact_boot() {
             # log "$error_message" > /dev/null
             dialog_msgbox "Error!" "$error_message"
         else
-            echo "ERROR: $error_message"
+            echo "ERROR: $error_message" >&2
         fi
         return 1
     fi
@@ -504,9 +504,9 @@ function create_fun_fact_launching() {
             if [[ ! -f "$rom_path" ]]; then # If full ROM path doesn't exist
                 rom_file="$rom_path"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
-                    echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!"
-                    echo "Check if the system '$system' and the ROM '$rom_file' are correct."
-                    echo "Remember to add the file extension of the ROM."
+                    echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!" >&2
+                    echo "Check if the system '$system' and the ROM '$rom_file' are correct." >&2
+                    echo "Remember to add the file extension of the ROM." >&2
                     exit 1
                 else
                     rom_ext="${rom_file#*.}"
@@ -521,10 +521,10 @@ function create_fun_fact_launching() {
                 RESULT_SPLASH="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
                 echo "Creating Fun Facts! launching image for '$system - $rom_file' ..."
             else
-                echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
+                echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!" >&2
                 rom_path=""
                 RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
-                echo "Can't create launching image with boxart without a scraped image."
+                echo "Can't create launching image with boxart without a scraped image." >&2
                 echo "Switching to default launching image for '$system' ..."
                 echo "Creating Fun Facts! launching image for '$system' ..."    
             fi
@@ -563,7 +563,7 @@ function create_fun_fact_launching() {
             echo "$success_message"
         else
             local error_message="Fun Facts! launching image failed!"
-            echo "ERROR: $error_message"
+            echo "ERROR: $error_message" >&2
         fi
     fi
 }
@@ -633,7 +633,7 @@ function is_fun_facts_empty() {
             echo "'$FUN_FACTS_TXT' is empty!"
             return 1
         else
-            echo "'$FUN_FACTS_TXT' is empty!"
+            echo "ERROR: '$FUN_FACTS_TXT' is empty!" >&2
             exit 1
         fi
     else
@@ -649,12 +649,12 @@ function add_fun_fact() {
                 echo "'$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
                 return 1
             else
-                echo "ERROR: '$1' Fun Fact! is already in '$FUN_FACTS_TXT'"
+                echo "ERROR: '$1' Fun Fact! is already in '$FUN_FACTS_TXT'" >&2
                 exit 1
             fi
         fi
     done < "$FUN_FACTS_TXT"
-    echo "$1" >> "$FUN_FACTS_TXT" && echo "'$1' Fun Fact! added succesfully!"
+    echo "$1" >> "$FUN_FACTS_TXT" && echo "'$1' Fun Fact! added successfully!"
 }
 
 
@@ -705,12 +705,12 @@ function check_major_version() {
     git_version_major="$(echo "$git_version" | grep -Po "^[0-9]")"
     
     if [[ "$git_version_major" -gt "$script_version_major" ]]; then
-        echo "WARNING: A new major version is released!"
-        echo "As major versions usually involve breaking changes, it's best to:"
-        echo "- Save or backup the default files (splashscreen image, configuration file and Fun Facts! file), if you made any changes to them."
-        echo "- Delete the 'RetroPie-Fun-Facts-Splashscreens' folder."
-        echo "- Go to 'https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/'"
-        echo "- Download and install the script again."
+        echo "WARNING: A new major version is released!" >&2
+        echo "As major versions usually involve breaking changes, it's best to:" >&2
+        echo "- Save or backup the default files (splashscreen image, configuration file and Fun Facts! file), if you made any changes to them." >&2
+        echo "- Delete the 'RetroPie-Fun-Facts-Splashscreens' folder." >&2
+        echo "- Go to 'https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/'" >&2
+        echo "- Download and install the script again." >&2
         exit 1
     fi
 }
@@ -910,7 +910,7 @@ function get_options() {
                     set_config "boot_splashscreen_script" "true" > /dev/null
                     echo "Boot splashscreen script enabled."
                 else
-                    echo "ERROR: failed to enable boot splashscreen script."
+                    echo "ERROR: failed to enable boot splashscreen script." >&2
                 fi
                 ;;
 #H -dbs, --disable-boot-splashscreen            Disable the script to create a boot splashscreen at startup.
@@ -919,7 +919,7 @@ function get_options() {
                     set_config "boot_splashscreen_script" "false" > /dev/null
                     echo "Boot splashscreen script disabled."
                 else
-                    echo "ERROR: failed to disable boot splashscreen script."
+                    echo "ERROR: failed to disable boot splashscreen script." >&2
                 fi
                 ;;
 #H -eli, --enable-launching-images              Enable the script to create launching images using 'runcommand-onend.sh'.
@@ -928,7 +928,7 @@ function get_options() {
                     set_config "launching_images_script" "true" > /dev/null
                     echo "Launching images script enabled."
                 else
-                    echo "ERROR: failed to enable launching images script."
+                    echo "ERROR: failed to enable launching images script." >&2
                 fi
                 ;;
 #H -dli, --disable-launching-images             Disable the script to create launching images using 'runcommand-onend.sh'.
@@ -937,7 +937,7 @@ function get_options() {
                     set_config "launching_images_script" "false" > /dev/null
                     echo "Launching images script disabled."
                 else
-                    echo "ERROR: failed to disable launching images script."
+                    echo "ERROR: failed to disable launching images script." >&2
                 fi
                 ;;
 #H -ec,  --edit-config                          Edit the configuration file.
@@ -969,8 +969,8 @@ function get_options() {
                 echo "$SCRIPT_VERSION"
                 ;;
             *)
-                echo "ERROR: Invalid option '$1'."
-                echo "Try 'sudo $0 --help' for more info."
+                echo "ERROR: Invalid option '$1'." >&2
+                echo "Try 'sudo $0 --help' for more info." >&2
                 exit 2
                 ;;
         esac
@@ -980,13 +980,13 @@ function get_options() {
 
 function main() {
     if ! is_sudo; then
-        echo "ERROR: Script must be run under 'sudo'."
-        echo "Try 'sudo ./$SCRIPT_NAME'."
+        echo "ERROR: Script must be run under 'sudo'." >&2
+        echo "Try 'sudo ./$SCRIPT_NAME'." >&2
         exit 1
     fi
 
     if ! is_retropie; then
-        echo "ERROR: RetroPie is not installed. Aborting ..."
+        echo "ERROR: RetroPie is not installed. Aborting ..." >&2
         exit 1
     fi
 
