@@ -407,7 +407,13 @@ function create_fun_fact_boot() {
     
     local bg_color
     bg_color="$(get_config "boot_splashscreen_background_color")"
-    [[ -z "$bg_color" ]] && bg_color="$DEFAULT_BACKGROUND_COLOR"
+    if [[ -z "$bg_color" ]]; then
+        bg_color="$DEFAULT_BACKGROUND_COLOR"
+    else
+        validate_color "$bg_color"
+        local return_value="$?"
+        [[ "$return_value" -eq 1 ]] && exit 1
+    fi
     
     local text_color
     text_color="$(get_config "boot_splashscreen_text_color")"
@@ -476,16 +482,49 @@ function create_fun_fact_boot() {
 function create_fun_fact_launching() {
     local system="$1"
     local rom_path="$2"
+
     local splash    
     splash="$(get_config "launching_images_background_path")"
+
     local bg_color
     bg_color="$(get_config "launching_images_background_color")"
+    if [[ -z "$bg_color" ]]; then
+        bg_color="$DEFAULT_BACKGROUND_COLOR"
+    else
+        validate_color "$bg_color"
+        local return_value="$?"
+        [[ "$return_value" -eq 1 ]] && exit 1
+    fi
+
+    local text_color
+    text_color="$(get_config "launching_images_text_color")"
+    if [[ -z "$text_color" ]]; then
+        text_color="$DEFAULT_TEXT_COLOR"
+    else
+        validate_color "$text_color"
+        local return_value="$?"
+        [[ "$return_value" -eq 1 ]] && exit 1
+    fi
+
     local font
     font="$(get_config "launching_images_text_font_path")"
     [[ -z "$font" ]] && font="$(get_font)" || exit 1
+
     local press_button_text
     press_button_text="$(get_config "launching_images_press_button_text")"
     [[ -z "$press_button_text" ]] &&  press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
+    
+
+    local press_button_text_color
+    press_button_text_color="$(get_config "launching_images_press_button_text_color")"
+    if [[ -z "$press_button_text_color" ]]; then
+        press_button_text_color="$DEFAULT_TEXT_COLOR"
+    else
+        validate_color "$press_button_text_color"
+        local return_value="$?"
+        [[ "$return_value" -eq 1 ]] && exit 1
+    fi
+    
     local logo
     logo="$(get_system_logo)"
     
@@ -680,8 +719,8 @@ function validate_color() {
             log "Can't set/get the text color. Invalid color: '$1'."
             log "Check the 'XXX_text_color' values in '$SCRIPT_CFG'"
         else
-            echo "ERROR: Can't set/get the text color. Invalid color: '$1'." >&2
-            echo "Check the 'XXX_text_color' values in '$SCRIPT_CFG'" >&2
+            log "ERROR: Can't set/get the color. Invalid color: '$1'."
+            echo "Check the 'XXX_color' values in '$SCRIPT_CFG'" >&2
             echo >&2
             underline "Short list of available colors:" >&2
             echo "black white gray gray10 gray25 gray50 gray75 gray90" >&2

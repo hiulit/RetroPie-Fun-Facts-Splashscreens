@@ -158,7 +158,7 @@ function IM_add_fun_fact() {
 
 function IM_add_press_button_text() {
     convert "$TMP_DIR/$TMP_SPLASHSCREEN" \
-        -fill "$text_color" \
+        -fill "$press_button_text_color" \
         -interline-spacing 2 \
         -font "$font" \
         -pointsize 16 \
