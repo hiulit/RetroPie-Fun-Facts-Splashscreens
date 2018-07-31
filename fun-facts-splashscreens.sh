@@ -599,8 +599,7 @@ function select_fun_facts() {
         options=("${fun_facts[@]:$start:$items}" "$prev" "$next" "$quit")
     fi
 
-    echo "Choose a Fun Fact! to remove"
-    echo "----------------------------"
+    underline "Choose a Fun Fact! to remove"
     select option in "${options[@]}"; do
         case "$option" in
             "$option" )
