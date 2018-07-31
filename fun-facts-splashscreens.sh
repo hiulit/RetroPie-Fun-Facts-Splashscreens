@@ -908,36 +908,36 @@ function get_options() {
             -ebs|--enable-boot-splashscreen)
                 if enable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "true" > /dev/null
-                    echo "Script ENABLED at boot."
+                    echo "Boot splashscreen script enabled."
                 else
-                    log "ERROR: failed to ENABLE script at boot."
+                    echo "ERROR: failed to enable boot splashscreen script."
                 fi
                 ;;
 #H -dbs, --disable-boot-splashscreen            Disable the script to create a boot splashscreen at startup.
             -dbs|--disable-boot-splashscreen)   
                 if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
-                    echo "Script DISABLED at boot."
+                    echo "Boot splashscreen script disabled."
                 else
-                    log "ERROR: failed to DISABLE script at boot."
+                    echo "ERROR: failed to disable boot splashscreen script."
                 fi
                 ;;
 #H -eli, --enable-launching-images              Enable the script to create launching images using 'runcommand-onend.sh'.
             -eli|--enable-launching-images)
                 if enable_launching_images; then
                     set_config "launching_images_script" "true" > /dev/null
-                    echo "Launching images ENABLED."
+                    echo "Launching images script enabled."
                 else
-                    log "ERROR: failed to ENABLE launching images."
+                    echo "ERROR: failed to enable launching images script."
                 fi
                 ;;
 #H -dli, --disable-launching-images             Disable the script to create launching images using 'runcommand-onend.sh'.
             -dli|--disable-launching-images)
                 if disable_launching_images; then
                     set_config "launching_images_script" "false" > /dev/null
-                    echo "Launching images DISABLED."
+                    echo "Launching images script disabled."
                 else
-                    log "ERROR: failed to DISABLE launching images."
+                    echo "ERROR: failed to disable launching images script."
                 fi
                 ;;
 #H -ec,  --edit-config                          Edit the configuration file.
