@@ -82,7 +82,7 @@ function dialog_choose_splashscreen_settings() {
     if [[ "$property" == "launching_images" ]]; then
         local press_button_text="$(get_config "${property}_press_button_text")"
         if [[ -n "$press_button_text" ]]; then
-            option_press_button_text="'Press a button' text ($press_button_text)"
+            option_press_button_text="'Press a button' text ($(truncate "$press_button_text" 10))"
         else
             option_press_button_text="'Press a button' text"
         fi
@@ -158,6 +158,8 @@ function dialog_choose_text() {
             set_config "${property}_text" "${!property_var}" > /dev/null
         fi
         dialog_msgbox "$dialog_title" "$dialog_text"
+        property="${property%_*}" # $property has too many '_', needed to remove the last one.
+        dialog_choose_splashscreen_settings "${property%_*}"
     fi
 }
 
@@ -166,14 +168,16 @@ function dialog_choose_background() {
     local property="$1"
     local property_text="${property//_/ }"
     
-    local image_path="$(get_config "${property}_path")"
+    local image_path
+    image_path="$(get_config "${property}_path")"
     if [[ -n "$image_path" ]]; then
         option_image_path="Image ($(basename "$image_path"))"
     else
         option_image_path="Image"
     fi
     
-    local solid_color="$(get_config "${property}_color")"
+    local solid_color
+    solid_color="$(get_config "${property}_color")"
     if [[ -n "$solid_color" ]]; then
         option_solid_color="Solid color ($solid_color)"
     else
@@ -320,13 +324,15 @@ function dialog_choose_path() {
     local property_var="${property^^}_PATH"
     local property_text="${property//_/ }"
     local file_type="$2"
+
+    local file_path
     file_path="$(dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
                     --title "Set $property_text path" \
                     --cancel-label "Back" \
                     --inputbox "Enter $property_text path (must be an absolute path).\n\nEnter 'default' to set the default $file_type.\nLeave the input empty to unset the $file_type." \
                     12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
-    result_value="$?"
+    local result_value="$?"
     if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
         if [[ -z "$file_path" ]]; then
             dialog_title="Success!"
