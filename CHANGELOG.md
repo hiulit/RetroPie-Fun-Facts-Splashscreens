@@ -8,14 +8,21 @@
 
 * Refixed `check_dependencies`.
 * Fixed the creation of `runcommand-onend.sh` if it doesn't exist.
+* Fixed dialogs *routes* (not going back to where they were suposed to).
 
 ### Added
 
+* Brand new GUI menu!
 * New dependency `librsvg2-bin`.
 * Support for `launching images` with **Fun Facts!**.
-* Added options for `--create-fun-fact`. See the [documentation](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#--create-fun-fact).
-* Added `--bg-color` option to set the background of the launching image.
+* Added new options for `--create-fun-fact`. See the [documentation](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#--create-fun-fact-options).
+* Added lots of new options to configure the splashscreens (background image/color, text color, font, etc.)
 * Added `fun-facts-splashscreen-runcommand-onend.sh`.
+* Created the `utils` folder to have separated scripts so the main script doesn't get bloated.
+
+### Deprecated
+
+* ~~Added functionality to enable/disable logging in the config file.~~ - The log file is now always enabled.
 
 ## v2.0.0 (February 12th 2018)
 
