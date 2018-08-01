@@ -100,6 +100,7 @@ function error_report() {
     log "ERROR: '${FUNCNAME[1]}' function on line $(caller)"
 }
 
+
 function check_log_file(){
     if [[ ! -f "$LOG_FILE" ]]; then
         touch "$LOG_FILE" && chown -R "$user":"$user" "$LOG_FILE"
