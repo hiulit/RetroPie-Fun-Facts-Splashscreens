@@ -10,6 +10,28 @@ function is_sudo() {
     [[ "$(id -u)" -eq 0 ]]
 }
 
+function truncate() {
+    local string="$1"
+    if [[ -z "$string" ]]; then
+        error_report
+        log "Missing a string as the first argument."
+        exit 1
+    fi
+    local N="$2"
+    if [[ -z "$N" ]]; then
+        error_report
+        log "Missing a number as the second argument."
+        exit 1
+    else
+        if [[ ! "$N" =~ ^[0-9]+$ ]]; then
+            error_report
+            log "Second argument must be a number [0-9]."
+            exit 1
+        fi
+    fi
+
+    echo "$(echo "$1" | cut -c1-"$2")..."
+}
 
 function check_dependencies() {
     local pkg
