@@ -10,6 +10,7 @@ function IM_add_background() {
         return 0
     else
         log "ERROR: Imagemagick - Adding background ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -23,6 +24,7 @@ function IM_convert_svg_to_png() {
         return 0
     else
         log "ERROR: Imagemagick - SVG to PNG conversion ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -44,6 +46,7 @@ function IM_resize_logo() {
         return 0
     else
         log "ERROR: Imagemagick - Logo resizing ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -85,6 +88,7 @@ function IM_add_logo() {
         return 0
     else
         log "ERROR: Imagemagick - Adding '$system' logo image ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -105,6 +109,7 @@ function IM_add_boxart() {
         return 0
     else
         log "ERROR: Imagemagick - Adding boxart image ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -125,6 +130,7 @@ function IM_add_console() {
         return 0
     else
         log "ERROR: Imagemagick - Adding '$system' console image ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -151,6 +157,7 @@ function IM_add_fun_fact() {
         return 0
     else
         log "ERROR: Imagemagick - Adding 'Fun Fact!' ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }
@@ -171,6 +178,7 @@ function IM_add_press_button_text() {
         return 0
     else
         log "ERROR: Imagemagick - Adding 'Press button text' ... failed!"
+        ERRORS=$(($ERRORS + 1))
         return 1
     fi
 }

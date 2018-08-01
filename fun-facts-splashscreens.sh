@@ -78,6 +78,7 @@ DEFAULT_FILES=(
     "$DEFAULT_SPLASHSCREEN_BACKGROUND"
 )
 DEFAULT_THEME="carbon"
+ERRORS=0
 
 
 # External resources ######################################
@@ -360,8 +361,10 @@ get_all_systems() {
 function create_fun_fact() {
     local theme
     theme="$(get_current_theme)"
+
     local random_fact
     random_fact="$(shuf -n 1 "$FUN_FACTS_TXT")"
+
     local screen_w=1024
     local screen_h=576
     
@@ -469,7 +472,6 @@ function create_fun_fact_boot() {
     else
         local error_message="Fun Facts! boot splashscreen failed!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
-            # log "$error_message" > /dev/null
             dialog_msgbox "Error!" "$error_message"
         else
             echo "ERROR: $error_message" >&2
@@ -512,9 +514,8 @@ function create_fun_fact_launching() {
 
     local press_button_text
     press_button_text="$(get_config "launching_images_press_button_text")"
-    [[ -z "$press_button_text" ]] &&  press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
+    [[ -z "$press_button_text" ]] && press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
     
-
     local press_button_text_color
     press_button_text_color="$(get_config "launching_images_press_button_text_color")"
     if [[ -z "$press_button_text_color" ]]; then
@@ -524,7 +525,7 @@ function create_fun_fact_launching() {
         local return_value="$?"
         [[ "$return_value" -eq 1 ]] && exit 1
     fi
-    
+
     local logo
     logo="$(get_system_logo)"
     
@@ -570,7 +571,11 @@ function create_fun_fact_launching() {
         else    
             [[ ! -d "$RP_CONFIG_DIR/$system" ]] && echo "ERROR: '$system' is not a valid system." && exit 1
             RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
-            echo "Creating Fun Facts! launching image for '$system' ..."
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                dialog_info "Creating Fun Facts! launching image for '$system' ..."
+            else
+                echo "Creating Fun Facts! launching image for '$system' ..."
+            fi
         fi
         
         if [[ -z "$splash" ]]; then
@@ -595,14 +600,23 @@ function create_fun_fact_launching() {
         
         # TODO: better handling of errors.
         local return_value="$?"
-        if [[ "$return_value" -eq 0 ]]; then
+        if [[ "$ERRORS" -eq 0 ]]; then
             [[ -f "$RESULT_SPLASH" ]] && rm "$RESULT_SPLASH"
             mv "$TMP_DIR/$TMP_SPLASHSCREEN" "$RESULT_SPLASH" && chown -R "$user":"$user" "$RESULT_SPLASH"
-            local success_message="Fun Facts! launching image created successfully!"
-            echo "$success_message"
+            local success_message="Fun Facts! launching image for '$system' created successfully!"
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                dialog_info "$success_message" && sleep 1
+            else
+                echo "$success_message"
+            fi
         else
-            local error_message="Fun Facts! launching image failed!"
-            echo "ERROR: $error_message" >&2
+            local error_message="Fun Facts! launching image for '$system' failed!"
+            if [[ "$GUI_FLAG" -eq 1 ]]; then
+                dialog_msgbox "Error!" "$error_message"
+            else
+                log "ERROR: $error_message" >&2
+            fi
+            
         fi
     fi
 }
