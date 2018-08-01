@@ -15,7 +15,9 @@ readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 
 function dialog_info() {
     [[ -z "$1" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
-    dialog --infobox "$1" 8 "$DIALOG_WIDTH"
+    dialog \
+        --backtitle "$DIALOG_BACKTITLE" \
+        --infobox "$1" 8 "$DIALOG_WIDTH"
 }
 
 function dialog_msgbox() {
@@ -559,7 +561,7 @@ function dialog_choose_systems() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! system    launching images" \
+        --title "Create Fun Facts! system launching images" \
         --cancel-label "Back" \
         --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
