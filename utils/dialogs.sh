@@ -37,7 +37,7 @@ function dialog_splashscreens_settings() {
     local cmd
     local choices
     local choice
-    
+
     options=(
         1 "Boot splashscreen"
         2 "Launching images"
@@ -287,6 +287,8 @@ function dialog_choose_color() {
                     if [[ "$property" = *"press_button"* ]]; then
                         property="launching_images"
                         dialog_choose_splashscreen_settings "$property"
+                    elif [[ "${property##*_}" == "background" ]]; then
+                        dialog_choose_background "$property"
                     else
                         dialog_choose_splashscreen_settings "${property%_*}"
                     fi
@@ -331,6 +333,8 @@ function dialog_choose_color() {
                     if [[ "$property" = *"press_button"* ]]; then
                         property="launching_images"
                         dialog_choose_splashscreen_settings "$property"
+                    elif [[ "${property##*_}" == "background" ]]; then
+                        dialog_choose_background "$property"
                     else
                         dialog_choose_splashscreen_settings "${property%_*}"
                     fi
@@ -340,7 +344,11 @@ function dialog_choose_color() {
                 ;;
         esac
     else
-        dialog_choose_splashscreen_settings "${property%_*}"
+        if [[ "${property##*_}" == "background" ]]; then
+            dialog_choose_background "$property"
+        else
+            dialog_choose_splashscreen_settings "${property%_*}"
+        fi
     fi
 }
 
