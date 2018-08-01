@@ -69,7 +69,7 @@ function dialog_choose_splashscreen_settings() {
     
     local text_font_path="$(get_config "${property}_text_font_path")"
     if [[ -n "$text_font_path" ]]; then
-        option_text_font_path="Text font ($text_font_path)"
+        option_text_font_path="Text font ($(basename "$text_font_path"))"
     else
         option_text_font_path="Text font"
     fi
@@ -168,7 +168,7 @@ function dialog_choose_background() {
     
     local image_path="$(get_config "${property}_path")"
     if [[ -n "$image_path" ]]; then
-        option_image_path="Image ($image_path)"
+        option_image_path="Image ($(basename "$image_path"))"
     else
         option_image_path="Image"
     fi
