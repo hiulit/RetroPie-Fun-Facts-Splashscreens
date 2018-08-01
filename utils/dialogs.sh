@@ -525,8 +525,8 @@ function dialog_choose_launching_images() {
 
 function dialog_choose_launching_images_system() {
     options=(
-        1 "All systems"
-        2 "Choose systems"
+        1 "Choose systems"
+        2 "All systems"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
@@ -539,11 +539,11 @@ function dialog_choose_launching_images_system() {
     if [[ -n "$choice" ]]; then
         case "$choice" in
             1)
-                create_fun_fact "all"
-                dialog_choose_launching_images_system
+                dialog_choose_systems
                 ;;
             2)
-                dialog_choose_systems
+                create_fun_fact "all"
+                dialog_choose_launching_images_system
                 ;;
         esac
     else
