@@ -31,6 +31,13 @@ function dialog_msgbox() {
 }
 
 function dialog_splashscreens_settings() {
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+    
     options=(
         1 "Boot splashscreen"
         2 "Launching images"
@@ -59,6 +66,12 @@ function dialog_splashscreens_settings() {
 function dialog_choose_splashscreen_settings() {
     local property="$1"
     local property_text="${property//_/ }"
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
     
     local text_color="$(get_config "${property}_text_color")"
     if [[ -n "$text_color" ]]; then
@@ -167,6 +180,12 @@ function dialog_choose_text() {
 function dialog_choose_background() {
     local property="$1"
     local property_text="${property//_/ }"
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
     
     local image_path
     image_path="$(get_config "${property}_path")"
@@ -215,6 +234,13 @@ function dialog_choose_color() {
     local property="$1"
     local property_var="${property^^}_COLOR"
     local property_text="${property//_/ }"
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     options=(
         1 "Basic colors"
         2 "Full list of colors"
@@ -377,6 +403,13 @@ function dialog_choose_path() {
 
 
 function dialog_fun_facts_settings() {
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     options=(
         1 "Add"
         2 "Remove"
@@ -469,6 +502,13 @@ function dialog_fun_facts_settings() {
 
 
 function dialog_create_fun_facts_splashscreens() {
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     options=(
         1 "Boot splashscreen"
         2 "Launching images"
@@ -496,6 +536,13 @@ function dialog_create_fun_facts_splashscreens() {
 
 
 function dialog_choose_launching_images() {
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     options=(
         1 "System launching images"
         2 "Game launching images"
@@ -524,6 +571,13 @@ function dialog_choose_launching_images() {
 
 
 function dialog_choose_launching_images_system() {
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     options=(
         1 "Choose systems"
         2 "All systems"
@@ -555,7 +609,12 @@ function dialog_choose_systems() {
     local systems
     local system
     local i=1
-    options=()
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
     
     systems="$(get_all_systems)"
     IFS=" " read -r -a systems <<< "${systems[@]}"
@@ -587,7 +646,12 @@ function dialog_choose_games() {
     local systems
     local system
     local i=1
-    options=()
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
     
     for system in "$RP_ROMS_DIR/"*; do
         if [[ ! -L "$system" ]]; then # Filter out symlinks.
@@ -635,6 +699,15 @@ function dialog_choose_games() {
 }
 
 function dialog_automate_scripts() {
+    local option_boot
+    local option_launching
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     if check_boot_splashscreen; then
         option_boot="enabled"
     else
@@ -645,6 +718,7 @@ function dialog_automate_scripts() {
     else
         option_launching="disabled"
     fi
+
     options=(
         1 "Enable/disable boot splashscreen ($option_boot)"
         2 "Enable/disable launching images ($option_launching)"
@@ -702,6 +776,13 @@ function dialog_automate_scripts() {
 
 
 function dialog_configuration_file() {
+    local options=()
+    local menu_items
+    local menu_text
+    local cmd
+    local choices
+    local choice
+
     options=(
         1 "Edit configuration file"
         2 "Reset configuration file"
