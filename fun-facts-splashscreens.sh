@@ -259,7 +259,11 @@ function get_current_theme() {
 function get_font() {
     local theme
     theme="$(get_current_theme)"
-    [[ -z "$theme" ]] && theme="$DEFAULT_THEME"
+    if [[ -z "$theme" ]]; then
+        echo "WARNING: Couldn't get the current theme."
+        echo "Switching to the default's theme ..."
+        theme="$DEFAULT_THEME"
+    fi
     local font
     font="$(xmlstarlet sel -t -v \
         "/theme/view[contains(@name,'detailed')]/textlist/fontPath" \
@@ -429,9 +433,17 @@ function create_fun_fact_boot() {
     fi
     
     local font
-    font="$(get_config "boot_splashscreen_text_font")"
-    [[ -z "$font" ]] && font="$(get_font)" || exit 1
-    
+    font="$(get_config "boot_splashscreen_text_font_path")"
+    if [[ -z "$font" ]]; then
+        font="$(get_font)"
+    else
+        if [[ ! -f "$font" ]]; then
+            echo "WARNING: Couldn't find the font path set in 'boot_splashscreen_text_font_path'. Check configuration file."
+            echo "Trying to use the current theme's font ..."
+            font="$(get_font)"
+        fi
+    fi
+
     local size_x="$(((screen_w*75/100)))"
     local size_y="$(((screen_h*15/100)))"
     
@@ -510,7 +522,15 @@ function create_fun_fact_launching() {
 
     local font
     font="$(get_config "launching_images_text_font_path")"
-    [[ -z "$font" ]] && font="$(get_font)" || exit 1
+    if [[ -z "$font" ]]; then
+        font="$(get_font)"
+    else
+        if [[ ! -f "$font" ]]; then
+            echo "WARNING: Couldn't find the font path set in 'launching_images_text_font_path'. Check configuration file."
+            echo "Trying to use the current theme's font ..."
+            font="$(get_font)"
+        fi
+    fi
 
     local press_button_text
     press_button_text="$(get_config "launching_images_press_button_text")"
