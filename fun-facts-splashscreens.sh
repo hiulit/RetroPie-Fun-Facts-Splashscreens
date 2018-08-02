@@ -96,36 +96,58 @@ function download_github_file() {
     file_name="$(basename "$file_path")"
     if curl -s -f "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/new-gui-menu/$file_name" -o "$file_path"; then
         chown -R "$user":"$user" "$file_path"
-        [[ "$GUI_FLAG" -eq 0 ]] && echo "'$file_name' downloaded succesfully!"
+        echo "'$file_name' downloaded successfully!"
     else
-        log "ERROR: Can't download '$file_name'."
+        if [[ "$GUI_FLAG" -eq 1 ]]; then
+            log "Can't download '$file_name'."
+        else
+            log "ERROR: Can't download '$file_name'."
+        fi
         return 1
     fi
 }
 
 
 function restore_default_files() {
-    echo "Would you like to restore the default files?"
-    echo "This action will overwrite those files and erase any changes you may have made to them."
-    local options=("Yes" "No")
-    select option in "${options[@]}"; do
-        case "$option" in
-            Yes)
-                for file in "${DEFAULT_FILES[@]}"; do
-                    download_github_file "$file"
-                done
-                exit 1
-                ;;
-            No)
-                exit 1
-                ;;
-            *)
-                echo "Invalid option. Choose a number between 1 and ${#options[@]}."
-                ;;
-        esac
-    done
-
-
+    if [[ "$GUI_FLAG" -eq 1 ]]; then
+        local text="Would you like to restore the default files?"
+        text+="\n"
+        for file in "${DEFAULT_FILES[@]}"; do
+            text+="\n- '$(basename "$file")'"
+        done
+        text+="\n\n"
+        text+="This action will overwrite those files and erase any changes you may have made to them."
+        echo "$text"
+        dialog \
+            --backtitle "$DIALOG_BACKTITLE" \
+            --title "Warning" \
+            --yesno "$text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH"
+    else
+        echo "Would you like to restore the default files?"
+        echo
+        for file in "${DEFAULT_FILES[@]}"; do
+            echo "- '$(basename "$file")'"
+        done
+        echo
+        echo "This action will overwrite those files and erase any changes you may have made to them."
+        local options=("Yes" "No")
+        select option in "${options[@]}"; do
+            case "$option" in
+                Yes)
+                    for file in "${DEFAULT_FILES[@]}"; do
+                        download_github_file "$file"
+                    done
+                    exit 1
+                    ;;
+                No)
+                    exit 1
+                    ;;
+                *)
+                    echo "Invalid option. Choose a number between 1 and ${#options[@]}."
+                    ;;
+            esac
+        done
+    fi
 }
 
 
@@ -904,23 +926,43 @@ function gui() {
                     dialog_configuration_file
                     ;;
                 6)
-                    local validation
-                    validation="$(restore_default_files)"
-                    if [[ -n "$validation" ]]; then
-                        local title="Error!"
-                        local text="$validation"
+                    restore_default_files
+                    local result_value="$?"
+                    if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
+                        local text
+                        for file in "${DEFAULT_FILES[@]}"; do
+                            text+="-$(download_github_file "$file")\n"
+                        done
+                        local result_value="$?"
+                        if [[ "$result_value" -eq 1 ]]; then
+                            local title="Error!"
+                        else
+                            local title="Success!"
+                        fi
+                        dialog \
+                            --backtitle "$DIALOG_BACKTITLE" \
+                            --title "$title" \
+                            --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
-                        local title="Success!"
-                        local text="Default files restored successfully!"
-                            text+="\n\n"
-                            for file in "${DEFAULT_FILES[@]}"; do
-                                text+="\n- '$(basename "$file")'"
-                            done
+                        echo "no"
                     fi
-                    dialog \
-                        --backtitle "$DIALOG_BACKTITLE" \
-                        --title "$title" \
-                        --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                    # local validation
+                    # validation="$(restore_default_files)"
+                    # if [[ -n "$validation" ]]; then
+                    #     local title="Error!"
+                    #     local text="$validation"
+                    # else
+                    #     local title="Success!"
+                    #     local text="Default files restored successfully!"
+                    #         text+="\n\n"
+                    #         for file in "${DEFAULT_FILES[@]}"; do
+                    #             text+="\n- '$(basename "$file")'"
+                    #         done
+                    # fi
+                    # dialog \
+                    #     --backtitle "$DIALOG_BACKTITLE" \
+                    #     --title "$title" \
+                    #     --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     ;;
                 7)
                     if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
