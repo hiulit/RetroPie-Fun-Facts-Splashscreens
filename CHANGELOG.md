@@ -8,21 +8,34 @@
 
 * Refixed `check_dependencies`.
 * Fixed the creation of `runcommand-onend.sh` if it doesn't exist.
-* Fixed dialogs *routes* (not going back to where they were suposed to).
+* Fixed dialogs 'routes' (not going back to where they were suposed to).
+* Check for scraped images using the default EmulationStation scraper [#42](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/42)
 
 ### Added
 
 * Brand new GUI menu!
 * New dependency `librsvg2-bin`.
 * Support for `launching images` with **Fun Facts!**.
-* Added new options for `--create-fun-fact`. See the [documentation](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#--create-fun-fact-options).
-* Added lots of new options to configure the splashscreens (background image/color, text color, font, etc.)
+* New options:
+    * `--enable-launching-images`.
+    * `--disable-launching-images`.
+* New options for `--create-fun-fact`. See the [documentation](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens#--create-fun-fact-options).
+* Lots of new options to configure the splashscreens (background image/color, text color, font, etc.)
 * Added `fun-facts-splashscreen-runcommand-onend.sh`.
+* Show a warning message when updating to a major version [#40](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/40)
+* Show a warning message when trying to restore default files [#41](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/41)
 * Created the `utils` folder to have separated scripts so the main script doesn't get bloated.
+
+### Changed
+
+* `--enable-boot` for `--enable-boot-splashscreen`.
+* `--disable-boot` for `--disable-boot-splashscreen` .
 
 ### Deprecated
 
 * ~~Added functionality to enable/disable logging in the config file.~~ - The log file is now always enabled.
+* ~~`--splash-path`, `--text-color`, `--bg-color` options~~ - These options (and some other new ones) have to be modified either via the GUI or he configuration file.
+* ~~`--apply-splash`~~ - This options is now integrated in the script and applies automatically when creating a splashscreen.
 
 ## v2.0.0 (February 12th 2018)
 
