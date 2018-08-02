@@ -183,6 +183,27 @@ function edit_config() {
 }
 
 
+function backup_config() {
+    if [[ -f "$SCRIPT_CFG.bak" ]]; then
+        restore_backup_config
+    else
+        if [[ -f "$SCRIPT_CFG" ]]; then
+            cp "$SCRIPT_CFG" "$SCRIPT_CFG.bak"
+            chown -R "$user":"$user" "$SCRIPT_CFG.bak"
+        else
+            log "ERROR: There isn't a configuration file to backup!"
+        fi
+    fi
+}
+
+function restore_backup_config() {
+    rm "$SCRIPT_CFG"
+    cp "$SCRIPT_CFG.bak" "$SCRIPT_CFG"
+    chown -R "$user":"$user" "$SCRIPT_CFG"
+    rm "$SCRIPT_CFG.bak"
+}
+
+
 function enable_boot_splashscreen() {
     local command="\"$SCRIPT_FULL\" --create-fun-fact \&"
     disable_boot_splashscreen # deleting any previous config (do nothing if there isn't).
@@ -371,7 +392,7 @@ function create_fun_fact() {
 
     local screen_w=1024
     local screen_h=576
-    
+
     mkdir -p "$TMP_DIR" && chown -R "$user":"$user" "$TMP_DIR"
 
     if [[ -z "$1" ]]; then
@@ -388,7 +409,7 @@ function create_fun_fact() {
     else
         create_fun_fact_launching "$@"
     fi
-    
+
     rm -r "$TMP_DIR"
 }
 
@@ -403,15 +424,15 @@ function create_fun_fact_boot() {
     fi
 
     RESULT_SPLASH="$RESULT_BOOT_SPLASH"
-    
+
     local system="retropie"
-    
+
     local logo
     logo="$(get_system_logo)"
-    
+
     local splash
     splash="$(get_config "boot_splashscreen_background_path")"
-    
+
     local bg_color
     bg_color="$(get_config "boot_splashscreen_background_color")"
     if [[ -z "$bg_color" ]]; then
@@ -421,7 +442,7 @@ function create_fun_fact_boot() {
         local return_value="$?"
         [[ "$return_value" -eq 1 ]] && exit 1
     fi
-    
+
     local text_color
     text_color="$(get_config "boot_splashscreen_text_color")"
     if [[ -z "$text_color" ]]; then
@@ -431,7 +452,7 @@ function create_fun_fact_boot() {
         local return_value="$?"
         [[ "$return_value" -eq 1 ]] && exit 1
     fi
-    
+
     local font
     font="$(get_config "boot_splashscreen_text_font_path")"
     if [[ -z "$font" ]]; then
@@ -446,7 +467,7 @@ function create_fun_fact_boot() {
 
     local size_x="$(((screen_w*75/100)))"
     local size_y="$(((screen_h*15/100)))"
-    
+
     if [[ -z "$splash" ]]; then
         IM_add_background
         if [[ -f "$logo" ]]; then
@@ -459,7 +480,7 @@ function create_fun_fact_boot() {
     else
         bg_color="none"
     fi
-    
+
     # Add Fun Fact!
     convert "$splash" \
         -size "$size_x"x"$size_y" \
@@ -497,7 +518,7 @@ function create_fun_fact_launching() {
     local system="$1"
     local rom_path="$2"
 
-    local splash    
+    local splash
     splash="$(get_config "launching_images_background_path")"
 
     local bg_color
@@ -535,7 +556,7 @@ function create_fun_fact_launching() {
     local press_button_text
     press_button_text="$(get_config "launching_images_press_button_text")"
     [[ -z "$press_button_text" ]] && press_button_text="$DEFAULT_LAUNCHING_IMAGES_PRESS_BUTTON_TEXT"
-    
+
     local press_button_text_color
     press_button_text_color="$(get_config "launching_images_press_button_text_color")"
     if [[ -z "$press_button_text_color" ]]; then
@@ -548,7 +569,7 @@ function create_fun_fact_launching() {
 
     local logo
     logo="$(get_system_logo)"
-    
+
     if [[ "$system" == "all" ]]; then
         local system_dir
         for system_dir in "$RP_CONFIG_DIR/"*; do
@@ -586,9 +607,9 @@ function create_fun_fact_launching() {
                 RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
                 echo "Can't create launching image with boxart without a scraped image." >&2
                 echo "Switching to default launching image for '$system' ..."
-                echo "Creating Fun Facts! launching image for '$system' ..."    
+                echo "Creating Fun Facts! launching image for '$system' ..."
             fi
-        else    
+        else
             [[ ! -d "$RP_CONFIG_DIR/$system" ]] && echo "ERROR: '$system' is not a valid system." && exit 1
             RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
             if [[ "$GUI_FLAG" -eq 1 ]]; then
@@ -597,7 +618,7 @@ function create_fun_fact_launching() {
                 echo "Creating Fun Facts! launching image for '$system' ..."
             fi
         fi
-        
+
         if [[ -z "$splash" ]]; then
             [[ -z "$bg_color" ]] &&  bg_color="$DEFAULT_BACKGROUND_COLOR"
             IM_add_background
@@ -606,7 +627,7 @@ function create_fun_fact_launching() {
             local screen_h="$(identify -format "%h" "$splash")"
             cp "$splash" "$TMP_DIR/$TMP_SPLASHSCREEN"
         fi
-    
+
         if [[ -f "$logo" ]]; then
             IM_add_logo
         fi
@@ -617,7 +638,7 @@ function create_fun_fact_launching() {
         fi
         IM_add_fun_fact
         IM_add_press_button_text
-        
+
         # TODO: better handling of errors.
         local return_value="$?"
         if [[ "$ERRORS" -eq 0 ]]; then
@@ -636,7 +657,7 @@ function create_fun_fact_launching() {
             else
                 log "ERROR: $error_message" >&2
             fi
-            
+
         fi
     fi
 }
@@ -774,7 +795,7 @@ function check_major_version() {
     script_version_major="$(echo "$SCRIPT_VERSION" | grep -Po "^[0-9]")"
     local git_version_major
     git_version_major="$(echo "$git_version" | grep -Po "^[0-9]")"
-    
+
     if [[ "$git_version_major" -gt "$script_version_major" ]]; then
         echo "WARNING: A new major version is released!" >&2
         echo "As major versions usually involve breaking changes, it's best to:" >&2
@@ -829,7 +850,7 @@ function gui() {
             check_updates
             option_updates="Update script ($updates_output)"
         fi
-        
+
         options=(
             1 "Splashscreens settings"
             2 "Fun Facts! settings"
@@ -865,7 +886,7 @@ function gui() {
                     dialog_splashscreens_settings
                     ;;
                 2)
-                   dialog_fun_facts_settings 
+                   dialog_fun_facts_settings
                     ;;
                 3)
                     local validation
@@ -915,9 +936,11 @@ function gui() {
                             --msgbox "$text" 15 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                     else
                         if [[ "$updates_status" == "needs-to-pull" ]]; then
+                            # backup_config
                             git pull && chown -R "$user":"$user" .
+                            # restore_backup_config
                         else
-                            dialog_msgbox "Info"  "Fun Facts! Splashscreens is $updates_output!"
+                            dialog_msgbox "Info" "Fun Facts! Splashscreens is $updates_output!"
                         fi
                     fi
                     ;;
@@ -985,7 +1008,7 @@ function get_options() {
                 fi
                 ;;
 #H -dbs, --disable-boot-splashscreen            Disable the script to create a boot splashscreen at startup.
-            -dbs|--disable-boot-splashscreen)   
+            -dbs|--disable-boot-splashscreen)
                 if disable_boot_splashscreen; then
                     set_config "boot_splashscreen_script" "false" > /dev/null
                     echo "Boot splashscreen script disabled."
