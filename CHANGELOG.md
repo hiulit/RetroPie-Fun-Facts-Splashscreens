@@ -15,7 +15,7 @@
 
 * Brand new GUI menu!
 * New dependency `librsvg2-bin`.
-* Support for `launching images` with **Fun Facts!**.
+* Support for `launching images` (for systems and games) with **Fun Facts!**.
 * New options:
     * `--enable-launching-images`.
     * `--disable-launching-images`.
