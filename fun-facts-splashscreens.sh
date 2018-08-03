@@ -257,7 +257,7 @@ function check_boot_splashscreen() {
 
 function create_runcommand_onend() {
     if [[ ! -f "$RUNCOMMAND_ONEND" ]]; then
-        touch "$RUNCOMMAND_ONEND" && chown -R "$user":"$user" "$RUNCOMMAND_ONEND"
+        touch "$RUNCOMMAND_ONEND" && chown -R "$user":"$user" "$RUNCOMMAND_ONEND" && chmod +x "$RUNCOMMAND_ONEND"
         cat > "$RUNCOMMAND_ONEND" << _EOF_
 #!/usr/bin/env bash
 # $(basename "$RUNCOMMAND_ONEND")
@@ -1155,3 +1155,4 @@ function main() {
 }
 
 main "$@"
+
