@@ -24,6 +24,7 @@
 * Added `fun-facts-splashscreen-runcommand-onend.sh`.
 * Show a warning message when updating to a major version [#40](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/40)
 * Show a warning message when trying to restore default files [#41](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/41)
+* [Remove console outputs from automated scripts](https://github.com/hiulit/RetroPie-Fun-Facts-Splashscreens/issues/43)
 * Created the `utils` folder to have separated scripts so the main script doesn't get bloated.
 
 ### Changed
