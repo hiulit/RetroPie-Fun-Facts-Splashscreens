@@ -1116,7 +1116,7 @@ function get_options() {
 
 function main() {
     if ! is_sudo; then
-        echo "ERROR: Script must be run under 'sudo'." >&2
+        echo "ERROR: '$(basename "$0")' must be run under 'sudo'." >&2
         echo "Try 'sudo ./$SCRIPT_NAME'." >&2
         exit 1
     fi
@@ -1155,4 +1155,3 @@ function main() {
 }
 
 main "$@"
-
