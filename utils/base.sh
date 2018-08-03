@@ -132,7 +132,9 @@ function check_log_file(){
 
 function log() {
     check_log_file
-    if [[ "$GUI_FLAG" -eq 1 ]] ; then
+    if [[ "$RUNCOMMAND_ONEND_FLAG" -eq 1 ]] ; then
+        echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) $* $([[ -n "$OPTION" ]] && echo "<< $OPTION")" >> "$LOG_FILE"
+    elif [[ "$GUI_FLAG" -eq 1 ]] ; then
         #~ echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* << ${FUNCNAME[@]:1:((${#FUNCNAME[@]}-3))} $OPTION" >> "$LOG_FILE" # -2 are log ... get_options main main
         echo "$(date +%F\ %T) - (v$SCRIPT_VERSION) GUI: $* $([[ -n "$OPTION" ]] && echo "<< $OPTION")" >> "$LOG_FILE"
         echo "$*"

@@ -442,7 +442,7 @@ function create_fun_fact_boot() {
             --backtitle "$DIALOG_BACKTITLE" \
             --infobox "Creating Fun Facts! boot splashscreen ..." 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
     else
-        echo "Creating Fun Facts! boot splashscreen ..."
+        [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Creating Fun Facts! boot splashscreen ..."
     fi
 
     RESULT_SPLASH="$RESULT_BOOT_SPLASH"
@@ -481,8 +481,8 @@ function create_fun_fact_boot() {
         font="$(get_font)"
     else
         if [[ ! -f "$font" ]]; then
-            echo "WARNING: Couldn't find the font path set in 'boot_splashscreen_text_font_path'. Check configuration file."
-            echo "Trying to use the current theme's font ..."
+            [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "WARNING: Couldn't find the font path set in 'boot_splashscreen_text_font_path'. Check configuration file."
+            [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Trying to use the current theme's font ..."
             font="$(get_font)"
         fi
     fi
@@ -522,14 +522,14 @@ function create_fun_fact_boot() {
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog_msgbox "Success!" "$success_message"
         else
-            echo "$success_message"
+            [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "$success_message"
         fi
     else
         local error_message="Fun Facts! boot splashscreen failed!"
         if [[ "$GUI_FLAG" -eq 1 ]]; then
             dialog_msgbox "Error!" "$error_message"
         else
-            echo "ERROR: $error_message" >&2
+            log "ERROR: $error_message"
         fi
         return 1
     fi
@@ -569,8 +569,8 @@ function create_fun_fact_launching() {
         font="$(get_font)"
     else
         if [[ ! -f "$font" ]]; then
-            echo "WARNING: Couldn't find the font path set in 'launching_images_text_font_path'. Check configuration file."
-            echo "Trying to use the current theme's font ..."
+            [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "WARNING: Couldn't find the font path set in 'launching_images_text_font_path'. Check configuration file."
+            [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Trying to use the current theme's font ..."
             font="$(get_font)"
         fi
     fi
@@ -607,9 +607,9 @@ function create_fun_fact_launching() {
             if [[ ! -f "$rom_path" ]]; then # If full ROM path doesn't exist
                 rom_file="$rom_path"
                 if [[ ! -f "$RP_ROMS_DIR/$system/$rom_file" ]]; then # Try to use /home/pi/RetroPie/roms/$system/$rom_file
-                    echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!" >&2
-                    echo "Check if the system '$system' and the ROM '$rom_file' are correct." >&2
-                    echo "Remember to add the file extension of the ROM." >&2
+                    log "ERROR: '$RP_ROMS_DIR/$system/$rom_file' is not a valid ROM path!"
+                    log "Check if the system '$system' and the ROM '$rom_file' are correct."
+                    log "Remember to add the file extension of the ROM."
                     exit 1
                 else
                     rom_ext="${rom_file#*.}"
@@ -622,22 +622,22 @@ function create_fun_fact_launching() {
             if get_boxart > /dev/null; then
                 mkdir -p "$RP_ROMS_DIR/$system/images" && chown -R "$user":"$user" "$RP_ROMS_DIR/$system/images"
                 RESULT_SPLASH="$RP_ROMS_DIR/$system/images/${rom_file}-launching.png"
-                echo "Creating Fun Facts! launching image for '$system - $rom_file' ..."
+                [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Creating Fun Facts! launching image for '$system - $rom_file' ..."
             else
-                echo "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!" >&2
+                log "ERROR: '$RP_ROMS_DIR/$system/$rom_file.$rom_ext' doesn't have a scraped image!"
                 rom_path=""
                 RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
-                echo "Can't create launching image with boxart without a scraped image." >&2
-                echo "Switching to default launching image for '$system' ..."
-                echo "Creating Fun Facts! launching image for '$system' ..."
+                [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Can't create launching image with boxart without a scraped image." >&2
+                [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Switching to default launching image for '$system' ..."
+                [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Creating Fun Facts! launching image for '$system' ..."
             fi
         else
-            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && echo "ERROR: '$system' is not a valid system." && exit 1
+            [[ ! -d "$RP_CONFIG_DIR/$system" ]] && log "ERROR: '$system' is not a valid system." && exit 1
             RESULT_SPLASH="$RP_CONFIG_DIR/$system/launching.png"
             if [[ "$GUI_FLAG" -eq 1 ]]; then
                 dialog_info "Creating Fun Facts! launching image for '$system' ..."
             else
-                echo "Creating Fun Facts! launching image for '$system' ..."
+                [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "Creating Fun Facts! launching image for '$system' ..."
             fi
         fi
 
@@ -670,7 +670,7 @@ function create_fun_fact_launching() {
             if [[ "$GUI_FLAG" -eq 1 ]]; then
                 dialog_info "$success_message" && sleep 1
             else
-                echo "$success_message"
+                [[ "$RUNCOMMAND_ONEND_FLAG" -eq 0 ]] && echo "$success_message"
             fi
         else
             local error_message="Fun Facts! launching image for '$system' failed!"

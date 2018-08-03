@@ -16,4 +16,6 @@ readonly GAME_LAUNCHING_IMAGE="$RP_ROMS_DIR/$SYSTEM/images/$(basename "${ROM_PAT
 [[ -f "$SYSTEM_LAUNCHING_IMAGE" ]] && rm "$SYSTEM_LAUNCHING_IMAGE"
 [[ -f "$GAME_LAUNCHING_IMAGE" ]] && rm "$GAME_LAUNCHING_IMAGE"
 
-sudo "$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$ROM_PATH"
+export RUNCOMMAND_ONEND_FLAG=1
+
+sudo --preserve-env "$SCRIPT_DIR/fun-facts-splashscreens.sh" --create-fun-fact "$SYSTEM" "$ROM_PATH"
