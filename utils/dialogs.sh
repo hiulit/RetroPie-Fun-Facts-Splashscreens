@@ -682,45 +682,57 @@ function dialog_choose_games() {
     for system in "$RP_ROMS_DIR/"*; do
         if [[ ! -L "$system" ]]; then # Filter out symlinks.
             if [[ $(ls -A "$system") ]]; then # Check if folder is NOT empty
-                if [[ $(find "$system" -maxdepth 1 -type f -name "*.*") ]]; then # Check if file has extension
-                    options+=("$i" "$(basename "$system")" off)
-                    ((i++))
+                local file_extension
+                file_extension="$(find "$system" -maxdepth 1 -type f -name "*.*")"
+                if [[ "$file_extension" ]]; then # Check if file has extension
+                    local extension
+                    extension="${file_extension#*.}"
+                    if [[ "$extension" != "sh" ]]; then
+                        options+=("$i" "$(basename "$system")" off)
+                        ((i++))
+                    fi
                 fi
             fi
         fi
     done
-    menu_items="$(((${#options[@]} / 2)))"
-    menu_text="Choose an option."
-    cmd=(dialog \
-        --backtitle "$DIALOG_BACKTITLE" \
-        --title "Create Fun Facts! game launching images" \
-        --cancel-label "Back" \
-        --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
-    choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
-    if [[ -n "$choices" ]]; then
-        IFS=" " read -r -a choices <<< "${choices[@]}"
-        for choice in "${choices[@]}"; do
-            system="${options[choice*3-2]}"
-            system_extensions="$(xmlstarlet sel -t -v \
-                "/systemList/system[name=\"$system\"]/extension" \
-                "/etc/emulationstation/es_systems.cfg")"
-            IFS=" " read -r -a system_extensions <<< "$system_extensions"
-            games=()
-            for extension in "${system_extensions[@]}"; do
-                game="$(find "$RP_ROMS_DIR/$system/" -maxdepth 1 -type f  -name "*$extension")"
-                if [[ -n "$game" ]]; then
-                    games+=("$game")
+
+    if [[ "${#options[@]}" -eq 0 ]]; then
+        dialog_msgbox "Info" "Couldn't find any games to create launching images.\n\nMake sure the ROMS are placed correctly in '$RP_ROMS_DIR/[SYSTEM]'."
+        dialog_choose_launching_images
+    else
+        menu_items="$(((${#options[@]} / 2)))"
+        menu_text="Choose an option."
+        cmd=(dialog \
+            --backtitle "$DIALOG_BACKTITLE" \
+            --title "Create Fun Facts! game launching images" \
+            --cancel-label "Back" \
+            --checklist "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
+        choices="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
+        if [[ -n "$choices" ]]; then
+            IFS=" " read -r -a choices <<< "${choices[@]}"
+            for choice in "${choices[@]}"; do
+                system="${options[choice*3-2]}"
+                system_extensions="$(xmlstarlet sel -t -v \
+                    "/systemList/system[name=\"$system\"]/extension" \
+                    "/etc/emulationstation/es_systems.cfg")"
+                IFS=" " read -r -a system_extensions <<< "$system_extensions"
+                games=()
+                for extension in "${system_extensions[@]}"; do
+                    game="$(find "$RP_ROMS_DIR/$system/" -maxdepth 1 -type f  -name "*$extension")"
+                    if [[ -n "$game" ]]; then
+                        games+=("$game")
+                    fi
+                done
+                if [[ "${#games[@]}" -gt 0 ]]; then
+                    for game in "${games[@]}"; do
+                        create_fun_fact "$system" "$game"
+                    done
                 fi
             done
-            if [[ "${#games[@]}" -gt 0 ]]; then
-                for game in "${games[@]}"; do
-                    create_fun_fact "$system" "$game"
-                done
-            fi
-        done
-        dialog_choose_games
-    else
-        dialog_choose_launching_images
+            dialog_choose_games
+        else
+            dialog_choose_launching_images
+        fi
     fi
 }
 
