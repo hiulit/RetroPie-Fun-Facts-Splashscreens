@@ -880,15 +880,15 @@ function gui() {
         fi
 
         options=(
-            1 "Splashscreens settings" "1 - Settings for boot splashscreens and launching images."
+            1 "Splashscreens settings" "1 - Settings for boot splashscreens and launching images, such as: background image/color, text color, etc."
             2 "Fun Facts! settings" "2 - Add/Remove Fun Facts!"
             "-" "----------" ""
-            3 "Create Fun Facts! splashscreens" "3 - Select which type of splashscreens to create (boot splashscreen or launching images)"
+            3 "Create Fun Facts! splashscreens" "3 - Select which type of splashscreen to create (boot splashscreen or launching images)"
             "-" "----------" ""
             4 "Automate scripts" "4 - Enable/Disable scripts to automate the creation of splashscreens."
             "-" "----------" ""
             5 "Configuration file" "5 - Edit/Reset the configuration file"
-            6 "Restore default files" "6 - Download (and overwrite) the default files from the source."
+            6 "Restore default files" "6 - Download (and overwrite) the default files from source."
             "-" "----------" ""
             7 "$option_updates" "7 - Update the script."
         )
