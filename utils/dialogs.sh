@@ -827,7 +827,7 @@ function dialog_configuration_file() {
     menu_text="Choose an option."
     cmd=(dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --title "Automate scripts" \
+        --title "Configuration file" \
         --cancel-label "Back" \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
@@ -837,7 +837,8 @@ function dialog_configuration_file() {
                 edit_config
                 ;;
             2)
-                reset_config
+                reset_config && sleep 1
+                dialog_configuration_file
                 ;;
         esac
     fi
