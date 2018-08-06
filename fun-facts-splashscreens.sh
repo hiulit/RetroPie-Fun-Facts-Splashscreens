@@ -203,6 +203,7 @@ function edit_config() {
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
             echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Configuration file updated successfully!"
         else
+            dialog_msgbox "Error!" "Couldn't update the configuration file!"
             dialog_configuration_file
         fi
     else
