@@ -50,13 +50,9 @@ function dialog_splashscreens_settings() {
     local choices
     local choice
 
-    options_help=(
-        ""
-        ""
-    )
     options=(
-        1 "Boot splashscreen" "$(echo -e "${options_help[0]}")"
-        2 "Launching images" "$(echo -e "${options_help[1]}")"
+        1 "Boot splashscreen"
+        2 "Launching images"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
@@ -64,8 +60,6 @@ function dialog_splashscreens_settings() {
         --backtitle "$DIALOG_BACKTITLE" \
         --title "Splashscreens settings" \
         --cancel-label "Back" \
-        --item-help \
-        --help-button \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
     if [[ -n "$choice" ]]; then
