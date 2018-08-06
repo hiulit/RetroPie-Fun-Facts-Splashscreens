@@ -201,7 +201,7 @@ function edit_config() {
                     --editbox "$SCRIPT_CFG" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
         local result_value="$?"
         if [[ "$result_value" == "$DIALOG_OK" ]]; then
-            echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Configuration file updated."
+            echo "$config_file" > "$SCRIPT_CFG" && dialog_msgbox "Success!" "Configuration file updated successfully!"
         else
             dialog_configuration_file
         fi
