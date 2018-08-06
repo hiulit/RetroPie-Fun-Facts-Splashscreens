@@ -14,23 +14,35 @@ readonly DIALOG_BACKTITLE="$SCRIPT_TITLE"
 # Functions ###########################################
 
 function dialog_info() {
-    [[ -z "$1" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
+    local message="$1"
+    local dialog_height="$2"
+    local dialog_width="$3"
+    [[ -z "$message" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
+    [[ -z "$dialog_height" ]] && dialog_height=8
+    [[ -z "$dialog_width" ]] && dialog_width="$DIALOG_WIDTH"
     dialog \
         --backtitle "$DIALOG_BACKTITLE" \
-        --infobox "$1" 8 "$DIALOG_WIDTH"
+        --infobox "$message" "$dialog_height" "$dialog_width"
 }
 
 function dialog_msgbox() {
-    [[ -z "$1" ]] && log "ERROR: '${FUNCNAME[0]}' needs a title as an argument!" >&2 && exit 1
-    [[ -z "$2" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
+    local title="$1"
+    local message="$2"
+    local dialog_height="$3"
+    local dialog_width="$4"
+    [[ -z "$title" ]] && log "ERROR: '${FUNCNAME[0]}' needs a title as an argument!" >&2 && exit 1
+    [[ -z "$message" ]] && log "ERROR: '${FUNCNAME[0]}' needs a message as an argument!" >&2 && exit 1
+    [[ -z "$dialog_height" ]] && dialog_height=8
+    [[ -z "$dialog_width" ]] && dialog_width="$DIALOG_WIDTH"
     dialog \
         --backtitle "$DIALOG_BACKTITLE" \
         --title "$1" \
         --ok-label "OK" \
-        --msgbox "$2" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+        --msgbox "$2" "$dialog_height" "$dialog_width" 2>&1 >/dev/tty
 }
 
 function dialog_splashscreens_settings() {
+    local options_help=()
     local options=()
     local menu_items
     local menu_text
@@ -38,9 +50,13 @@ function dialog_splashscreens_settings() {
     local choices
     local choice
 
+    options_help=(
+        ""
+        ""
+    )
     options=(
-        1 "Boot splashscreen"
-        2 "Launching images"
+        1 "Boot splashscreen" "$(echo -e "${options_help[0]}")"
+        2 "Launching images" "$(echo -e "${options_help[1]}")"
     )
     menu_items="$(((${#options[@]} / 2)))"
     menu_text="Choose an option."
@@ -48,6 +64,8 @@ function dialog_splashscreens_settings() {
         --backtitle "$DIALOG_BACKTITLE" \
         --title "Splashscreens settings" \
         --cancel-label "Back" \
+        --item-help \
+        --help-button \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
     if [[ -n "$choice" ]]; then
