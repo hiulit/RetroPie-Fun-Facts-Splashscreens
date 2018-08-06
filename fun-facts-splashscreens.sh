@@ -874,17 +874,17 @@ function gui() {
         fi
 
         options=(
-            1 "Splashscreens settings"
-            2 "Fun Facts! settings"
-            "-" "----------"
-            3 "Create Fun Facts! splashscreens"
-            "-" "----------"
-            4 "Automate scripts"
-            "-" "----------"
-            5 "Configuration file"
-            6 "Restore default files"
-            "-" "----------"
-            7 "$option_updates"
+            1 "Splashscreens settings" "1 - Settings for boot splashscreens and launching images."
+            2 "Fun Facts! settings" "2 - Add/Remove Fun Facts!"
+            "-" "----------" ""
+            3 "Create Fun Facts! splashscreens" "3 - Select which type of splashscreens to create (boot splashscreen or launching images)"
+            "-" "----------" ""
+            4 "Automate scripts" "4 - Enable/Disable scripts to automate the creation of splashscreens."
+            "-" "----------" ""
+            5 "Configuration file" "5 - Edit/Reset the configuration file"
+            6 "Restore default files" "6 - Download (and overwrite) the default files from the source."
+            "-" "----------" ""
+            7 "$option_updates" "7 - Update the script."
         )
         menu_items="$(((${#options[@]} / 2)))"
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
@@ -897,100 +897,109 @@ function gui() {
             --backtitle "$DIALOG_BACKTITLE" \
             --title "Fun Facts! Splashscreens" \
             --cancel-label "Exit" \
+            --item-help \
+            --help-button \
             --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
         choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
         if [[ -n "$choice" ]]; then
-            case "$choice" in
-                "-")
-                    :
-                    ;;
-                1)
-                    dialog_splashscreens_settings
-                    ;;
-                2)
-                   dialog_fun_facts_settings
-                    ;;
-                3)
-                    local validation
-                    validation="$(is_fun_facts_empty)"
-                    if [[ -n "$validation" ]]; then
-                        dialog_msgbox "Error!" "$validation"
-                    else
-                        dialog_create_fun_facts_splashscreens
-                    fi
-                    ;;
-                4)
-                    dialog_automate_scripts
-                    ;;
-                5)
-                    dialog_configuration_file
-                    ;;
-                6)
-                    restore_default_files
-                    local result_value="$?"
-                    if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
-                        local text
-                        for file in "${DEFAULT_FILES[@]}"; do
-                            text+="-$(download_github_file "$file")\n"
-                        done
+            if [[ "${choice[@]:0:4}" == "HELP" ]]; then
+                choice="${choice[@]:5}" # Removes 'HELP' from $choice
+                choice="${choice#* - }" # Removes ' - ' from $choice
+                dialog_msgbox "Help" "$choice"
+            else
+                case "$choice" in
+                    "-")
+                        : # Do nothing
+                        ;;
+                    1)
+                        dialog_splashscreens_settings
+                        ;;
+                    2)
+                       dialog_fun_facts_settings
+                        ;;
+                    3)
+                        local validation
+                        validation="$(is_fun_facts_empty)"
+                        if [[ -n "$validation" ]]; then
+                            dialog_msgbox "Error!" "$validation"
+                        else
+                            dialog_create_fun_facts_splashscreens
+                        fi
+                        ;;
+                    4)
+                        dialog_automate_scripts
+                        ;;
+                    5)
+                        dialog_configuration_file
+                        ;;
+                    6)
+                        restore_default_files
                         local result_value="$?"
-                        if [[ "$result_value" -eq 1 ]]; then
-                            local title="Error!"
+                        if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
+                            local text
+                            for file in "${DEFAULT_FILES[@]}"; do
+                                text+="-$(download_github_file "$file")\n"
+                            done
+                            local result_value="$?"
+                            if [[ "$result_value" -eq 1 ]]; then
+                                local title="Error!"
+                            else
+                                local title="Success!"
+                            fi
+                            dialog \
+                                --backtitle "$DIALOG_BACKTITLE" \
+                                --title "$title" \
+                                --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         else
-                            local title="Success!"
+                            echo "no"
                         fi
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "$title" \
-                            --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        echo "no"
-                    fi
-                    # local validation
-                    # validation="$(restore_default_files)"
-                    # if [[ -n "$validation" ]]; then
-                    #     local title="Error!"
-                    #     local text="$validation"
-                    # else
-                    #     local title="Success!"
-                    #     local text="Default files restored successfully!"
-                    #         text+="\n\n"
-                    #         for file in "${DEFAULT_FILES[@]}"; do
-                    #             text+="\n- '$(basename "$file")'"
-                    #         done
-                    # fi
-                    # dialog \
-                    #     --backtitle "$DIALOG_BACKTITLE" \
-                    #     --title "$title" \
-                    #     --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    ;;
-                7)
-                    if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
-                        local text="Can't update the script when using it from RetroPie-Setup."
-                                text+="\n\nGo to:"
-                                text+="\n -> Manage packages"
-                                text+="\n -> Manage experimental packages"
-                                text+="\n -> fun-facts-splashscreens"
-                                text+="\n -> Update from source"
-                        dialog \
-                            --backtitle "$DIALOG_BACKTITLE" \
-                            --title "Info" \
-                            --msgbox "$text" 15 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                    else
-                        if [[ "$updates_status" == "needs-to-pull" ]]; then
-                            # backup_config
-                            git pull && chown -R "$user":"$user" .
-                            # restore_backup_config
+                        # local validation
+                        # validation="$(restore_default_files)"
+                        # if [[ -n "$validation" ]]; then
+                        #     local title="Error!"
+                        #     local text="$validation"
+                        # else
+                        #     local title="Success!"
+                        #     local text="Default files restored successfully!"
+                        #         text+="\n\n"
+                        #         for file in "${DEFAULT_FILES[@]}"; do
+                        #             text+="\n- '$(basename "$file")'"
+                        #         done
+                        # fi
+                        # dialog \
+                        #     --backtitle "$DIALOG_BACKTITLE" \
+                        #     --title "$title" \
+                        #     --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+                        ;;
+                    7)
+                        if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
+                            local text="Can't update the script when using it from RetroPie-Setup."
+                                    text+="\n\nGo to:"
+                                    text+="\n -> Manage packages"
+                                    text+="\n -> Manage experimental packages"
+                                    text+="\n -> fun-facts-splashscreens"
+                                    text+="\n -> Update from source"
+                            dialog \
+                                --backtitle "$DIALOG_BACKTITLE" \
+                                --title "Info" \
+                                --msgbox "$text" 15 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         else
-                            dialog_msgbox "Info" "Fun Facts! Splashscreens is $updates_output!"
+                            if [[ "$updates_status" == "needs-to-pull" ]]; then
+                                # backup_config
+                                git pull && chown -R "$user":"$user" .
+                                # restore_backup_config
+                            else
+                                dialog_msgbox "Info" "Fun Facts! Splashscreens is $updates_output!"
+                            fi
                         fi
-                    fi
-                    ;;
-            esac
+                        ;;
+                esac
+            fi
         else
             break
         fi
     done
+    clear
 }
 
 
