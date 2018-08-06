@@ -10,6 +10,7 @@ function is_sudo() {
     [[ "$(id -u)" -eq 0 ]]
 }
 
+
 function truncate() {
     local string="$1"
     if [[ -z "$string" ]]; then
@@ -32,6 +33,7 @@ function truncate() {
 
     echo "$(echo "$1" | cut -c1-"$2")..."
 }
+
 
 function check_dependencies() {
     local pkg
