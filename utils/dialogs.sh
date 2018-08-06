@@ -27,7 +27,7 @@ function dialog_msgbox() {
         --backtitle "$DIALOG_BACKTITLE" \
         --title "$1" \
         --ok-label "OK" \
-        --msgbox "$2"  8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
+        --msgbox "$2" 8 "$DIALOG_WIDTH" 2>&1 >/dev/tty
 }
 
 function dialog_splashscreens_settings() {
@@ -737,8 +737,6 @@ function dialog_automate_scripts() {
         --backtitle "$DIALOG_BACKTITLE" \
         --title "Automate scripts" \
         --cancel-label "Back" \
-        --help-button \
-        --help-label "Help" \
         --menu "$menu_text" "$DIALOG_HEIGHT" "$DIALOG_WIDTH" "$menu_items")
     choice="$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)"
     if [[ -n "$choice" ]]; then
