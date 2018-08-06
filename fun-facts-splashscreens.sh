@@ -889,10 +889,10 @@ function gui() {
         fi
 
         options_help=(
-            "1 - Settings for boot splashscreens and launching images.\n\nSuch as: background image/color, text color, etc."
+            "1 - Settings for boot splashscreens and launching images.\n\n- Boot splashscreens and launching images:\n  - Background image/color\n  - Text color\n  - Text font\n\n- Launching images:\n  - 'Press a button' text\n  - 'Press a button' text color"
             "2 - Add/Remove Fun Facts!"
-            "3 - Select which type of splashscreen to create.\n\nYou can choose:\n- Boot splashscreen\n- Launching images)"
-            "4 - Enable/Disable scripts to automate the creation of splashscreens.\n\n- Boot splashscreen: Create a new splashscreen at startup.\n- Launching images: Create a new launching image when a game stops. *\n\n* If the game have a scraped image, a launching image with said image will be created, otherwise, a launching image for the game's system will be created."
+            "3 - Select which type of splashscreen to create.\n\n- Boot splashscreen (shows at startup)\n- Launching images (shows instead of the runcommand launch menu, before a game starts)"
+            "4 - Enable/Disable scripts to automate the creation of splashscreens.\n\n- Boot splashscreen script: Creates a new splashscreen at startup.\n- Launching images script: Creates a new launching image when a game stops. *\n\n* If the game have a scraped image, a launching image with said image will be created, otherwise, a launching image for the game's system will be created."
             "5 - Edit/Reset the configuration file.\n\n- Edit: Launch a simple editor to modify the configuration file.\n\n- Reset: Revert all the changes made to the configuration file leaving all the options blank."
             "6 - Download (and overwrite) the default files from source."
             "7 - Update the script."
