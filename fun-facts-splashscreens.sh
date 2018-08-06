@@ -870,6 +870,15 @@ function get_last_commit() {
 function gui() {
     GUI_FLAG=1
     while true; do
+        local version
+        local options_help=()
+        local options=()
+        local menu_items
+        local menu_text
+        local cmd
+        local choices
+        local choice
+
         version="$SCRIPT_VERSION"
 
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
@@ -879,18 +888,27 @@ function gui() {
             option_updates="Update script ($updates_output)"
         fi
 
+        options_help=(
+            "1 - Settings for boot splashscreens and launching images.\n\nSuch as: background image/color, text color, etc."
+            "2 - Add/Remove Fun Facts!"
+            "3 - Select which type of splashscreen to create.\n\nYou can choose:\n- Boot splashscreen\n- Launching images)"
+            "4 - Enable/Disable scripts to automate the creation of splashscreens."
+            "5 - Edit/Reset the configuration file"
+            "6 - Download (and overwrite) the default files from source."
+            "7 - Update the script."
+        )
         options=(
-            1 "Splashscreens settings" "1 - Settings for boot splashscreens and launching images, such as: background image/color, text color, etc."
-            2 "Fun Facts! settings" "2 - Add/Remove Fun Facts!"
+            1 "Splashscreens settings" "$(echo -e "${options_help[0]}")"
+            2 "Fun Facts! settings" "$(echo -e "${options_help[1]}")"
             "-" "----------" ""
-            3 "Create Fun Facts! splashscreens" "3 - Select which type of splashscreen to create (boot splashscreen or launching images)"
+            3 "Create Fun Facts! splashscreens" "$(echo -e "${options_help[2]}")"
             "-" "----------" ""
-            4 "Automate scripts" "4 - Enable/Disable scripts to automate the creation of splashscreens."
+            4 "Automate scripts" "$(echo -e "${options_help[3]}")"
             "-" "----------" ""
-            5 "Configuration file" "5 - Edit/Reset the configuration file"
-            6 "Restore default files" "6 - Download (and overwrite) the default files from source."
+            5 "Configuration file" "$(echo -e "${options_help[4]}")"
+            6 "Restore default files" "$(echo -e "${options_help[5]}")"
             "-" "----------" ""
-            7 "$option_updates" "7 - Update the script."
+            7 "$option_updates" "$(echo -e "${options_help[6]}")"
         )
         menu_items="$(((${#options[@]} / 2)))"
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
@@ -911,7 +929,7 @@ function gui() {
             if [[ "${choice[@]:0:4}" == "HELP" ]]; then
                 choice="${choice[@]:5}" # Removes 'HELP' from $choice
                 choice="${choice#* - }" # Removes ' - ' from $choice
-                dialog_msgbox "Help" "$choice"
+                dialog_msgbox "Help" "$choice" "$DIALOG_HEIGHT"
             else
                 case "$choice" in
                     "-")
