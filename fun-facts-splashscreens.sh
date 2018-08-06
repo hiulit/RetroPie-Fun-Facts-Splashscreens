@@ -94,6 +94,12 @@ function download_github_file() {
     local file_path="$1"
     local file_name
     file_name="$(basename "$file_path")"
+    local git_branch
+    git_branch="$(git rev-parse --abbrev-ref HEAD)"
+    if [[ "$git_branch" != "master" ]]; then
+        echo "Git branch is not 'master'. Can't download '$file_name'."
+        return 1
+    fi
     if curl -s -f "https://raw.githubusercontent.com/hiulit/RetroPie-Fun-Facts-Splashscreens/new-gui-menu/$file_name" -o "$file_path"; then
         chown -R "$user":"$user" "$file_path"
         echo "'$file_name' downloaded successfully!"
