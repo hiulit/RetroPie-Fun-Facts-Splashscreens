@@ -978,26 +978,7 @@ function gui() {
                                 --backtitle "$DIALOG_BACKTITLE" \
                                 --title "$title" \
                                 --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        # else
-                        #     echo "no"
                         fi
-                        # local validation
-                        # validation="$(restore_default_files)"
-                        # if [[ -n "$validation" ]]; then
-                        #     local title="Error!"
-                        #     local text="$validation"
-                        # else
-                        #     local title="Success!"
-                        #     local text="Default files restored successfully!"
-                        #         text+="\n\n"
-                        #         for file in "${DEFAULT_FILES[@]}"; do
-                        #             text+="\n- '$(basename "$file")'"
-                        #         done
-                        # fi
-                        # dialog \
-                        #     --backtitle "$DIALOG_BACKTITLE" \
-                        #     --title "$title" \
-                        #     --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
                         ;;
                     7)
                         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
