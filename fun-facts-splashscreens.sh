@@ -929,7 +929,11 @@ function gui() {
             if [[ "${choice[@]:0:4}" == "HELP" ]]; then
                 choice="${choice[@]:5}" # Removes 'HELP' from $choice
                 choice="${choice#* - }" # Removes ' - ' from $choice
-                dialog_msgbox "Help" "$choice" "$DIALOG_HEIGHT"
+                if [[ "$choice" == "" ]]; then
+                    : # Do thing
+                else
+                    dialog_msgbox "Help" "$choice" "$DIALOG_HEIGHT"
+                fi
             else
                 case "$choice" in
                     "-")
