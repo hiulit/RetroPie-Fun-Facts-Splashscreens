@@ -406,10 +406,9 @@ function dialog_choose_path() {
         fi
         dialog_msgbox "$dialog_title" "$dialog_text"
         if [[ "$file_type" == "image" ]]; then
-            dialog_choose_background "$property"
+            dialog_choose_path "$property" "image"
         elif [[ "$file_type" == "font" ]]; then
-            property="${property%_*}" # $property has too many '_', needed to remove the last one.
-            dialog_choose_splashscreen_settings "${property%_*}"
+            dialog_choose_path "$property" "font"
         fi
     elif [[ "$result_value" -eq "$DIALOG_CANCEL" ]]; then
         if [[ "$file_type" == "image" ]]; then
