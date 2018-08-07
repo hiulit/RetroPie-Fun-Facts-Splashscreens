@@ -914,7 +914,7 @@ function gui() {
         if [[ "$SCRIPT_DIR" == "$SCRIPTMODULE_DIR" ]]; then # If script is used as a scriptmodule
             menu_text="Version: $version"
         else
-            #~ last_commit="$(get_last_commit)"
+            # last_commit="$(get_last_commit)"
             menu_text="Version: $version\nLast commit: $last_commit"
         fi
         cmd=(dialog \
