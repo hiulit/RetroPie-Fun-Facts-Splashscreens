@@ -978,8 +978,8 @@ function gui() {
                                 --backtitle "$DIALOG_BACKTITLE" \
                                 --title "$title" \
                                 --msgbox "$text" 12 "$DIALOG_WIDTH" 2>&1 >/dev/tty
-                        else
-                            echo "no"
+                        # else
+                        #     echo "no"
                         fi
                         # local validation
                         # validation="$(restore_default_files)"
