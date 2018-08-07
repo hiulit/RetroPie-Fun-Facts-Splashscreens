@@ -42,7 +42,6 @@ function dialog_msgbox() {
 }
 
 function dialog_splashscreens_settings() {
-    local options_help=()
     local options=()
     local menu_items
     local menu_text
