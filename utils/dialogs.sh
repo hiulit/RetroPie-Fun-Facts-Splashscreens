@@ -369,14 +369,20 @@ function dialog_choose_path() {
     local property_var="${property^^}_PATH"
     local property_text="${property//_/ }"
     local file_type="$2"
+    local current_file
+
+    current_file="$(get_config "${property}_path")"
+    if [[ "$current_file" == "" ]]; then
+        current_file="unset"
+    fi
 
     local file_path
     file_path="$(dialog \
                     --backtitle "$DIALOG_BACKTITLE" \
                     --title "Set $property_text path" \
                     --cancel-label "Back" \
-                    --inputbox "Enter $property_text path (must be an absolute path).\n\nEnter 'default' to set the default $file_type.\nLeave the input empty to unset the $file_type." \
-                    12 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
+                    --inputbox "Enter $property_text path (must be an absolute path).\n\nEnter 'default' to set the default $file_type.\nLeave the input empty to unset the $file_type.\n\nCurrent $file_type: '$current_file'" \
+                    16 "$DIALOG_WIDTH" 2>&1 >/dev/tty)"
     local result_value="$?"
     if [[ "$result_value" -eq "$DIALOG_OK" ]]; then
         if [[ -z "$file_path" ]]; then
